@@ -2,7 +2,7 @@ import frappe
 import requests
 import json
 from frappe import *
-from cleartax_integration.cleartax_integration.utils import success_response, error_response, response_error_handling, response_logger, get_dict
+from india_compliance.cleartax_integration.utils import success_response, error_response, response_error_handling, response_logger, get_dict
 
 
 @frappe.whitelist()
@@ -21,7 +21,7 @@ def create_gst_invoice(**kwargs):
         for row in invoice.items:
             item_list.append(get_dict('Item',row.item_code))
         data = {
-            'invoice': frappe.as_dict(invoice),
+            'invoice': frappe._dict(invoice),
             'billing_address': get_dict('Address',invoice.company_address),
             'customer_address': get_dict('Address',invoice.customer_address),
             'shipping_address': get_dict('Address',invoice.shipping_address_name),

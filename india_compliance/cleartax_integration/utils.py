@@ -4,8 +4,7 @@ import json
 
 def get_dict(type,doc):
     if frappe.db.exists(type,doc):
-        doc = frappe.get_doc(type,doc)
-        return frappe.as_dict(doc)
+        return frappe.get_doc(type,doc).as_dict()
     return None
 
     

@@ -1,6 +1,6 @@
 import frappe
 from frappe import *
-from cleartax_integration.cleartax_integration.utils import success_response, error_response, response_error_handling, response_logger, get_dict
+from india_compliance.cleartax_integration.utils import success_response, error_response, response_error_handling, response_logger, get_dict
 import requests
 import json 
 
@@ -8,12 +8,15 @@ import json
 def generate_irn(**kwargs):
     try:
         invoice = frappe.get_doc('Sales Invoice',kwargs.get('invoice'))
+        frappe.log_error(frappe._dict(invoice),'inv')
         item_list = []
         gst_settings_accounts = frappe.get_all("GST Account",
                 filters={'company':invoice.company},
                 fields=["cgst_account", "sgst_account", "igst_account", "cess_account"])
         for row in invoice.items:
+            #frappe.log_error(get_dict('Item',row.item_code),"kk")
             item_list.append(get_dict('Item',row.item_code))
+        
         data = {
             'invoice': frappe.as_dict(invoice),
             'billing_address': get_dict('Address',invoice.company_address),
@@ -34,7 +37,7 @@ def generate_irn(**kwargs):
 def create_irn_request(data,inv):
     try:
         settings = frappe.get_doc('Cleartax Settings')
-        url = settings.host_site
+        url = settings.host_url
         url+= "/api/method/cleartax.cleartax.API.irn.generate_irn"
         headers = {
             'sandbox': settings.sandbox,
@@ -107,7 +110,7 @@ def cancel_irn(**kwargs):
 def cancel_irn_request(inv,data,gstin):
     try:
         settings = frappe.get_doc('Cleartax Settings')
-        url = settings.host_site
+        url = settings.host_url
         url+= "/api/method/cleartax.cleartax.API.irn.cancel_irn"
         headers = {
             'sandbox': settings.sandbox,
@@ -131,8 +134,9 @@ def cancel_irn_request(inv,data,gstin):
 
 @frappe.whitelist()
 def e_invoicing_enabled(company):
-    if frappe.db.exists('E Invoicing Eligible',{'parent':"Cleartax Integration",'company':company}):
-        return True 
+    if frappe.db.exists('E Invoicing Eligible',{'company':company}):
+        return True
+    
     return False
 
 @frappe.whitelist()
