@@ -1,10 +1,11 @@
 import frappe
+from frappe import *
 import json
 
-def get_json(type,doc):
+def get_dict(type,doc):
     if frappe.db.exists(type,doc):
         doc = frappe.get_doc(type,doc)
-        return frappe.as_json(doc)
+        return frappe.as_dict(doc)
     return None
 
     

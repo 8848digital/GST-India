@@ -1,7 +1,8 @@
 import frappe
 import requests
 import json
-from cleartax_integration.cleartax_integration.utils import success_response, error_response, response_error_handling, response_logger, get_json
+from frappe import *
+from cleartax_integration.cleartax_integration.utils import success_response, error_response, response_error_handling, response_logger, get_dict
 
 
 @frappe.whitelist()
@@ -14,15 +15,19 @@ def create_gst_invoice(**kwargs):
         else:
             invoice = frappe.get_doc('Purchase Invoice',kwargs.get('invoice'))
         item_list = []
+        gst_settings_accounts = frappe.get_all("GST Account",
+                filters={'company':invoice.company},
+                fields=["cgst_account", "sgst_account", "igst_account", "cess_account"])
         for row in invoice.items:
-            item_list.append(get_json('Item',row.item_code))
+            item_list.append(get_dict('Item',row.item_code))
         data = {
-            'invoice': frappe.as_json(invoice),
-            'billing_address': get_json('Address',invoice.company_address),
-            'customer_address': get_json('Address',invoice.customer_address),
-            'shipping_address': get_json('Address',invoice.shipping_address_name),
-            'dispatch_address': get_json('Address',invoice.dispatch_address_name),
-            'item_list': item_list
+            'invoice': frappe.as_dict(invoice),
+            'billing_address': get_dict('Address',invoice.company_address),
+            'customer_address': get_dict('Address',invoice.customer_address),
+            'shipping_address': get_dict('Address',invoice.shipping_address_name),
+            'dispatch_address': get_dict('Address',invoice.dispatch_address_name),
+            'item_list': item_list,
+            'gst_accounts':gst_settings_accounts
         }
         if invoice.is_return:
             return gst_cdn_request(data,kwargs.get('invoice'),type)

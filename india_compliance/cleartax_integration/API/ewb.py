@@ -1,5 +1,6 @@
 import frappe
-from cleartax_integration.cleartax_integration.utils import success_response, error_response, response_error_handling, response_logger,get_json
+from cleartax_integration.cleartax_integration.utils import success_response, error_response, response_error_handling, response_logger,get_dict
+from frappe import *
 import json
 import requests
 
@@ -8,17 +9,21 @@ def generate_e_waybill_by_irn(**kwargs):
     try:
         invoice = frappe.get_doc('Sales Invoice',kwargs.get('invoice'))
         item_list = []
+        gst_settings_accounts = frappe.get_all("GST Account",
+                filters={'company':invoice.company},
+                fields=["cgst_account", "sgst_account", "igst_account", "cess_account"])
         for row in invoice.items:
-            item_list.append(get_json('Item',row.item_code))
+            item_list.append(get_dict('Item',row.item_code))
         delivery_note = delivery_note(invoice)
         data = {
-            'invoice': frappe.as_json(invoice),
-            'billing_address': get_json('Address',invoice.company_address),
-            'customer_address': get_json('Address',invoice.customer_address),
-            'shipping_address': get_json('Address',invoice.shipping_address_name),
-            'dispatch_address': get_json('Address',invoice.dispatch_address_name),
+            'invoice': frappe.as_dict(invoice),
+            'billing_address': get_dict('Address',invoice.company_address),
+            'customer_address': get_dict('Address',invoice.customer_address),
+            'shipping_address': get_dict('Address',invoice.shipping_address_name),
+            'dispatch_address': get_dict('Address',invoice.dispatch_address_name),
             'item_list': item_list,
-            'delivery_note': frappe.as_json(delivery_note)
+            'gst_accounts':gst_settings_account,
+            'delivery_note': frappe.as_dict(delivery_note)
        }
         return create_ewb_request(invoice_doc,dispatch_address.gstin(),data)
     except Exception as e:
@@ -58,9 +63,9 @@ def ewb_without_irn(**kwargs):
     try:
         delivery_note = frappe.get_doc('Delivery Note',kwargs.get('delivery_note'))
         data = {
-            'delivery_note': frappe.as_json(delivery_note),
-            'billing_address': get_json('Address',delivery_note.company_address),
-            'customer_address': get_json('Address',delivery_note.customer_address),
+            'delivery_note': frappe.as_dict(delivery_note),
+            'billing_address': get_dict('Address',delivery_note.company_address),
+            'customer_address': get_dict('Address',delivery_note.customer_address),
         }
         return ewb_without_irn_request(kwargs.get('delivery_note'),data, gstin)
     except Exception as e:
@@ -110,9 +115,9 @@ def update_ewb_partb(**kwargs):
         
         data = {
             'data' : json.loads(kwargs.get('data')),
-            'delivery_note': frappe.as_json(deliver_note),
-            'dispatch_address': get_json('Address', delivery_note.dispatch_address_name),
-            'shipping_address': get_json('Address',deliver_note.shipping_address_name)
+            'delivery_note': frappe.as_dict(deliver_note),
+            'dispatch_address': get_dict('Address', delivery_note.dispatch_address_name),
+            'shipping_address': get_dict('Address',deliver_note.shipping_address_name)
         }
         return partb_request(data,kwargs.get('delivery_note'))
     except Exception as e:
