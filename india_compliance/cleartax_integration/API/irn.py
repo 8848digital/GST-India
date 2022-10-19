@@ -14,11 +14,13 @@ def generate_irn(**kwargs):
                 filters={'company':invoice.company},
                 fields=["cgst_account", "sgst_account", "igst_account", "cess_account"])
         for row in invoice.items:
-            #frappe.log_error(get_dict('Item',row.item_code),"kk")
+            if row.batch_no:
+                row['batch'] = get_dict('Batch',row.batch_no)
             item_list.append(get_dict('Item',row.item_code))
         
         data = {
             'invoice': invoice,
+            'customer': get_dict('Customer',invoice.customer),
             'billing_address': get_dict('Address',invoice.company_address),
             'customer_address': get_dict('Address',invoice.customer_address),
             'shipping_address': get_dict('Address',invoice.shipping_address_name),
