@@ -18,7 +18,7 @@ def generate_irn(**kwargs):
             item_list.append(get_dict('Item',row.item_code))
         
         data = {
-            'invoice': frappe.as_dict(invoice),
+            'invoice': invoice,
             'billing_address': get_dict('Address',invoice.company_address),
             'customer_address': get_dict('Address',invoice.customer_address),
             'shipping_address': get_dict('Address',invoice.shipping_address_name),
