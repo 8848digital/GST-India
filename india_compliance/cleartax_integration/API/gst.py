@@ -105,4 +105,3 @@ def gst_cdn_request(data,id,type):
         frappe.logger('cleartax').exception(e)
         return error_response(e)
 
-

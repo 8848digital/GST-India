@@ -22,7 +22,8 @@ doctype_js = {
     "Customer": "gst_india/client_scripts/customer.js",
     "Delivery Note": [
          "public/js/delivery_note_doctype.js",
-#        "gst_india/client_scripts/e_waybill_actions.js",
+#        "public/js/delivery_note_doctype.js",
+        "gst_india/client_scripts/e_waybill_actions.js",
 #        "gst_india/client_scripts/delivery_note.js",
     ],
     "Item": "gst_india/client_scripts/item.js",
@@ -30,7 +31,8 @@ doctype_js = {
     "Payment Entry": "gst_india/client_scripts/payment_entry.js",
     "Sales Invoice": [
          "public/js/sales_invoice_doctype.js",
-#        "gst_india/client_scripts/e_waybill_actions.js",
+#        "public/js/sales_invoice_doctype.js",
+        "gst_india/client_scripts/e_waybill_actions.js",
 #        "gst_india/client_scripts/e_invoice_actions.js",
 #        "gst_india/client_scripts/sales_invoice.js",
     ],
@@ -40,7 +42,8 @@ doctype_js = {
 doctype_list_js = {
     "Sales Invoice": [
         "public/js/sales_invoice_list.js",
-#        "gst_india/client_scripts/e_waybill_actions.js",
+#        "public/js/sales_invoice_list.js",
+        "gst_india/client_scripts/e_waybill_actions.js",
         "gst_india/client_scripts/sales_invoice_list.js",
     ]
 }
@@ -87,6 +90,8 @@ doc_events = {
         "validate": (
             "india_compliance.gst_india.overrides.transaction.validate_transaction"
         ),
+        "before_submit": "cleartax_integration.public.py.purchase_invoice_doctype.purchase_invoice_submit",
+        "before_cancel": "cleartax_integration.public.py.purchase_invoice_doctype.purchase_invoice_cancel"
     },
     "Purchase Receipt": {
         "validate": (

@@ -15,4 +15,3 @@ def sales_invoice_cancel(doc, method=None):
             create_gst_invoice(**{'invoice':doc.name,'type': "SALE",'cancel':1})
 
 
-

@@ -8,7 +8,6 @@ import json
 def generate_irn(**kwargs):
     try:
         invoice = frappe.get_doc('Sales Invoice',kwargs.get('invoice'))
-        frappe.log_error(frappe._dict(invoice),'inv')
         item_list = []
         gst_settings_accounts = frappe.get_all("GST Account",
                 filters={'company':invoice.company},
@@ -19,7 +18,7 @@ def generate_irn(**kwargs):
             item_list.append(get_dict('Item',row.item_code))
         
         data = {
-            'invoice': invoice,
+            'invoice': invoice.as_dict(),
             'customer': get_dict('Customer',invoice.customer),
             'billing_address': get_dict('Address',invoice.company_address),
             'customer_address': get_dict('Address',invoice.customer_address),
@@ -28,7 +27,6 @@ def generate_irn(**kwargs):
             'item_list': item_list,
             'gst_accounts':gst_settings_accounts
         }
-        return data
         return create_irn_request(data,invoice.name)
     except Exception as e:
         frappe.logger('cleartax').exception(e)
@@ -42,19 +40,24 @@ def create_irn_request(data,inv):
         url = settings.host_url
         url+= "/api/method/cleartax.cleartax.API.irn.generate_irn"
         headers = {
-            'sandbox': settings.sandbox,
-            'username': settings.username,
-            'api_key': settings.get_password('api_key'),
+            'sandbox': str(settings.sandbox),
             'Content-Type': 'application/json'
         }
+        if settings.enterprise:
+            if settings.sandbox:
+                headers['auth_token'] = settings.sandbox_auth_token
+            else:
+                headers['auth_token'] = settings.production_auth_token
+
         payload = json.dumps(data, indent=4, sort_keys=False, default=str)
         response = requests.request(
             "POST", url, headers=headers, data=payload)
-        response = response.json()
-        if response.msg == 'success':
-            store_irn_details(**{inv,response})
+        response = response.json()['message']
+        frappe.logger('cleartax').exception(response)
+        if response['msg'] == 'Success':
+            store_irn_details(**{inv,json.loads(json.dumps(response['response']))})
             return success_response()
-        return error_response(response.error)
+        return response_error_handling(json.loads(json.dumps(response['response'])))
     except Exception as e:
         frappe.logger('cleartax').exception(e)
         return error_response(e)

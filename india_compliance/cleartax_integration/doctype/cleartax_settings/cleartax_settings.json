@@ -1,20 +1,24 @@
 {
  "actions": [],
  "allow_rename": 1,
- "creation": "2022-10-13 19:59:19.907149",
+ "creation": "2022-10-20 12:29:13.937986",
+ "default_view": "List",
  "doctype": "DocType",
  "editable_grid": 1,
  "engine": "InnoDB",
  "field_order": [
   "enable",
   "automate",
+  "column_break_3",
   "sandbox",
-  "section_break_4",
-  "username",
-  "api_key",
-  "column_break_7",
-  "host_url",
-  "e_invoicing"
+  "enterprise",
+  "enterprise_section",
+  "production_auth_token",
+  "sandbox_auth_token",
+  "tax_entity_list",
+  "section_break_10",
+  "e_invoicing",
+  "host_url"
  ],
  "fields": [
   {
@@ -30,45 +34,65 @@
    "label": "Automate"
   },
   {
-   "default": "1",
+   "fieldname": "column_break_3",
+   "fieldtype": "Column Break"
+  },
+  {
+   "default": "0",
    "fieldname": "sandbox",
    "fieldtype": "Check",
    "label": "Sandbox"
   },
   {
-   "fieldname": "section_break_4",
-   "fieldtype": "Section Break"
+   "default": "0",
+   "fieldname": "enterprise",
+   "fieldtype": "Check",
+   "label": "Enterprise"
   },
   {
-   "fieldname": "username",
-   "fieldtype": "Data",
-   "label": "Username"
+   "collapsible": 1,
+   "depends_on": "eval:doc.enterprise ==1",
+   "fieldname": "enterprise_section",
+   "fieldtype": "Section Break",
+   "label": "Enterprise Details"
   },
   {
-   "fieldname": "api_key",
+   "fieldname": "production_auth_token",
    "fieldtype": "Password",
-   "label": "API Key"
+   "label": "Production Auth Token"
   },
   {
-   "fieldname": "column_break_7",
-   "fieldtype": "Column Break"
+   "fieldname": "sandbox_auth_token",
+   "fieldtype": "Password",
+   "label": "Sandbox Auth Token"
   },
   {
-   "fieldname": "host_url",
-   "fieldtype": "Data",
-   "label": "Host URL"
+   "fieldname": "tax_entity_list",
+   "fieldtype": "Table",
+   "label": "Tax Entity List",
+   "options": "Tax Entities"
+  },
+  {
+   "fieldname": "section_break_10",
+   "fieldtype": "Section Break"
   },
   {
    "fieldname": "e_invoicing",
    "fieldtype": "Table MultiSelect",
    "label": "E Invoicing",
    "options": "E Invoicing Eligible"
+  },
+  {
+   "default": "https://cleartax.frappe.cloud",
+   "fieldname": "host_url",
+   "fieldtype": "Data",
+   "label": "Host URL"
   }
  ],
  "index_web_pages_for_search": 1,
  "issingle": 1,
  "links": [],
- "modified": "2022-10-13 19:59:19.907149",
+ "modified": "2022-10-20 12:32:10.640984",
  "modified_by": "Administrator",
  "module": "Cleartax Integration",
  "name": "Cleartax Settings",
