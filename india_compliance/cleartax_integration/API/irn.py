@@ -51,7 +51,7 @@ def create_irn_request(data,inv):
 
         payload = json.dumps(data, indent=4, sort_keys=False, default=str)
         response = requests.request(
-            "POST", url, headers=headers, data=payload)
+            "POST", url, headers=headers, data=payload) 
         response = response.json()['message']
         frappe.logger('cleartax').exception(response)
         if response['msg'] == 'Success':
@@ -106,7 +106,8 @@ def cancel_irn(**kwargs):
                 'link_name': frappe.get_value('Sales Invoice',inv,'company'), 
                 'parenttype': 'Address'
                 }, ['parent'])
-        return cancel_irn_request(inv,data,company_address.gstin) 
+        addr = frappe.get_doc("Address",company_address)
+        return cancel_irn_request(inv,data,addr.gstin) 
     except Exception as e:
         frappe.logger('cleartax').exception(e)
         return error_response(e)
@@ -118,12 +119,16 @@ def cancel_irn_request(inv,data,gstin):
         url = settings.host_url
         url+= "/api/method/cleartax.cleartax.API.irn.cancel_irn"
         headers = {
-            'sandbox': settings.sandbox,
-            'username': settings.username,
-            'api_key': settings.get_password('api_key'),
+            'sandbox': str(settings.sandbox),
             'Content-Type': 'application/json'
         }
+        if settings.enterprise:
+            if settings.sandbox:
+                headers['auth_token'] = settings.sandbox_auth_token
+            else:
+                headers['auth_token'] = settings.production_auth_token
         payload = json.dumps(data, indent=4, sort_keys=False, default=str)
+        frappe.log_error(payload,"cancel irn")
         response = requests.request(
             "POST", url, headers=headers, data=payload)
         response_status = "Failed"

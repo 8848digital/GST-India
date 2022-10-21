@@ -21,7 +21,7 @@ def create_gst_invoice(**kwargs):
         for row in invoice.items:
             item_list.append(get_dict('Item',row.item_code))
         data = {
-            'invoice': frappe._dict(invoice),
+            'invoice': invoice.as_dict(),
             'billing_address': get_dict('Address',invoice.company_address),
             'customer_address': get_dict('Address',invoice.customer_address),
             'shipping_address': get_dict('Address',invoice.shipping_address_name),
@@ -43,11 +43,14 @@ def gst_invoice_request(data,id,type):
         url = settings.host_site
         url+= "/api/method/cleartax.cleartax.API.gst.generate_gst"
         headers = {
-            'sandbox': settings.sandbox,
-            'username': settings.username,
-            'api_key': settings.get_password('api_key'),
+            'sandbox': str(settings.sandbox),
             'Content-Type': 'application/json'
         }
+        if settings.enterprise:
+            if settings.sandbox:
+                headers['auth_token'] = settings.sandbox_auth_token
+            else:
+                headers['auth_token'] = settings.production_auth_token
         data = json.dumps(data, indent=4, sort_keys=False, default=str)
         response = requests.request("PUT", url, headers=headers, data= data)
         error = response.text
@@ -75,11 +78,14 @@ def gst_cdn_request(data,id,type):
         url = settings.host_site
         url+= "/api/method/cleartax.cleartax.API.gst.generate_cdn"
         headers = {
-            'sandbox': settings.sandbox,
-            'username': settings.username,
-            'api_key': settings.get_password('api_key'),
+            'sandbox': str(settings.sandbox),
             'Content-Type': 'application/json'
         }
+        if settings.enterprise:
+            if settings.sandbox:
+                headers['auth_token'] = settings.sandbox_auth_token
+            else:
+                headers['auth_token'] = settings.production_auth_token
         data = json.dumps(data, indent=4, sort_keys=False, default=str)
         response = requests.request("PUT", url, headers=headers, data= data)
         error = response.text
