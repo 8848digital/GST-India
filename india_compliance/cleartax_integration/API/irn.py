@@ -107,13 +107,14 @@ def cancel_irn(**kwargs):
                 'parenttype': 'Address'
                 }, ['parent'])
         addr = frappe.get_doc("Address",company_address)
-        return cancel_irn_request(inv,data,addr.gstin) 
+        data['gstin'] = addr.gstin
+        return cancel_irn_request(inv,data) 
     except Exception as e:
         frappe.logger('cleartax').exception(e)
         return error_response(e)
 
 
-def cancel_irn_request(inv,data,gstin):
+def cancel_irn_request(inv,data):
     try:
         settings = frappe.get_doc('Cleartax Settings')
         url = settings.host_url
@@ -128,12 +129,11 @@ def cancel_irn_request(inv,data,gstin):
             else:
                 headers['auth_token'] = settings.production_auth_token
         payload = json.dumps(data, indent=4, sort_keys=False, default=str)
-        frappe.log_error(payload,"cancel irn")
         response = requests.request(
             "POST", url, headers=headers, data=payload)
-        response_status = "Failed"
-        if response.json().get("Success") == "Y":
-            response_status = "Success"
+        response = response.json()['message']
+        response_status = response['msg']
+        if response['msg'] == 'Success':
             frappe.db.set_value('Sales Invoice',inv,'irn_cancelled',1)
             return success_response()
         response_logger(payload,response.json(),"CANCEL IRN","Sales Invoice",inv,response_status)
