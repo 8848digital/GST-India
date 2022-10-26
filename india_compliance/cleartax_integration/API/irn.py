@@ -53,7 +53,6 @@ def create_irn_request(data,inv):
         response = requests.request(
             "POST", url, headers=headers, data=payload) 
         response = response.json()['message']
-        frappe.logger('cleartax').exception(response)
         if response['msg'] == 'Success':
             store_irn_details(**{inv,json.loads(json.dumps(response['response']))})
             return success_response()

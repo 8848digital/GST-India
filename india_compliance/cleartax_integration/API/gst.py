@@ -22,6 +22,8 @@ def create_gst_invoice(**kwargs):
             item_list.append(get_dict('Item',row.item_code))
         data = {
             'invoice': invoice.as_dict(),
+            'type': type,
+            'customer': get_dict('Customer',invoice.customer),
             'billing_address': get_dict('Address',invoice.company_address),
             'customer_address': get_dict('Address',invoice.customer_address),
             'shipping_address': get_dict('Address',invoice.shipping_address_name),
@@ -30,7 +32,10 @@ def create_gst_invoice(**kwargs):
             'gst_accounts':gst_settings_accounts
         }
         if invoice.is_return:
+            data['original_invoice'] = get_dict('Sales Invoice',invoice.return_against)
             return gst_cdn_request(data,kwargs.get('invoice'),type)
+        if invoice.is_debit_note:
+            data['original_invoice'] = get_dict('Sales Invoice',invoice.return_against)
         return gst_invoice_request(data,kwargs.get('invoice'),type)
     except Exception as e:
         frappe.logger('cleartax').exception(e)
@@ -43,30 +48,28 @@ def gst_invoice_request(data,id,type):
         url = settings.host_site
         url+= "/api/method/cleartax.cleartax.API.gst.generate_gst"
         headers = {
-            'sandbox': str(settings.sandbox),
             'Content-Type': 'application/json'
         }
+        if type == 'SALE':
+            gstin = data.get('seller').get('gstin')
         if settings.enterprise:
-            if settings.sandbox:
-                headers['auth_token'] = settings.sandbox_auth_token
-            else:
-                headers['auth_token'] = settings.production_auth_token
+            headers['auth_token'] = settings.production_auth_token
+            headers['tax_id'] = settings.tax_id(gstin)
         data = json.dumps(data, indent=4, sort_keys=False, default=str)
         response = requests.request("PUT", url, headers=headers, data= data)
-        error = response.text
-        response = response.json()
+        response = response.json()['message']
         api = "GENERATE GST SINV" if type == 'SALE' else "GENERATE GST PINV"
         doctype = "Sales Invoice" if type == 'SALE' else "Purchase Invoice"
-        response_status = "Failed"
-        if response.get('invoice_status') == 'CREATED':
-            response_status = "Success"
-            response_logger(data,response,api,doctype,id,response_status)
+        response = response['msg']
+        response_status = response['msg']['response_status']
+        response_logger(data,response,api,doctype,id,response_status)
+        if response_status == "Success":
             if type == 'SALE':
                 frappe.db.set_value('Sales Invoice',id,'gst_invoice',1)
             else:
                 frappe.db.set_value('Purchase Invoice',id,'gst_invoice',1)
             return success_response(response)
-        return response_error_handling(error)
+        return response_error_handling(response['response'])
     except Exception as e:
         frappe.logger('cleartax').exception(e)
         return error_response(e)
@@ -88,14 +91,12 @@ def gst_cdn_request(data,id,type):
                 headers['auth_token'] = settings.production_auth_token
         data = json.dumps(data, indent=4, sort_keys=False, default=str)
         response = requests.request("PUT", url, headers=headers, data= data)
-        error = response.text
-        response = response.json()
+        response = response['msg']
+        response_status = response['msg']['response_status']
         api = "GENERATE GST CDN"
         doctype = "Sales Invoice" if type == 'SALE' else "Purchase Invoice"
-        response_status = " Failed"
-        if response.get('cdn_status') == 'CREATED':
-            response_status = "Success"
-            response_logger(data,response,api,doctype,id,response_status)
+        response_logger(data,response,api,doctype,id,response_status)
+        if response_status == 'Success':
             if type == 'SALE':
                 doc = frappe.get_doc('Sales Invoice',id)
                 if doc.is_return or doc.is_debit_note:

@@ -5,4 +5,5 @@
 from frappe.model.document import Document
 
 class CleartaxSettings(Document):
-	pass
+	def tax_id(self,gstin):
+		return frappe.get_value('Tax Entities',{'gstin':gstin,'parent':self.name},'entity_id')
