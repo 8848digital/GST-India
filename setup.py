@@ -1,5 +1,5 @@
 from setuptools import setup
 
-name = "India Einvoicing/Ewaybills"
+name = "GST India"
 
 setup()
