@@ -36,7 +36,7 @@ const routes = [
 ];
 
 export default new VueRouter({
-    mode: "history",
+    history: createWebHistory(),
     base: "/app/india-compliance-account",
     routes: routes,
 });
