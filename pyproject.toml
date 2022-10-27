@@ -1,7 +1,7 @@
 [project]
-name = "india_compliance"
+name = "gst_india"
 authors = [
-    { name = "Resilient Tech", email = "hello@indiacompliance.app" }
+    { name = "8848 Digital", email = "contact@8848digital.com" }
 ]
 description = "ERPNext app to simplify compliance with Indian Rules and Regulations"
 readme = "README.md"
