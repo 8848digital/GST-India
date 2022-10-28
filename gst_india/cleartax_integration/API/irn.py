@@ -53,10 +53,11 @@ def create_irn_request(data,inv):
         response = requests.request(
             "POST", url, headers=headers, data=payload) 
         response = response.json()['message']
+        response_logger(payload,response['response'][0],"GENERATE IRN","Sales Invoice",inv,response['msg'])
         if response['msg'] == 'Success':
-            store_irn_details(**{inv,json.loads(json.dumps(response['response']))})
+            store_irn_details(**{inv,json.loads(json.dumps(response['response'][0]))})
             return success_response()
-        return response_error_handling(json.loads(json.dumps(response['response'])))
+        return response_error_handling(json.loads(json.dumps(response['response'][0])))
     except Exception as e:
         frappe.logger('cleartax').exception(e)
         return error_response(e)
