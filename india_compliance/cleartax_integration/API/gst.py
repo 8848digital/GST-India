@@ -11,7 +11,7 @@ def create_gst_invoice(**kwargs):
         invoice = kwargs.get('invoice')
         type = kwargs.get('type')
         if  type == "SALE":
-            invoice = frappe.get_doc('Sales Invoice',kwargs.get('invoice'))
+            invoice = frappe.get_doc('Sales Invoice',invoice)
         else:
             invoice = frappe.get_doc('Purchase Invoice',kwargs.get('invoice'))
         item_list = []
@@ -23,19 +23,24 @@ def create_gst_invoice(**kwargs):
         data = {
             'invoice': invoice.as_dict(),
             'type': type,
-            'customer': get_dict('Customer',invoice.customer),
-            'billing_address': get_dict('Address',invoice.company_address),
-            'customer_address': get_dict('Address',invoice.customer_address),
-            'shipping_address': get_dict('Address',invoice.shipping_address_name),
-            'dispatch_address': get_dict('Address',invoice.dispatch_address_name),
             'item_list': item_list,
             'gst_accounts':gst_settings_accounts
         }
+        if type == 'SALE':
+            data['company_address'] = get_dict('Address',invoice.company_address)
+            data['customer'] = get_dict('Customer',invoice.customer)
+            data['customer_address'] = get_dict('Address',invoice.customer_address)
+            data['shipping_address'] = get_dict('Address',invoice.shipping_address_name)
+        else:
+            data['company_address'] = get_dict('Address',invoice.supplier_address)
+            data['customer_address'] = get_dict('Address',invoice.billing_address)
+            data['shipping_address'] = get_dict('Address',invoice.shipping_address)
         if invoice.is_return:
             data['original_invoice'] = get_dict('Sales Invoice',invoice.return_against)
             return gst_cdn_request(data,kwargs.get('invoice'),type)
-        if invoice.is_debit_note:
-            data['original_invoice'] = get_dict('Sales Invoice',invoice.return_against)
+        # if invoice.is_debit_note:
+        #     data['original_invoice'] = get_dict('Sales Invoice',invoice.return_against)
+        #     return gst_cdn_request(data,kwargs.get('invoice'),type)
         return gst_invoice_request(data,kwargs.get('invoice'),type)
     except Exception as e:
         frappe.logger('cleartax').exception(e)
@@ -45,30 +50,31 @@ def create_gst_invoice(**kwargs):
 def gst_invoice_request(data,id,type):
     try:
         settings = frappe.get_doc('Cleartax Settings')
-        url = settings.host_site
-        url+= "/api/method/cleartax.cleartax.API.gst.generate_gst"
+        url = settings.host_url
+        url+= "/api/method/cleartax.cleartax.API.gst.create_gst_invoice"
         headers = {
+            'sandbox': str(settings.sandbox),
             'Content-Type': 'application/json'
         }
-        if type == 'SALE':
-            gstin = data.get('seller').get('gstin')
         if settings.enterprise:
             headers['auth_token'] = settings.production_auth_token
             headers['tax_id'] = settings.tax_id(gstin)
+        if type == 'SALE':
+            gstin = data.get('seller').get('gstin')
         data = json.dumps(data, indent=4, sort_keys=False, default=str)
-        response = requests.request("PUT", url, headers=headers, data= data)
+        response = requests.request("PUT", url, headers=headers, data= data) 
         response = response.json()['message']
         api = "GENERATE GST SINV" if type == 'SALE' else "GENERATE GST PINV"
         doctype = "Sales Invoice" if type == 'SALE' else "Purchase Invoice"
-        response = response['msg']
-        response_status = response['msg']['response_status']
-        response_logger(data,response,api,doctype,id,response_status)
+        frappe.logger('cleartax').exception(response)
+        response_status = response['msg']
+        response_logger(data,response['response'],api,doctype,id,response_status)
         if response_status == "Success":
             if type == 'SALE':
                 frappe.db.set_value('Sales Invoice',id,'gst_invoice',1)
             else:
                 frappe.db.set_value('Purchase Invoice',id,'gst_invoice',1)
-            return success_response(response)
+            return success_response(response['response'])
         return response_error_handling(response['response'])
     except Exception as e:
         frappe.logger('cleartax').exception(e)

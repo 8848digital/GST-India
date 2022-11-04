@@ -83,8 +83,8 @@ doc_events = {
     },
     "Purchase Invoice": {
         "validate": "india_compliance.gst_india.overrides.purchase_invoice.validate",
-        "before_submit": "cleartax_integration.public.py.purchase_invoice_doctype.purchase_invoice_submit",
-        "before_cancel": "cleartax_integration.public.py.purchase_invoice_doctype.purchase_invoice_cancel"
+        "before_submit": "india_compliance.public.py.purchase_invoice_doctype.purchase_invoice_submit",
+        "before_cancel": "india_compliance.public.py.purchase_invoice_doctype.purchase_invoice_cancel"
     },
     "Purchase Order": {
         "validate": (
