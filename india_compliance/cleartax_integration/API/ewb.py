@@ -68,10 +68,21 @@ def create_ewb_request(inv,gstin,data):
 def ewb_without_irn(**kwargs):
     try:
         delivery_note = frappe.get_doc('Delivery Note',kwargs.get('delivery_note'))
+        item_list = []
+        gst_settings_accounts = frappe.get_all("GST Account",
+                filters={'company':delivery_note.company},
+                fields=["cgst_account", "sgst_account", "igst_account", "cess_account"])
+        for row in delivery_note.items:
+            item_list.append(get_dict('Item',row.item_code))
         data = {
             'delivery_note':  delivery_note.as_dict(),
             'billing_address': get_dict('Address',delivery_note.company_address),
             'customer_address': get_dict('Address',delivery_note.customer_address),
+            'shipping_address': get_dict('Address',delivery_note.shipping_address_name),
+            'dispatch_address': get_dict('Address',delivery_note.dispatch_address_name),
+            'transporter': get_dict('Supplier',delivery_note.transporter),
+            'item_list': item_list,
+            'gst_accounts':gst_settings_accounts
         }
         return ewb_without_irn_request(kwargs.get('delivery_note'),data)
     except Exception as e:
@@ -82,7 +93,7 @@ def ewb_without_irn_request(delivery_note,data):
     try:
         settings = frappe.get_doc('Cleartax Settings')
         url = settings.host_url
-        url+= "/api/method/cleartax.cleartax.API.ewb.generate_ewb_dn"
+        url+= "/api/method/cleartax.cleartax.API.ewb.ewb_without_irn"
         headers = {
             'sandbox': str(settings.sandbox),
             'Content-Type': 'application/json'
@@ -95,11 +106,11 @@ def ewb_without_irn_request(delivery_note,data):
         data = json.dumps(data, indent=4, sort_keys=False, default=str)
         response = requests.request(
             "POST", url, headers=headers, data=data)
-        response = response.json()
+        response = response.json()['message']
         response_status = "Failed"
         if response.get('govt_response').get('Success') =='Y':
             response_status = "Success"
-        response_logger(data,response.json(),"GENERATE EWB WITHOUT IRN","Delivery Note",delivery_note,
+        response_logger(data,response,"GENERATE EWB WITHOUT IRN","Delivery Note",delivery_note,
                         response_status)
         return store_ewb_details_dn(delivery_note,data,response)
     except Exception as e:
@@ -108,10 +119,10 @@ def ewb_without_irn_request(delivery_note,data):
 
 def store_ewb_details_dn(delivery_note,data,response):
     if response.get('govt_response').get('Success') =='Y':
-        frappe.db.set_value('DeliveryNote',deliver_note,'ewaybill', response.get('govt_response').get('EwbNo'))
-        frappe.db.set_value('DeliveryNote',deliver_note,'ewb_date', response.get('govt_response').get('EwbDt'))
-        frappe.db.set_value('DeliveryNote',deliver_note,'ewb_valid_till', response.get('govt_response').get('EwbValidTill'))
-        frappe.db.set_value('DeliveryNote',deliver_note,'ewb_trans_id', response.get('transaction_id'))
+        frappe.db.set_value('Delivery Note',delivery_note,'ewaybill', response.get('govt_response').get('EwbNo'))
+        frappe.db.set_value('Delivery Note',delivery_note,'ewb_date', response.get('govt_response').get('EwbDt'))
+        frappe.db.set_value('Delivery Note',delivery_note,'ewb_valid_till', response.get('govt_response').get('EwbValidTill'))
+        frappe.db.set_value('Delivery Note',delivery_note,'ewb_trans_id', response.get('transaction_id'))
         return success_response()
     return response_error_handling(response)
 
