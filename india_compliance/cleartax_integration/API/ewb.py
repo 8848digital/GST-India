@@ -132,12 +132,11 @@ def store_ewb_details_dn(delivery_note,data,response):
 def update_ewb_partb(**kwargs):
     try:
         delivery_note = frappe.get_doc('Delivery Note', kwargs.get('delivery_note'))
-        
         data = {
             'data' : json.loads(kwargs.get('data')),
-            'delivery_note': frappe._dict(deliver_note),
+            'delivery_note': delivery_note.as_dict(),
             'dispatch_address': get_dict('Address', delivery_note.dispatch_address_name),
-            'shipping_address': get_dict('Address',deliver_note.shipping_address_name)
+            'shipping_address': get_dict('Address',delivery_note.shipping_address_name)
         }
         return partb_request(data,kwargs.get('delivery_note'))
     except Exception as e:
@@ -166,7 +165,7 @@ def partb_request(data,dn):
         response_status = "Failed"
         if not (response.get('errors') or response.get('error_code')):
             response_status = "Success"
-        response_logger(data,response.json(),"UPDATE EWB PARTB","Delivery Note",dn, response_status)
+        response_logger(data,response,"UPDATE EWB PARTB","Delivery Note",dn, response_status)
         if response_status == 'Success':
             frappe.db.set_value('Delivery Note',dn,'update_partb',1)
             return success_response(response)
