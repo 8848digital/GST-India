@@ -148,7 +148,7 @@ def partb_request(data,dn):
     try:
         settings = frappe.get_doc('Cleartax Settings')
         url = settings.host_url
-        url+= "/api/method/cleartax.cleartax.API.ewb.update_ewb"
+        url+= "/api/method/cleartax.cleartax.API.ewb.update_ewb_partb"
         headers = {
             'sandbox': str(settings.sandbox),
             'Content-Type': 'application/json'
@@ -161,16 +161,14 @@ def partb_request(data,dn):
         data = json.dumps(data, indent=4, sort_keys=False, default=str)    
         response = requests.request(
             "POST", url, headers=headers, data=data)
-        response = response.json()
-        response_status = "Failed"
-        if not (response.get('errors') or response.get('error_code')):
-            response_status = "Success"
-        response_logger(data,response,"UPDATE EWB PARTB","Delivery Note",dn, response_status)
+        response = response.json()['message']
+        frappe.logger('cleartax').exception(response)
+        response_status = response['status']
         if response_status == 'Success':
             frappe.db.set_value('Delivery Note',dn,'update_partb',1)
-            return success_response(response)
+            return success_response(response['response'])
         else:
-            return response_error_handling(response)
+            return response_error_handling(response['response'])
     except Exception as e:
         frappe.logger('cleartax').exception(e)
         return error_response(e)
