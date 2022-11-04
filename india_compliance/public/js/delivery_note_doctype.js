@@ -1,5 +1,6 @@
 frappe.ui.form.on('Delivery Note', {
 	refresh(frm) {
+		if (frm.selected_doc.docstatus == 1) {
 		// Eway - Bill generation
 		var enabled = 0
 		if (frm.selected_doc.ewaybill == undefined || frm.selected_doc.ewaybill == '') {
@@ -120,6 +121,6 @@ frappe.ui.form.on('Delivery Note', {
 
 
 
-
+	}
 	}
 })

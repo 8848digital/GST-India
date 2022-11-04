@@ -1,4 +1,4 @@
-from cleartax_integration.cleartax_integration.API.ewb import ewb_without_irn
+from india_compliance.cleartax_integration.API.ewb import ewb_without_irn
 import frappe 
 
 def delivery_note_submit(doc, method=None):

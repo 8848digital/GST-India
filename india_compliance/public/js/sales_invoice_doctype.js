@@ -1,5 +1,6 @@
 frappe.ui.form.on('Sales Invoice', {
 	refresh(frm) {
+		if (frm.selected_doc.docstatus == 1) {
 		frappe.call({
 			method: "india_compliance.cleartax_integration.API.irn.e_invoicing_enabled",
 			args: {
@@ -174,7 +175,7 @@ frappe.ui.form.on('Sales Invoice', {
 
 
 
-
+	}
 
 	}
 })

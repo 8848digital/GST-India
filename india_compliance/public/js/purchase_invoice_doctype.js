@@ -1,5 +1,6 @@
 frappe.ui.form.on('Purchase Invoice', {
 	refresh(frm) {
+		if (frm.selected_doc.docstatus == 1) {
 					let button_name = ""
 					if (frm.selected_doc.gst_invoice == false) {
 						button_name = "GST Invoice"
@@ -29,7 +30,7 @@ frappe.ui.form.on('Purchase Invoice', {
 						}, __('Create'));
 						cur_frm.page.set_inner_btn_group_as_primary(__('Create'));}
 
-
+					}
 
 
 	}

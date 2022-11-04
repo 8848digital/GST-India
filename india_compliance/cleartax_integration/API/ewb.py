@@ -73,12 +73,12 @@ def ewb_without_irn(**kwargs):
             'billing_address': get_dict('Address',delivery_note.company_address),
             'customer_address': get_dict('Address',delivery_note.customer_address),
         }
-        return ewb_without_irn_request(kwargs.get('delivery_note'),data, gstin)
+        return ewb_without_irn_request(kwargs.get('delivery_note'),data)
     except Exception as e:
         frappe.logger('cleartax').exception(e)
         return error_response(e)
 
-def ewb_without_irn_request(delivery_note,data,gstin):
+def ewb_without_irn_request(delivery_note,data):
     try:
         settings = frappe.get_doc('Cleartax Settings')
         url = settings.host_url
@@ -191,7 +191,8 @@ def cancel_ewb(**kwargs):
                     "ewbNo": invoice.ewaybill,
                     "cancelRsnCode": data.get('reason'),
                     "cancelRmrk" : data.get('remarks'),
-                    'gstin': gstin
+                    'gstin': gstin,
+                    'invoice': invoice.name
                 }
         return cancel_ewb_request(headers,url,data,invoice.name)
     except Exception as e:
@@ -251,9 +252,9 @@ def cancel_ewb_request(headers,url,data,invoice=None,delivery_note=None):
     data = json.dumps(data, indent=4, sort_keys=False, default=str)
     response = requests.request(
             "POST", url, headers=headers, data=data)
-    response = response.json()
+    response = response.json()['message']
     doctype = "Sales Invoice" if invoice else "Delivery Note"
-    docname = invoice.name if invoice else delivery_note
+    docname = invoice if invoice else delivery_note
     response_status = "Failed"
     if response.get('ewbStatus') == 'CANCELLED':
         response_status = "Success"
