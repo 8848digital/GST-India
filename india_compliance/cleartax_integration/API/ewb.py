@@ -51,14 +51,13 @@ def create_ewb_request(inv,gstin,data):
         data = json.dumps(data, indent=4, sort_keys=False, default=str)
         response = requests.request(
             "POST", url, headers=headers, data=data)
-        response = response.json()['message']['response'][0]
-        frappe.logger('cleartax').exception(response)
+        response = response.json()['message']
         response_status = "Failed"
-        if response.get('govt_response').get('Status') == "GENERATED":
+        if response['response'][0].get('govt_response').get('Status') == "GENERATED":
             response_status = "Success"
-        response_logger(data,response,"GENERATE EWB BY IRN","Sales Invoice",inv.name,
+        response_logger(data,response['response'][0],"GENERATE EWB BY IRN","Sales Invoice",inv.name,
                         response_status)
-        return store_ewb_details(inv,data,response)
+        return store_ewb_details(inv.name,data,response['response'][0])
     except Exception as e:
         frappe.logger('cleartax').exception(e)
         return error_response(e)
@@ -234,10 +233,11 @@ def cancel_ewb_dn(**kwargs):
 
 def store_ewb_details(inv,data,response):
     try:
-        if response.get('govt_response').get('Status') == "GENERATED":
-            frappe.db.set_value('Sales Invoice',inv,'ewaybill', response.get('govt_response').get('EwbNo'))
-            frappe.db.set_value('Sales Invoice',inv,'ewb_date', response.get('govt_response').get('EwbDt'))
-            frappe.db.set_value('Sales Invoice',inv,'eway_bill_validity', response.get('govt_response').get('EwbValidTill'))
+        response = response.get('govt_response')
+        if response.get('Status') == "GENERATED":
+            frappe.db.set_value('Sales Invoice',inv,'ewaybill', response.get('EwbNo'))
+            frappe.db.set_value('Sales Invoice',inv,'ewb_date', response.get('EwbDt'))
+            frappe.db.set_value('Sales Invoice',inv,'eway_bill_validity', response.get('EwbValidTill'))
             return success_response(response)
         return response_error_handling(response)
     except Exception as e:
