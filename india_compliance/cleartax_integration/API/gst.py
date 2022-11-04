@@ -11,9 +11,10 @@ def create_gst_invoice(**kwargs):
         invoice = kwargs.get('invoice')
         type = kwargs.get('type')
         if  type == "SALE":
-            invoice = frappe.get_doc('Sales Invoice',invoice)
+            doctype = "Sales Invoice"
         else:
-            invoice = frappe.get_doc('Purchase Invoice',kwargs.get('invoice'))
+            doctype = "Purchase Invoice"
+        invoice = frappe.get_doc(doctype,kwargs.get('invoice'))
         item_list = []
         gst_settings_accounts = frappe.get_all("GST Account",
                 filters={'company':invoice.company},
@@ -36,7 +37,7 @@ def create_gst_invoice(**kwargs):
             data['customer_address'] = get_dict('Address',invoice.billing_address)
             data['shipping_address'] = get_dict('Address',invoice.shipping_address)
         if invoice.is_return:
-            data['original_invoice'] = get_dict('Sales Invoice',invoice.return_against)
+            data['original_invoice'] = get_dict(doctype,invoice.return_against)
             return gst_cdn_request(data,kwargs.get('invoice'),type)
         # if invoice.is_debit_note:
         #     data['original_invoice'] = get_dict('Sales Invoice',invoice.return_against)
@@ -56,17 +57,18 @@ def gst_invoice_request(data,id,type):
             'sandbox': str(settings.sandbox),
             'Content-Type': 'application/json'
         }
+        if type == 'SALE':
+            gstin = data.get('company_address').get('gstin')
+        else:
+            gstin = data.get('customer_address').get('gstin')
         if settings.enterprise:
             headers['auth_token'] = settings.production_auth_token
             headers['tax_id'] = settings.tax_id(gstin)
-        if type == 'SALE':
-            gstin = data.get('seller').get('gstin')
         data = json.dumps(data, indent=4, sort_keys=False, default=str)
         response = requests.request("PUT", url, headers=headers, data= data) 
         response = response.json()['message']
         api = "GENERATE GST SINV" if type == 'SALE' else "GENERATE GST PINV"
         doctype = "Sales Invoice" if type == 'SALE' else "Purchase Invoice"
-        frappe.logger('cleartax').exception(response)
         response_status = response['msg']
         response_logger(data,response['response'],api,doctype,id,response_status)
         if response_status == "Success":
@@ -84,32 +86,34 @@ def gst_invoice_request(data,id,type):
 def gst_cdn_request(data,id,type):
     try:
         settings = frappe.get_doc('Cleartax Settings')
-        url = settings.host_site
-        url+= "/api/method/cleartax.cleartax.API.gst.generate_cdn"
+        url = settings.host_url
+        url+= "/api/method/cleartax.cleartax.API.gst.create_gst_invoice"
         headers = {
             'sandbox': str(settings.sandbox),
             'Content-Type': 'application/json'
         }
+        if type == 'SALE':
+            gstin = data.get('company_address').get('gstin')
+        else:
+            gstin = data.get('customer_address').get('gstin')
         if settings.enterprise:
-            if settings.sandbox:
-                headers['auth_token'] = settings.sandbox_auth_token
-            else:
-                headers['auth_token'] = settings.production_auth_token
+            headers['auth_token'] = settings.production_auth_token
+            headers['tax_id'] = settings.tax_id(gstin)
         data = json.dumps(data, indent=4, sort_keys=False, default=str)
         response = requests.request("PUT", url, headers=headers, data= data)
-        response = response['msg']
-        response_status = response['msg']['response_status']
+        response = response.json()['message']
+        response_status = response['msg']
         api = "GENERATE GST CDN"
         doctype = "Sales Invoice" if type == 'SALE' else "Purchase Invoice"
-        response_logger(data,response,api,doctype,id,response_status)
+        response_logger(data,response['response'],api,doctype,id,response_status)
         if response_status == 'Success':
             if type == 'SALE':
                 doc = frappe.get_doc('Sales Invoice',id)
-                if doc.is_return or doc.is_debit_note:
+                if doc.is_return:
                     doc.cdn=1
             else:
                 doc = frappe.get_doc('Purchase Invoice',id)
-                if doc.is_return or doc.is_debit_note:
+                if doc.is_return:
                     doc.cdn=1
             doc.save(ignore_permissions=True)
             return success_response(response)
