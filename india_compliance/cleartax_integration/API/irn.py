@@ -55,7 +55,7 @@ def create_irn_request(data,inv):
         response = response.json()['message']
         response_logger(payload,response['response'][0],"GENERATE IRN","Sales Invoice",inv,response['msg'])
         if response['msg'] == 'Success':
-            store_irn_details(**{inv,json.loads(json.dumps(response['response'][0]))})
+            store_irn_details(inv,response['response'][0])
             return success_response()
         return response_error_handling(json.loads(json.dumps(response['response'][0])))
     except Exception as e:
@@ -64,18 +64,17 @@ def create_irn_request(data,inv):
 
 
 @frappe.whitelist()
-def store_irn_details(**kwargs):
+def store_irn_details(inv,response):
     try:
-        response = kwargs.get('response')
-        frappe.db.set_value("Sales Invoice",kwargs.get('inv'),'acknowledgement_number', response.get('govt_response').get("AckNo"))
-        frappe.db.set_value("Sales Invoice",kwargs.get('inv'),'acknowledgement_date', response.get('govt_response').get('AckDt'))
-        frappe.db.set_value("Sales Invoice",kwargs.get('inv'),'signed_invoice', response.get('govt_response').get('SignedInvoice'))
-        frappe.db.set_value("Sales Invoice",kwargs.get('inv'),'signed_qr_code', response.get('govt_response').get('SignedQRCode'))
-        frappe.db.set_value("Sales Invoice",kwargs.get('inv'),'irn', response.get('govt_response').get('Irn'))
-        frappe.db.set_value("Sales Invoice",kwargs.get('inv'),'irn_status', response.get('govt_response').get('Status'))
-        frappe.db.set_value("Sales Invoice",kwargs.get('inv'),'ewb_number', response.get('EwbNo'))
-        frappe.db.set_value("Sales Invoice",kwargs.get('inv'),'ewb_date', response.get('EwbDt'))
-        frappe.db.set_value("Sales Invoice",kwargs.get('inv'),'ewb_valid_till', response.get('EwbValidTill'))
+        frappe.db.set_value("Sales Invoice",inv,'acknowledgement_number', response.get('govt_response').get("AckNo"))
+        frappe.db.set_value("Sales Invoice",inv,'acknowledgement_date', response.get('govt_response').get('AckDt'))
+        frappe.db.set_value("Sales Invoice",inv,'signed_invoice', response.get('govt_response').get('SignedInvoice'))
+        frappe.db.set_value("Sales Invoice",inv,'signed_qr_code', response.get('govt_response').get('SignedQRCode'))
+        frappe.db.set_value("Sales Invoice",inv,'irn', response.get('govt_response').get('Irn'))
+        frappe.db.set_value("Sales Invoice",inv,'irn_status', response.get('govt_response').get('Status'))
+        # frappe.db.set_value("Sales Invoice",inv,'ewb_number', response.get('EwbNo'))
+        # frappe.db.set_value("Sales Invoice",inv,'ewb_date', response.get('EwbDt'))
+        # frappe.db.set_value("Sales Invoice",inv,'ewb_valid_till', response.get('EwbValidTill'))
     except Exception as e:
         frappe.logger('cleartax').exception(e)
         return error_response(e)
@@ -131,13 +130,14 @@ def cancel_irn_request(inv,data):
         payload = json.dumps(data, indent=4, sort_keys=False, default=str)
         response = requests.request(
             "POST", url, headers=headers, data=payload)
+        frappe.logger('cleartax').exception(response.json())
         response = response.json()['message']
         response_status = response['msg']
         if response['msg'] == 'Success':
             frappe.db.set_value('Sales Invoice',inv,'irn_cancelled',1)
             return success_response()
-        response_logger(payload,response.json(),"CANCEL IRN","Sales Invoice",inv,response_status)
-        return response_error_handling(response.json())
+        response_logger(payload,response,"CANCEL IRN","Sales Invoice",inv,response_status)
+        return response_error_handling(response)
     except Exception as e:
         frappe.logger('cleartax').exception(e)
         return error_response(e)

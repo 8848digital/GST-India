@@ -14,16 +14,18 @@ def generate_e_waybill_by_irn(**kwargs):
                 fields=["cgst_account", "sgst_account", "igst_account", "cess_account"])
         for row in invoice.items:
             item_list.append(get_dict('Item',row.item_code))
-        delivery_note = delivery_note(invoice)
+        delivery_note = get_delivery_note(invoice)
         data = {
             'invoice': invoice.as_dict(),
+            'customer': get_dict('Customer',invoice.customer),
             'billing_address': get_dict('Address',invoice.company_address),
             'customer_address': get_dict('Address',invoice.customer_address),
             'shipping_address': get_dict('Address',invoice.shipping_address_name),
             'dispatch_address': get_dict('Address',invoice.dispatch_address_name),
             'item_list': item_list,
             'gst_accounts':gst_settings_accounts,
-            'delivery_note': delivery_note.as_dict()
+            'delivery_note': delivery_note,
+            'transporter': get_dict('Supplier',delivery_note.transporter)
        }
         dispatch_address = frappe.get_doc("Address",invoice.dispatch_address_name)
         return create_ewb_request(invoice,dispatch_address.gstin,data)
@@ -36,7 +38,7 @@ def create_ewb_request(inv,gstin,data):
     try:
         settings = frappe.get_doc('Cleartax Settings')
         url = settings.host_url
-        url+= "/api/method/cleartax.cleartax.API.ewb.generate_ewb"
+        url+= "/api/method/cleartax.cleartax.API.ewb.generate_e_waybill_by_irn"
         headers = {
             'sandbox': str(settings.sandbox),
             'Content-Type': 'application/json'
@@ -49,11 +51,12 @@ def create_ewb_request(inv,gstin,data):
         data = json.dumps(data, indent=4, sort_keys=False, default=str)
         response = requests.request(
             "POST", url, headers=headers, data=data)
-        response = response.json()[0]
+        response = response.json()['message']['response'][0]
+        frappe.logger('cleartax').exception(response)
         response_status = "Failed"
         if response.get('govt_response').get('Status') == "GENERATED":
             response_status = "Success"
-        response_logger(data,response.json(),"GENERATE EWB BY IRN","Sales Invoice",inv.name,
+        response_logger(data,response,"GENERATE EWB BY IRN","Sales Invoice",inv.name,
                         response_status)
         return store_ewb_details(inv,data,response)
     except Exception as e:
@@ -264,13 +267,13 @@ def cancel_ewb_request(headers,url,data,invoice=None,delivery_note=None):
 
 
 
-def delivery_note(doc):
+def get_delivery_note(doc):
         delivery_note = frappe.get_value('Delivery Note Item',{"against_sales_invoice":doc.name},"parent")
         if delivery_note:
-            return frappe.get_doc('Delivery Note',delivery_note)
+            return frappe.get_doc('Delivery Note',delivery_note).as_dict()
         delivery_note = frappe.get_value('Sales Invoice Item',{"parent":doc.name},"delivery_note")
         if delivery_note:
-            return frappe.get_doc('Delivery Note',delivery_note)
+            return frappe.get_doc('Delivery Note',delivery_note).as_dict()
         return {}
 
 @frappe.whitelist()

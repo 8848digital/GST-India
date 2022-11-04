@@ -73,7 +73,7 @@ doc_events = {
         "validate": (
             "india_compliance.gst_india.overrides.transaction.validate_transaction"
         ),
-        "before_submit": "cleartax_integration.public.py.delivery_note_doctype.delivery_note_submit"
+        "before_submit": "india_compliance.public.py.delivery_note_doctype.delivery_note_submit"
     },
     "Item": {"validate": "india_compliance.gst_india.overrides.item.validate_hsn_code"},
     "Payment Entry": {
@@ -105,7 +105,7 @@ doc_events = {
         "onload": "india_compliance.gst_india.overrides.sales_invoice.onload",
         "validate": "india_compliance.gst_india.overrides.sales_invoice.validate",
         "on_submit": "india_compliance.gst_india.overrides.sales_invoice.on_submit",
-        "before_submit": "cleartax_integration.public.py.sales_invoice_doctype.sales_invoice_submit",
+        "before_submit": "india_compliance.public.py.sales_invoice_doctype.sales_invoice_submit",
         "before_cancel": "cleartax_integration.public.py.sales_invoice_doctype.sales_invoice_cancel"
     },
     "Sales Order": {
