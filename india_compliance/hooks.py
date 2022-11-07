@@ -1,6 +1,6 @@
 from . import __version__ as app_version
 
-app_name = "gst_india"
+app_name = "india_compliance"
 app_title = "GST India"
 app_publisher = "8848 Digital LLP"
 app_description = "ERPNext app to simplify compliance with Indian Rules and Regulations"
