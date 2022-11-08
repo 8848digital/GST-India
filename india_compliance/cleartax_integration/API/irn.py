@@ -53,6 +53,8 @@ def create_irn_request(data,inv):
         response = requests.request(
             "POST", url, headers=headers, data=payload) 
         response = response.json()['message']
+        if not response.get('response'):
+            return error_response(response)
         response_logger(payload,response['response'][0],"GENERATE IRN","Sales Invoice",inv,response['msg'])
         if response['msg'] == 'Success':
             store_irn_details(inv,response['response'][0])
@@ -132,6 +134,8 @@ def cancel_irn_request(inv,data):
             "POST", url, headers=headers, data=payload)
         frappe.logger('cleartax').exception(response.json())
         response = response.json()['message']
+        if not response.get('response'):
+            return error_response(response)
         response_status = response['msg']
         if response['msg'] == 'Success':
             frappe.db.set_value('Sales Invoice',inv,'irn_cancelled',1)
