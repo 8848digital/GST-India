@@ -1,7 +1,7 @@
 from . import __version__ as app_version
 
 app_name = "india_compliance"
-app_title = "GST India"
+app_title = "India Compliance"
 app_publisher = "8848 Digital LLP"
 app_description = "ERPNext app to simplify compliance with Indian Rules and Regulations"
 app_icon = "octicon octicon-file-directory"
