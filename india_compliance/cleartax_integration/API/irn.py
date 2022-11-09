@@ -56,7 +56,7 @@ def create_irn_request(data,inv):
         frappe.logger('cleartax').exception(response) 
         if response.get('error'):
             return error_response(response.get('error'))
-        response_logger(payload,response['response'][0],"GENERATE IRN","Sales Invoice",inv,response['msg'])
+        response_logger(payload,response['response'],"GENERATE IRN","Sales Invoice",inv,response['msg'])
         if response['msg'] == 'Success':
             store_irn_details(inv,response['response'][0])
             return success_response()
