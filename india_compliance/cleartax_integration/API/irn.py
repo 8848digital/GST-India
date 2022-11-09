@@ -52,8 +52,8 @@ def create_irn_request(data,inv):
         payload = json.dumps(data, indent=4, sort_keys=False, default=str)
         response = requests.request(
             "POST", url, headers=headers, data=payload) 
-        frappe.logger('cleartax').exception(response)
         response = response.json()['message']
+        frappe.logger('cleartax').exception(response) 
         if response.get('error'):
             return error_response(response.get('error'))
         response_logger(payload,response['response'][0],"GENERATE IRN","Sales Invoice",inv,response['msg'])
