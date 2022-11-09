@@ -52,8 +52,8 @@ def create_ewb_request(inv,gstin,data):
         response = requests.request(
             "POST", url, headers=headers, data=data)
         response = response.json()['message']
-        if not response.get('response'):
-            return error_response(response)
+        if response.get('error'):
+            return error_response(response.get('error'))
         response_status = "Failed"
         if response['response'][0].get('govt_response').get('Status') == "GENERATED":
             response_status = "Success"
@@ -109,8 +109,8 @@ def ewb_without_irn_request(delivery_note,data):
         response = requests.request(
             "POST", url, headers=headers, data=data)
         response = response.json()['message']
-        if not response.get('govt_response'):
-            return error_response(response)
+        if response.get('error'):
+            return error_response(response.get('error'))
         response_status = "Failed"
         if response.get('govt_response').get('Success') =='Y':
             response_status = "Success"
@@ -166,8 +166,8 @@ def partb_request(data,dn):
         response = requests.request(
             "POST", url, headers=headers, data=data)
         response = response.json()['message']
-        if not response.get('response'):
-            return error_response(response)
+        if response.get('error'):
+            return error_response(response.get('error'))
         frappe.logger('cleartax').exception(response)
         response_status = response['status']
         if response_status == 'Success':
@@ -270,6 +270,8 @@ def cancel_ewb_request(headers,url,data,invoice=None,delivery_note=None):
     doctype = "Sales Invoice" if invoice else "Delivery Note"
     docname = invoice if invoice else delivery_note
     response_status = "Failed"
+    if response.get('error'):
+        return error_response(response.get('error'))
     if response.get('ewbStatus') == 'CANCELLED':
         response_status = "Success"
         response_logger(data,response,"CANCEL EWB",doctype,docname,response_status)

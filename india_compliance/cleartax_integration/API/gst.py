@@ -67,6 +67,8 @@ def gst_invoice_request(data,id,type):
         data = json.dumps(data, indent=4, sort_keys=False, default=str)
         response = requests.request("PUT", url, headers=headers, data= data) 
         response = response.json()['message']
+        if response.get('error'):
+            return error_response(response.get('error'))
         api = "GENERATE GST SINV" if type == 'SALE' else "GENERATE GST PINV"
         doctype = "Sales Invoice" if type == 'SALE' else "Purchase Invoice"
         response_status = response['msg']
@@ -102,6 +104,8 @@ def gst_cdn_request(data,id,type):
         data = json.dumps(data, indent=4, sort_keys=False, default=str)
         response = requests.request("PUT", url, headers=headers, data= data)
         response = response.json()['message']
+        if response.get('error'):
+            return error_response(response.get('error'))
         response_status = response['msg']
         api = "GENERATE GST CDN"
         doctype = "Sales Invoice" if type == 'SALE' else "Purchase Invoice"
