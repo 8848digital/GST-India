@@ -53,14 +53,16 @@ def create_irn_request(data,inv):
         response = requests.request(
             "POST", url, headers=headers, data=payload) 
         response = response.json()['message']
-        frappe.logger('cleartax').exception(response) 
         if response.get('error'):
             return error_response(response.get('error'))
         response_logger(payload,response['response'],"GENERATE IRN","Sales Invoice",inv,response['msg'])
         if response['msg'] == 'Success':
             store_irn_details(inv,response['response'][0])
             return success_response()
-        return response_error_handling(json.loads(json.dumps(response['response'][0])))
+        if response['response'][0]['document_status'] == 'IRN_CANCELLED': 
+            return response_error_handling(json.loads(json.dumps(response['response'][0])))
+    except Exception as e:
+        return response_error_handling("IRN with this document number Already Cancelled!")
     except Exception as e:
         frappe.logger('cleartax').exception(e)
         return error_response(e)
