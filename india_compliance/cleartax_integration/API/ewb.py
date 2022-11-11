@@ -54,12 +54,12 @@ def create_ewb_request(inv,gstin,data):
         response = response.json()['message']
         if response.get('error'):
             return error_response(response.get('error'))
-        response_status = "Failed"
-        if response['response'][0].get('govt_response').get('Status') == "GENERATED":
-            response_status = "Success"
+        response_status = response['msg']
         response_logger(data,response['response'][0],"GENERATE EWB BY IRN","Sales Invoice",inv.name,
                         response_status)
-        return store_ewb_details(inv.name,data,response['response'][0])
+        if response_status == "Success":
+            return store_ewb_details(inv.name,data,response['response'][0])
+        return response_error_handling(response['response'])
     except Exception as e:
         frappe.logger('cleartax').exception(e)
         return error_response(e)
