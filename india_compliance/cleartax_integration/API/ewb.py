@@ -55,7 +55,7 @@ def create_ewb_request(inv,gstin,data):
         if response.get('error'):
             return error_response(response.get('error'))
         response_status = response['msg']
-        response_logger(data,response['response'][0],"GENERATE EWB BY IRN","Sales Invoice",inv.name,
+        response_logger(data,response['response'],"GENERATE EWB BY IRN","Sales Invoice",inv.name,
                         response_status)
         if response_status == "Success":
             return store_ewb_details(inv.name,data,response['response'][0])
