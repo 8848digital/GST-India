@@ -104,7 +104,7 @@ doc_events = {
         "validate": "india_compliance.gst_india.overrides.sales_invoice.validate",
         "on_submit": "india_compliance.gst_india.overrides.sales_invoice.on_submit",
         "before_submit": "india_compliance.public.py.sales_invoice_doctype.sales_invoice_submit",
-        "before_cancel": "india_complianc.public.py.sales_invoice_doctype.sales_invoice_cancel"
+        "before_cancel": "india_compliance.public.py.sales_invoice_doctype.sales_invoice_cancel"
     },
     "Sales Order": {
         "validate": (
