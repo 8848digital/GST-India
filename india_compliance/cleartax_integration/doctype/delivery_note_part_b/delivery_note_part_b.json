@@ -12,7 +12,8 @@
   "lr_date",
   "vehicle_no",
   "distance",
-  "mode_of_transport"
+  "mode_of_transport",
+  "amended_from"
  ],
  "fields": [
   {
@@ -46,14 +47,24 @@
   },
   {
    "fieldname": "mode_of_transport",
-   "fieldtype": "Data",
-   "label": "Mode of Transport"
+   "fieldtype": "Select",
+   "label": "Mode of Transport",
+   "options": "\nRoad\nAir\nRail\nShip"
+  },
+  {
+   "fieldname": "amended_from",
+   "fieldtype": "Link",
+   "label": "Amended From",
+   "no_copy": 1,
+   "options": "Delivery Note Part B",
+   "print_hide": 1,
+   "read_only": 1
   }
  ],
  "index_web_pages_for_search": 1,
  "is_submittable": 1,
  "links": [],
- "modified": "2022-11-09 12:27:22.488746",
+ "modified": "2022-11-14 14:58:24.115795",
  "modified_by": "Administrator",
  "module": "Cleartax Integration",
  "name": "Delivery Note Part B",
