@@ -14,4 +14,10 @@ def sales_invoice_cancel(doc, method=None):
         if not e_invoicing_enabled(company=doc.company):
             create_gst_invoice(**{'invoice':doc.name,'type': "SALE",'cancel':1})
 
+def sales_invoice_save(doc,method=None):
+    if not doc.shipping_address_name:
+        doc.shipping_address_name = doc.customer_address
+    if not doc.dispatch_address_name:
+        doc.dispatch_address_name = doc.company_address
+
 

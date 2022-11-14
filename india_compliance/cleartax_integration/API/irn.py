@@ -45,9 +45,9 @@ def create_irn_request(data,inv):
         }
         if settings.enterprise:
             if settings.sandbox:
-                headers['auth_token'] = settings.sandbox_auth_token
+                headers['auth_token'] = settings.get_password('sandbox_auth_token')
             else:
-                headers['auth_token'] = settings.production_auth_token
+                headers['auth_token'] = settings.get_password('production_auth_token')
 
         payload = json.dumps(data, indent=4, sort_keys=False, default=str)
         response = requests.request(
@@ -129,9 +129,9 @@ def cancel_irn_request(inv,data):
         }
         if settings.enterprise:
             if settings.sandbox:
-                headers['auth_token'] = settings.sandbox_auth_token
+                headers['auth_token'] = settings.get_password('sandbox_auth_token')
             else:
-                headers['auth_token'] = settings.production_auth_token
+                headers['auth_token'] = settings.get_password('production_auth_token')
         payload = json.dumps(data, indent=4, sort_keys=False, default=str)
         response = requests.request(
             "POST", url, headers=headers, data=payload)

@@ -45,9 +45,9 @@ def create_ewb_request(inv,gstin,data):
         }
         if settings.enterprise:
             if settings.sandbox:
-                headers['auth_token'] = settings.sandbox_auth_token
+                headers['auth_token'] = settings.get_password('sandbox_auth_token')
             else:
-                headers['auth_token'] = settings.production_auth_token
+                headers['auth_token'] = settings.get_password('production_auth_token')
         data = json.dumps(data, indent=4, sort_keys=False, default=str)
         response = requests.request(
             "POST", url, headers=headers, data=data)
@@ -102,9 +102,9 @@ def ewb_without_irn_request(delivery_note,data):
         }
         if settings.enterprise:
             if settings.sandbox:
-                headers['auth_token'] = settings.sandbox_auth_token
+                headers['auth_token'] = settings.get_password('sandbox_auth_token')
             else:
-                headers['auth_token'] = settings.production_auth_token
+                headers['auth_token'] = settings.get_password('production_auth_token')
         data = json.dumps(data, indent=4, sort_keys=False, default=str)
         response = requests.request(
             "POST", url, headers=headers, data=data)
@@ -159,9 +159,9 @@ def partb_request(data,dn):
         }
         if settings.enterprise:
             if settings.sandbox:
-                headers['auth_token'] = settings.sandbox_auth_token
+                headers['auth_token'] = settings.get_password('sandbox_auth_token')
             else:
-                headers['auth_token'] = settings.production_auth_token
+                headers['auth_token'] = settings.get_password('production_auth_token')
         data = json.dumps(data, indent=4, sort_keys=False, default=str)    
         response = requests.request(
             "POST", url, headers=headers, data=data)
@@ -195,9 +195,9 @@ def cancel_ewb(**kwargs):
         }
         if settings.enterprise:
             if settings.sandbox:
-                headers['auth_token'] = settings.sandbox_auth_token
+                headers['auth_token'] = settings.get_password('sandbox_auth_token')
             else:
-                headers['auth_token'] = settings.production_auth_token
+                headers['auth_token'] = settings.get_password('production_auth_token')
         invoice = frappe.get_doc('Sales Invoice', kwargs.get('invoice'))
         gstin = frappe.get_value('Address', invoice.company_address,'gstin')
         data = json.loads(kwargs.get('data'))
@@ -225,9 +225,9 @@ def cancel_ewb_dn(**kwargs):
         }
         if settings.enterprise:
             if settings.sandbox:
-                headers['auth_token'] = settings.sandbox_auth_token
+                headers['auth_token'] = settings.get_password('sandbox_auth_token')
             else:
-                headers['auth_token'] = settings.production_auth_token
+                headers['auth_token'] = settings.get_password('production_auth_token')
         deliver_note = frappe.get_doc('Delivery Note', kwargs.get('delivery_note'))
         gstin = frappe.get_value('Address', deliver_note.dispatch_address_name,'gstin')
         data = json.loads(kwargs.get('data'))
