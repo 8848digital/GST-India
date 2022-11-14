@@ -50,6 +50,7 @@ def create_irn_request(data,inv):
                 headers['auth_token'] = settings.get_password('production_auth_token')
 
         payload = json.dumps(data, indent=4, sort_keys=False, default=str)
+        frappe.logger('cleartax').exception(headers)
         response = requests.request(
             "POST", url, headers=headers, data=payload) 
         response = response.json()['message']

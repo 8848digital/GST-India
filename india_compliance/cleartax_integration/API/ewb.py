@@ -86,12 +86,12 @@ def ewb_without_irn(**kwargs):
             'item_list': item_list,
             'gst_accounts':gst_settings_accounts
         }
-        return ewb_without_irn_request(kwargs.get('delivery_note'),data)
+        return ewb_without_irn_request(data,delivery_note=kwargs.get('delivery_note'))
     except Exception as e:
         frappe.logger('cleartax').exception(e)
         return error_response(e)
 
-def ewb_without_irn_request(delivery_note,data):
+def ewb_without_irn_request(data,delivery_note=None,subcontracting_challan=None):
     try:
         settings = frappe.get_doc('Cleartax Settings')
         url = settings.host_url
@@ -114,9 +114,14 @@ def ewb_without_irn_request(delivery_note,data):
         response_status = "Failed"
         if response.get('govt_response').get('Success') =='Y':
             response_status = "Success"
-        response_logger(data,response,"GENERATE EWB WITHOUT IRN","Delivery Note",delivery_note,
-                        response_status)
-        return store_ewb_details_dn(delivery_note,data,response)
+        if deliver_note:
+            response_logger(data,response,"GENERATE EWB WITHOUT IRN","Delivery Note",delivery_note,
+                            response_status)
+            return store_ewb_details_dn(delivery_note,data,response)
+        if subcontracting_challan:
+            response_logger(data,response,"GENERATE EWB WITHOUT IRN","Subcontracting Challan",subcontracting_challan,
+                            response_status)
+            return store_ewb_details_sc(subcontracting_challan,data,response)
     except Exception as e:
         frappe.logger('cleartax').exception(e)
         return error_response(e) 
@@ -127,6 +132,15 @@ def store_ewb_details_dn(delivery_note,data,response):
         frappe.db.set_value('Delivery Note',delivery_note,'ewb_date', response.get('govt_response').get('EwbDt'))
         frappe.db.set_value('Delivery Note',delivery_note,'ewb_valid_till', response.get('govt_response').get('EwbValidTill'))
         frappe.db.set_value('Delivery Note',delivery_note,'ewb_trans_id', response.get('transaction_id'))
+        return success_response()
+    return response_error_handling(response)
+
+def store_ewb_details_sc(subcontracting_challan,data,response):
+    if response.get('govt_response').get('Success') =='Y':
+        frappe.db.set_value('Subcontracting Challan',subcontracting_challan,'ewaybill', response.get('govt_response').get('EwbNo'))
+        frappe.db.set_value('Subcontracting Challan',subcontracting_challan,'ewb_date', response.get('govt_response').get('EwbDt'))
+        frappe.db.set_value('Subcontracting Challan',subcontracting_challan,'ewb_valid_till', response.get('govt_response').get('EwbValidTill'))
+        frappe.db.set_value('Subcontracting Challan',subcontracting_challan,'ewb_trans_id', response.get('transaction_id'))
         return success_response()
     return response_error_handling(response)
 
@@ -299,5 +313,30 @@ def bulk_ewb(**kwargs):
         data = json.loads(kwargs.get('data'))
         for i in data:
             frappe.enqueue("cleartax.cleartax.API.ewb.generate_e_waybill_by_irn",**{'invoice':i})
+    except Exception as e:
+        frappe.logger('sfa_online').exception(e)
+
+
+@frappe.whitelist()
+def sub_con_ewb(**kwargs):
+    try:
+        sc = frappe.get_doc('Subcontracting Challan',kwargs.get('subcontracting_challan'))
+        item_list = []
+        gst_settings_accounts = frappe.get_all("GST Account",
+                filters={'company':sc.company},
+                fields=["cgst_account", "sgst_account", "igst_account", "cess_account"])
+        for row in sc.items:
+            item_list.append(get_dict('Item',row.item_code))
+        data = {
+            'delivery_note':  sc.as_dict(),
+            'billing_address': get_dict('Address',sc.company_address),
+            'customer_address': get_dict('Address',sc.customer_address),
+            'shipping_address': get_dict('Address',sc.shipping_address_name),
+            'dispatch_address': get_dict('Address',sc.dispatch_address_name),
+            'transporter': get_dict('Supplier',sc.transporter),
+            'item_list': item_list,
+            'gst_accounts':gst_settings_accounts
+        }
+        return ewb_without_irn_request(data,subcontracting_challan=kwargs.get('subcontracting_challan'))
     except Exception as e:
         frappe.logger('sfa_online').exception(e)
