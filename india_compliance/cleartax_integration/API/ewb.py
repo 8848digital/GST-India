@@ -329,14 +329,14 @@ def sub_con_ewb(**kwargs):
             item_list.append(get_dict('Item',row.item_code))
         data = {
             'delivery_note':  sc.as_dict(),
-            'billing_address': get_dict('Address',sc.company_address),
-            'customer_address': get_dict('Address',sc.customer_address),
-            'shipping_address': get_dict('Address',sc.shipping_address_name),
-            'dispatch_address': get_dict('Address',sc.dispatch_address_name),
+            'billing_address': get_dict('Address',sc.billing_address),
+            'customer_address': get_dict('Address',sc.shipping_address),
+            'shipping_address': get_dict('Address',sc.shipping_address),
+            'dispatch_address': get_dict('Address',sc.billing_address),
             'transporter': get_dict('Supplier',sc.transporter),
             'item_list': item_list,
             'gst_accounts':gst_settings_accounts
         }
         return ewb_without_irn_request(data,subcontracting_challan=kwargs.get('subcontracting_challan'))
     except Exception as e:
-        frappe.logger('sfa_online').exception(e)
+        frappe.logger('cleartax').exception(e)
