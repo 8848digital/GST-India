@@ -114,7 +114,7 @@ def ewb_without_irn_request(data,delivery_note=None,subcontracting_challan=None)
         response_status = "Failed"
         if response.get('govt_response').get('Success') =='Y':
             response_status = "Success"
-        if deliver_note:
+        if delivery_note:
             response_logger(data,response,"GENERATE EWB WITHOUT IRN","Delivery Note",delivery_note,
                             response_status)
             return store_ewb_details_dn(delivery_note,data,response)
