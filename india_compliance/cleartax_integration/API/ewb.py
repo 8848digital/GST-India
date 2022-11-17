@@ -337,7 +337,7 @@ def cancel_ewb_request(headers,url,data,invoice=None,delivery_note=None,sc=None)
         response_logger(data,response,"CANCEL EWB",doctype,docname,response_status)
         if invoice:
             frappe.db.set_value('Sales Invoice',invoice,'eway_bill_cancelled',1)
-        elif deliver_note:
+        elif delivery_note:
             frappe.db.set_value('Delivery Note',delivery_note,'eway_bill_cancelled',1)
         elif sc:
             frappe.db.set_value('Subcontracting Challan',sc,'eway_bill_cancelld',1)
