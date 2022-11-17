@@ -257,7 +257,34 @@ def cancel_ewb_dn(**kwargs):
         return error_response(e)
         
 
-
+@frappe.whitelist()
+def cancel_ewb_sc(**kwargs):
+    try:
+        settings = frappe.get_doc('Cleartax Settings')
+        url = settings.host_url
+        url+= "/api/method/cleartax.cleartax.API.ewb.cancel_ewb"
+        headers = {
+            'sandbox': str(settings.sandbox),
+            'Content-Type': 'application/json'
+        }
+        if settings.enterprise:
+            if settings.sandbox:
+                headers['auth_token'] = settings.get_password('sandbox_auth_token')
+            else:
+                headers['auth_token'] = settings.get_password('production_auth_token')
+        sc = frappe.get_doc('Subcontracting Challan', kwargs.get('doc'))
+        gstin = frappe.get_value('Address', sc.billing_address,'gstin')
+        data = json.loads(kwargs.get('data'))
+        data = {
+                    "ewbNo": sc.ewaybill,
+                    "cancelRsnCode":data.get('reason'),
+                    "cancelRmrk" : data.get('remarks'),
+                    "gstin":gstin
+                }
+        return cancel_ewb_request(headers,url,data,sc=kwargs.get('doc'))
+    except Exception as e:
+        frappe.logger('cleartax').exception(e)
+        return error_response(e)
 
 
 def store_ewb_details(inv,data,response):
@@ -276,7 +303,7 @@ def store_ewb_details(inv,data,response):
 
 
 
-def cancel_ewb_request(headers,url,data,invoice=None,delivery_note=None):
+def cancel_ewb_request(headers,url,data,invoice=None,delivery_note=None,sc=None):
     data = json.dumps(data, indent=4, sort_keys=False, default=str)
     response = requests.request(
             "POST", url, headers=headers, data=data)
@@ -291,8 +318,10 @@ def cancel_ewb_request(headers,url,data,invoice=None,delivery_note=None):
         response_logger(data,response,"CANCEL EWB",doctype,docname,response_status)
         if invoice:
             frappe.db.set_value('Sales Invoice',invoice,'eway_bill_cancelled',1)
-        else:
+        elif deliver_note:
             frappe.db.set_value('Delivery Note',delivery_note,'eway_bill_cancelled',1)
+        elif sc:
+            frappe.db.set_value('Subcontracting Challan',sc,'eway_bill_cancelld',1)
         return success_response(data=response)
     return response_error_handling(response) 
 
