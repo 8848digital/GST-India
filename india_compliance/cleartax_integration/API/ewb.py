@@ -156,13 +156,29 @@ def update_ewb_partb(**kwargs):
             'dispatch_address': get_dict('Address', delivery_note.dispatch_address_name),
             'shipping_address': get_dict('Address',delivery_note.shipping_address_name)
         }
-        return partb_request(data,kwargs.get('delivery_note'))
+        return partb_request(data,dn=kwargs.get('delivery_note'))
     except Exception as e:
         frappe.logger('cleartax').exception(e)
         return error_response(e)
 
 
-def partb_request(data,dn):
+@frappe.whitelist()
+def update_ewb_partb_sc(**kwargs):
+    try:
+        sc = frappe.get_doc('Subcontracting Challan', kwargs.get('doc'))
+        data = {
+            'data' : json.loads(kwargs.get('data')),
+            'delivery_note': sc.as_dict(),
+            'dispatch_address': get_dict('Address', sc.billing_address),
+            'shipping_address': get_dict('Address',sc.shipping_address)
+        }
+        return partb_request(data,sc=kwargs.get('doc'))
+    except Exception as e:
+        frappe.logger('cleartax').exception(e)
+        return error_response(e)
+
+
+def partb_request(data,dn=None,sc=None):
     try:
         settings = frappe.get_doc('Cleartax Settings')
         url = settings.host_url
@@ -185,7 +201,10 @@ def partb_request(data,dn):
         frappe.logger('cleartax').exception(response)
         response_status = response['status']
         if response_status == 'Success':
-            frappe.db.set_value('Delivery Note',dn,'update_partb',1)
+            if dn:
+                frappe.db.set_value('Delivery Note',dn,'update_partb',1)
+            elif sc:
+                frappe.db.set_value('Subcontracting Challan',sc,'update_partb',1)
             return success_response(response['response'])
         else:
             return response_error_handling(response['response'])
