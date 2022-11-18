@@ -45,7 +45,7 @@ def create_irn_request(data,inv):
         }
         if settings.enterprise:
             if settings.sandbox:
-                headers['auth_token'] = '1234' #settings.get_password('sandbox_auth_token')
+                headers['token'] = '1234' #settings.get_password('sandbox_auth_token')
             else:
                 headers['auth_token'] = settings.get_password('production_auth_token')
 
