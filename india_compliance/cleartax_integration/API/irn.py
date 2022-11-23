@@ -12,6 +12,7 @@ def generate_irn(**kwargs):
         gst_settings_accounts = frappe.get_all("GST Account",
                 filters={'company':invoice.company},
                 fields=["cgst_account", "sgst_account", "igst_account", "cess_account"])
+        #add batch
         for row in invoice.items:
             if row.batch_no:
                 row['batch'] = get_dict('Batch',row.batch_no)
