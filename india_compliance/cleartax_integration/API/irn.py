@@ -13,10 +13,10 @@ def generate_irn(**kwargs):
                 filters={'company':invoice.company},
                 fields=["cgst_account", "sgst_account", "igst_account", "cess_account"])
         #add batch
-        for row in invoice.items:
-            item_list.append(get_dict('Item',row.item_code))
-            if row.batch_no:
-                item_list[-1]['batch_no'] = get_dict('Batch',row.batch_no)
+        # for row in invoice.items:
+        #     item_list.append(get_dict('Item',row.item_code))
+        #     if row.batch_no:
+        #         item_list[-1]['batch_no'] = get_dict('Batch',row.batch_no)
             
         
         data = {
