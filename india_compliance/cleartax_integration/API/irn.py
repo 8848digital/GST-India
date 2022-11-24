@@ -7,16 +7,17 @@ import json
 @frappe.whitelist(allow_guest=True)
 def generate_irn(**kwargs):
     try:
-        invoice = get_dict('Sales Invoice',kwargs.get('invoice'))
+        invoice = frappe.get_doc(get_doc('Sales Invoice',kwargs.get('invoice')))
         item_list = []
         gst_settings_accounts = frappe.get_all("GST Account",
                 filters={'company':invoice.company},
                 fields=["cgst_account", "sgst_account", "igst_account", "cess_account"])
         #add batch
         for row in invoice.items:
-            if row.batch_no:
-                row['batch'] = get_dict('Batch',row.batch_no)
             item_list.append(get_dict('Item',row.item_code))
+            if row.batch_no:
+                item_list[-1]['batch_no'] = get_dict('Batch',row.batch_no)
+            
         
         data = {
             'invoice': invoice.as_dict(),
