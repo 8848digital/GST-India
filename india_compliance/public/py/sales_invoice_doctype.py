@@ -13,6 +13,12 @@ def sales_invoice_cancel(doc, method=None):
     if frappe.get_value('Cleartax Settings', 'Cleartax Settings','automate'):
         if not e_invoicing_enabled(company=doc.company):
             create_gst_invoice(**{'invoice':doc.name,'type': "SALE",'cancel':1})
+        else:
+            if doc.ewaybill and not eway_bill_cancelled:
+                frappe.throw("Please Cancel EWB!")
+            if doc.irn and not doc.irn_cancelled:
+                frappe.throw("Please Cancel IRN!")
+            
 
 def sales_invoice_save(doc,method=None):
     if not doc.shipping_address_name:
