@@ -66,7 +66,7 @@
   },
   {
    "fieldname": "lr_date",
-   "fieldtype": "Data",
+   "fieldtype": "Date",
    "label": "Transport Receipt Date"
   },
   {
@@ -103,7 +103,7 @@
  "index_web_pages_for_search": 1,
  "is_submittable": 1,
  "links": [],
- "modified": "2022-11-28 11:37:46.041026",
+ "modified": "2022-11-28 13:05:40.181211",
  "modified_by": "Administrator",
  "module": "Cleartax Integration",
  "name": "Transporter Details",
