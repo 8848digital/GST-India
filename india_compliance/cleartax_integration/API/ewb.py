@@ -7,6 +7,7 @@ import requests
 @frappe.whitelist()
 def generate_e_waybill_by_irn(**kwargs):
     try:
+        transporter_details = None
         invoice = frappe.get_doc('Sales Invoice',kwargs.get('invoice'))
         item_list = []
         gst_settings_accounts = frappe.get_all("GST Account",
@@ -15,6 +16,9 @@ def generate_e_waybill_by_irn(**kwargs):
         for row in invoice.items:
             item_list.append(get_dict('Item',row.item_code))
         delivery_note = get_delivery_note(invoice)
+        if not delivery_note:
+            delivery_note = get_transporter(invoice)
+        transporter = delivery_note.transporter
         data = {
             'invoice': invoice.as_dict(),
             'customer': get_dict('Customer',invoice.customer),
@@ -25,7 +29,7 @@ def generate_e_waybill_by_irn(**kwargs):
             'item_list': item_list,
             'gst_accounts':gst_settings_accounts,
             'delivery_note': delivery_note,
-            'transporter': get_dict('Supplier',delivery_note.transporter)
+            'transporter': get_dict('Supplier',transporter)
        }
         dispatch_address = frappe.get_doc("Address",invoice.dispatch_address_name)
         return create_ewb_request(invoice,dispatch_address.gstin,data)
@@ -353,7 +357,17 @@ def get_delivery_note(doc):
         delivery_note = frappe.get_value('Sales Invoice Item',{"parent":doc.name},"delivery_note")
         if delivery_note:
             return frappe.get_doc('Delivery Note',delivery_note).as_dict()
+        if frappe.db.exists('Transporter Details', {'sales_invoice':doc.name}):
+            td = frappe.get_value('Transporter Details', {'sales_invoice':doc.name},'name')
+            return frappe.get_doc('Transporter Details',td)
         return {}
+
+def get_transporter(doc):
+    if frappe.db.exists('Transporter Details', {'sales_invoice':doc.name}):
+            td = frappe.get_value('Transporter Details', {'sales_invoice':doc.name},'name')
+            return frappe.get_doc('Transporter Details',td)
+    return {}
+
 
 @frappe.whitelist()
 def bulk_ewb(**kwargs):
