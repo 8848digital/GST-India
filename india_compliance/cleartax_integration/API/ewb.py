@@ -16,8 +16,6 @@ def generate_e_waybill_by_irn(**kwargs):
         for row in invoice.items:
             item_list.append(get_dict('Item',row.item_code))
         delivery_note = get_delivery_note(invoice)
-        if not delivery_note:
-            delivery_note = get_transporter(invoice)
         transporter = delivery_note.transporter
         data = {
             'invoice': invoice.as_dict(),
@@ -359,14 +357,11 @@ def get_delivery_note(doc):
             return frappe.get_doc('Delivery Note',delivery_note).as_dict()
         if frappe.db.exists('Transporter Details', {'sales_invoice':doc.name}):
             td = frappe.get_value('Transporter Details', {'sales_invoice':doc.name},'name')
+            frappe.logger('cleartax').exception('td')
+            frappe.logger('cleartax').exception(td)
             return frappe.get_doc('Transporter Details',td)
         return {}
 
-def get_transporter(doc):
-    if frappe.db.exists('Transporter Details', {'sales_invoice':doc.name}):
-            td = frappe.get_value('Transporter Details', {'sales_invoice':doc.name},'name')
-            return frappe.get_doc('Transporter Details',td)
-    return {}
 
 
 @frappe.whitelist()
