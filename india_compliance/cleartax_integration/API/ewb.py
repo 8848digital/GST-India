@@ -359,7 +359,7 @@ def get_delivery_note(doc):
             td = frappe.get_value('Transporter Details', {'sales_invoice':doc.name},'name')
             frappe.logger('cleartax').exception('td')
             frappe.logger('cleartax').exception(td)
-            return frappe.get_doc('Transporter Details',td)
+            return frappe.get_doc('Transporter Details',td).as_dict()
         return {}
 
 
