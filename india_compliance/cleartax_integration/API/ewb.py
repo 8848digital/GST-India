@@ -373,6 +373,16 @@ def bulk_ewb(**kwargs):
     except Exception as e:
         frappe.logger('sfa_online').exception(e)
 
+@frappe.whitelist()
+def bulk_ewb_dn(**kwargs):
+    try:
+        data = json.loads(kwargs.get('data'))
+        for i in data:
+            frappe.enqueue("cleartax.cleartax.API.ewb.ewb_without_irn",**{'delivery_note':i})
+        frappe.db.commit()
+    except Exception as e:
+        frappe.logger('sfa_online').exception(e)
+
 
 @frappe.whitelist()
 def sub_con_ewb(**kwargs):
