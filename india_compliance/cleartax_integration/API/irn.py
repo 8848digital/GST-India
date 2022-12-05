@@ -80,9 +80,6 @@ def store_irn_details(inv,response):
         frappe.db.set_value("Sales Invoice",inv,'signed_qr_code', response.get('govt_response').get('SignedQRCode'))
         frappe.db.set_value("Sales Invoice",inv,'irn', response.get('govt_response').get('Irn'))
         frappe.db.set_value("Sales Invoice",inv,'irn_status', response.get('govt_response').get('Status'))
-        # frappe.db.set_value("Sales Invoice",inv,'ewb_number', response.get('EwbNo'))
-        # frappe.db.set_value("Sales Invoice",inv,'ewb_date', response.get('EwbDt'))
-        # frappe.db.set_value("Sales Invoice",inv,'ewb_valid_till', response.get('EwbValidTill'))
     except Exception as e:
         frappe.logger('cleartax').exception(e)
         return error_response(e)
