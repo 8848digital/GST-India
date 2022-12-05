@@ -8,6 +8,7 @@ def sales_invoice_submit(doc, method=None):
             generate_irn(**{'invoice':doc.name})
         else:
             create_gst_invoice(**{'invoice':doc.name,'type':"SALE"})
+        frappe.db.commit()
 
 def sales_invoice_cancel(doc, method=None):
     if frappe.get_value('Cleartax Settings', 'Cleartax Settings','automate'):
