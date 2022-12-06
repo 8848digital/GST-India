@@ -84,7 +84,7 @@ doc_events = {
     },
     "Purchase Invoice": {
         "validate": "india_compliance.gst_india.overrides.purchase_invoice.validate",
-        "on_submit": "india_compliance.public.py.purchase_invoice_doctype.purchase_invoice_submit",
+        "before_submit": "india_compliance.public.py.purchase_invoice_doctype.purchase_invoice_submit",
         "before_cancel": "india_compliance.public.py.purchase_invoice_doctype.purchase_invoice_cancel",
         "before_save": "india_compliance.public.py.purchase_invoice_doctype.purchase_invoice_save"
     },
@@ -104,7 +104,8 @@ doc_events = {
         ),
         "onload": "india_compliance.gst_india.overrides.sales_invoice.onload",
         "validate": "india_compliance.gst_india.overrides.sales_invoice.validate",
-        "on_submit": ["india_compliance.gst_india.overrides.sales_invoice.on_submit", "india_compliance.public.py.sales_invoice_doctype.sales_invoice_submit"],
+        "on_submit": "india_compliance.gst_india.overrides.sales_invoice.on_submit", 
+        "before_submit":"india_compliance.public.py.sales_invoice_doctype.sales_invoice_submit",
         "before_cancel": "india_compliance.public.py.sales_invoice_doctype.sales_invoice_cancel",
         "before_save": "india_compliance.public.py.sales_invoice_doctype.sales_invoice_save"
     },
