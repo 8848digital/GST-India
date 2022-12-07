@@ -69,6 +69,12 @@ Once you've [set up a Frappe site](https://frappeframework.com/docs/v14/user/en/
     6. Check the Automate checkbox if you want automatic generation of IRNs and EWBs on submit of documents.
     
       ![890bac94-cae5-47b6-bf5f-b11d6d602d1d](https://user-images.githubusercontent.com/48561545/206155163-323c2387-cd2b-4f6a-aedf-92318ee81886.png)
+      
+    7. Select the companies that require E- Invoicing here
+    
+       ![download](https://user-images.githubusercontent.com/48561545/206155995-9673c24a-9c64-4612-887c-4bdcacfc4b49.png)
+       
+    8. Let the Host Site have the default value unless asked to change by the organization.
 
         
 2. SMB Users
