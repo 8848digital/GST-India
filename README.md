@@ -94,8 +94,19 @@ Once you've [set up a Frappe site](https://frappeframework.com/docs/v14/user/en/
 ## Functionalities
 
 ### E-Invoicing
-    1. You can generate IRNs for a Sales Invoice(submitted) by clicking Create -> IRN
-    2. You can see the IRN details in the E-Invoicing section in the More Info tab.
+
+   1. You can generate IRNs for a Sales Invoice(submitted) by clicking Create -> IRN
+   2. You can see the IRN details in the E-Invoicing section in the More Info tab.
+   3. If there are issues with the document, a popup will display the errors.
+   4. You can also check the errors from Cleartax Api Log List
+   5. After generating IRN, now you can generate EWB by IRN.
+   6. In order to generate EWB, 
+      1. The Sales Invoice must be generated from a Delivery Note
+      2.  (OR) A Delivery Note must be generated from the Sales Invoice
+      3.  (OR) Transporter Details must be created from the Sales Invoice.
+   7. To generate EWB, click Create -> EWB 
+   8. EWB details will be in the Ewaybill section in the More Info tab
+   9. You can cancel EWB and IRN from Cancel EWb and Cancel IRN Buttons at the top.
     
 
 
