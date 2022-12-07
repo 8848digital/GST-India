@@ -1,11 +1,7 @@
 <div align="center">
 
 <!-- TODO: add link to website once it is ready -->
-<h1>India Compliance</h1>
-
-Simple, yet powerful compliance solutions for Indian businesses
-
-[![Server Tests](https://github.com/resilient-tech/india-compliance/actions/workflows/server-tests.yml/badge.svg)](https://github.com/resilient-tech/india-compliance/actions/workflows/server-tests.yml)
+<h1>GST INDIA</h1>
 
 </div>
 
@@ -13,19 +9,22 @@ Simple, yet powerful compliance solutions for Indian businesses
 
 ## Introduction
 
-India Compliance has been designed to make compliance with Indian rules and regulations simple, swift and reliable. To this end, it has been carefully integrated with GST APIs to simplify recurring compliance processes.
+This project aims to integrate the ClearTax portal's APIs with the ERPNext solution. The user can directly generate e-invoices, IRNs, and E-way bills and cancel them from within ERPNext.
 
-It builds on top of [ERPNext](https://github.com/frappe/erpnext) and the [Frappe Framework](https://github.com/frappe/frappe) - incredible FOSS projects built and maintained by the incredible folks at Frappe. Go check these out if you haven't already!
+It works on top of [ERPNext](https://github.com/frappe/erpnext) and the [Frappe Framework](https://github.com/frappe/frappe) - incredible FOSS projects built and maintained by the incredible folks at Frappe. Go check these out if you haven't already!
 
 ## Key Features
 
-- End-to-end GST e-Waybill management
-- Automated GST e-Invoice generation and cancellation
-- Autofill Party and Address details by entering their GSTIN
-- Configurable features based on business needs
-- Powerful validations to ensure correct compliance
+- E-invoicing (Generation/Cancellation)
+- E-Way Bills (Generation/Cancellation/Updation)
+- GST Invoices (Generation)
 
-For a detailed overview of these features, please [refer to the documentation](https://docs.erpnext.com/docs/v14/user/manual/en/regional/india).
+
+## Prerequisites
+
+- Cleartax Account ( Only for Enterprise Users)
+- Erpnext(v13 & above)
+- Frappe (v13 & above)
 
 ## Installation
 
@@ -35,7 +34,7 @@ Once you've [set up a Frappe site](https://frappeframework.com/docs/v14/user/en/
 1. Download the app using the Bench CLI
 
   ```bash
-  bench get-app https://github.com/resilient-tech/india-compliance.git
+  bench get-app https://github.com/8848digital/GST-India.git
   ```
 
 2. Install the app on your site
@@ -44,19 +43,17 @@ Once you've [set up a Frappe site](https://frappeframework.com/docs/v14/user/en/
   bench --site [site name] install-app india_compliance
   ```
 
-## In-app Purchases
+## Setup Instructions
 
-Some of the automation features available in India Compliance require access to [GST APIs](https://discuss.erpnext.com/t/introducing-india-compliance/86335#a-note-on-gst-apis-3). Since there are some costs associated with these APIs, they can be accessed by signing up for an India Compliance Account after installing this app.
+1. Enterprise Users
+    1. Go to Cleartax Settings
+        
+2. SMB Users
 
-## Planned Features
 
-- Advanced purchase reconciliation based on GSTR-2B and GSTR-2A
-- Quick and easy filing process for GSTR-1 and GSTR-3B
 
-## Contributing
 
-- [Issue Guidelines](https://github.com/frappe/erpnext/wiki/Issue-Guidelines)
-- [Pull Request Requirements](https://github.com/frappe/erpnext/wiki/Contribution-Guidelines)
+
 
 ## License
 
