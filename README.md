@@ -47,16 +47,27 @@ Once you've [set up a Frappe site](https://frappeframework.com/docs/v14/user/en/
 
 1. Enterprise Users
     1. Go to Cleartax Settings
+    
       ![3edc54eb-ebc2-4376-9f40-789be607ada2](https://user-images.githubusercontent.com/48561545/206153841-efcdbda0-33f1-4607-9e6c-bf4fcb44b35d.png)
+      
     2. Check the Enterprise checkbox
+    
       ![a3c5a656-4c6e-4351-a408-5a952066a621](https://user-images.githubusercontent.com/48561545/206154012-583a8108-a845-46ff-8c24-cd9cd9aa3ce9.png)
+      
     3. Under Enterprise Details, enter the auth tokens, GSTINs and their corresponding tax entity IDs
+    
       ![bf71efbc-f6cc-4986-88e7-fbb30db4936d](https://user-images.githubusercontent.com/48561545/206154488-77bdcd35-e214-4987-9aab-630fb4a7e4b0.png)
+      
     4. Click the Enable checkbox to enable all features.
+    
       ![a528497c-8f2a-4b30-befa-922d0d511104](https://user-images.githubusercontent.com/48561545/206154731-e82b4746-744b-4d0f-ad6d-88f30aa5c126.png)
+      
     5. Check the Sandbox checkbox for testing and uncheck it for production mode.
+    
       ![e4db45ad-73c2-4bf2-a610-9ff35c104328](https://user-images.githubusercontent.com/48561545/206154931-dc22a05e-3958-497c-9e20-793f926b5641.png)
+      
     6. Check the Automate checkbox if you want automatic generation of IRNs and EWBs on submit of documents.
+    
       ![890bac94-cae5-47b6-bf5f-b11d6d602d1d](https://user-images.githubusercontent.com/48561545/206155163-323c2387-cd2b-4f6a-aedf-92318ee81886.png)
 
         
