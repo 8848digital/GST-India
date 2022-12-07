@@ -91,7 +91,12 @@ Once you've [set up a Frappe site](https://frappeframework.com/docs/v14/user/en/
     5. Let the Host Site have the default value unless asked to change by the organization.
 
         
+## Functionalities
 
+### E-Invoicing
+    1. You can generate IRNs for a Sales Invoice(submitted) by clicking Create -> IRN
+    2. You can see the IRN details in the E-Invoicing section in the More Info tab.
+    
 
 
 
