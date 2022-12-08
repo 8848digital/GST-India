@@ -128,7 +128,23 @@ Once you've [set up a Frappe site](https://frappeframework.com/docs/v14/user/en/
   2. To Generate GST Invoice, the billing company must be removed from E-Invoicing list in cleartax Settings
   3. Click on Create -> GST Invoice
    
- 
+### Error Log
+   1. Incase anything goes wrong when generating an IRN/EWB/GST Invoice, you can look into the error logs and resolve the data.
+   2. To Check Error logs, go to Cleartax Api Log List.
+   3. You can filter the log by Document ID and API TYPE(i.e. IRN,EWB etc)
+   
+### Bulk Generation
+   1. You can generate IRN and EWB in bulk from Sales Invoice List and Delivery Note List.
+   2. Select the documents, then click on Action -> IRN/EWB.
+
+### Dashboards
+   We have created 3 dashboards
+    1. E-Invoicing
+    2. EWB (IRN - Sales Invoice)
+    3. EWB (Delivery Note)
+   
+   You can get the count of generated, pending, failed, cancelled and also a monthly chart in these dashboards.
+  
     
 
 
