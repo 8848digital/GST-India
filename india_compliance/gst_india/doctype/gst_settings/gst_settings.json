@@ -129,7 +129,7 @@
   },
   {
    "default": "0",
-   "depends_on": "eval: ic.can_enable_api(doc)",
+   "depends_on": "",
    "description": "Enable this to use API features like e-Waybill / e-Invoice generation from your ERP",
    "fieldname": "enable_api",
    "fieldtype": "Check",
