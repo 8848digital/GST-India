@@ -88,7 +88,7 @@
    "label": "Accounts"
   },
   {
-   "depends_on": "eval: ic.is_api_enabled(doc)",
+   "depends_on": "",
    "fieldname": "credentials_tab",
    "fieldtype": "Tab Break",
    "label": "Credentials"
@@ -121,7 +121,7 @@
   },
   {
    "default": "1",
-   "depends_on": "eval: ic.is_api_enabled(doc) && doc.enable_e_waybill",
+   "depends_on": " && doc.enable_e_waybill",
    "description": "If checked, a PDF of the e-Waybill will be automatically attached to the transaction after it's generation",
    "fieldname": "attach_e_waybill_print",
    "fieldtype": "Check",
@@ -136,7 +136,7 @@
    "label": "Enable API Features"
   },
   {
-   "depends_on": "eval: ic.is_api_enabled(doc)",
+   "depends_on": "",
    "fieldname": "e_invoice_section",
    "fieldtype": "Section Break",
    "label": "e-Invoice"
@@ -167,11 +167,11 @@
    "fieldname": "auto_generate_e_waybill",
    "fieldtype": "Check",
    "label": "Automatically Generate e-Waybill on Invoice Submission",
-   "read_only_depends_on": "eval: ic.is_api_enabled(doc) && doc.enable_e_invoice"
+   "read_only_depends_on": " && doc.enable_e_invoice"
   },
   {
    "default": "1",
-   "depends_on": "eval: ic.is_api_enabled(doc) && doc.enable_e_waybill",
+   "depends_on": " && doc.enable_e_waybill",
    "description": "Automatically fetch e-Waybill data after it's generation for printing or logging purposes. This will lead to one additional API request.",
    "fieldname": "fetch_e_waybill_data",
    "fieldtype": "Check",
@@ -213,7 +213,7 @@
    "label": "Enable SEZ / Overseas Transactions"
   },
   {
-   "depends_on": "eval: ic.is_api_enabled(doc)",
+   "depends_on": "",
    "fieldname": "other_apis_section",
    "fieldtype": "Section Break",
    "label": "Other APIs"
