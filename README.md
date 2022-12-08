@@ -118,6 +118,15 @@ Once you've [set up a Frappe site](https://frappeframework.com/docs/v14/user/en/
    11. In Delivery Note, you can enter the vehicle details, and update with the cleartax Portal. 
    12. This can be done using the Update Part B Button.
    13. You can also generate IRN for a Credit Note(same as Sales Invoice)
+
+### GST Invoice
+  1. You Can Generate GST Invoice for the Following Documents
+      1. Sales Invoice
+      2. Purchase Invoice
+      3. Credit Note
+      4. Debit Note
+  2. To Generate GST Invoice, the billing company must be removed from E-Invoicing list in cleartax Settings
+  3. Click on Create -> GST Invoice
    
  
     
