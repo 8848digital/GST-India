@@ -163,7 +163,6 @@
   },
   {
    "default": "1",
-   "depends_on": "eval: ic.is_api_enabled(doc) && doc.enable_e_waybill",
    "description": "e-Waybill will be automatically generated after Sales Invoice submission if the invoice value threshold is met, and data is available and valid",
    "fieldname": "auto_generate_e_waybill",
    "fieldtype": "Check",
@@ -230,7 +229,7 @@
  "index_web_pages_for_search": 1,
  "issingle": 1,
  "links": [],
- "modified": "2022-09-07 09:49:38.261631",
+ "modified": "2022-12-08 09:39:18.220994",
  "modified_by": "Administrator",
  "module": "GST India",
  "name": "GST Settings",
