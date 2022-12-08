@@ -139,14 +139,15 @@ Once you've [set up a Frappe site](https://frappeframework.com/docs/v14/user/en/
 
 ### Dashboards
    We have created 3 dashboards
-    1. E-Invoicing
-    2. EWB (IRN - Sales Invoice)
-    3. EWB (Delivery Note)
+   1. E-Invoicing
+   2. EWB (IRN - Sales Invoice)
+   3. EWB (Delivery Note)
    
    You can get the count of generated, pending, failed, cancelled and also a monthly chart in these dashboards.
   
     
-
+### Cleartax Portal Functionalities (Enterprise)
+  
 
 
 
