@@ -146,13 +146,11 @@ Once you've [set up a Frappe site](https://frappeframework.com/docs/v14/user/en/
    You can get the count of generated, pending, failed, cancelled and also a monthly chart in these dashboards.
   
     
-### Cleartax Portal Functionalities (Enterprise)
+
   
 
 
 
 
 
-## License
 
-[GNU General Public License (v3)](https://github.com/resilient-tech/india-compliance/blob/develop/license.txt)
