@@ -75,7 +75,8 @@ doc_events = {
             "india_compliance.gst_india.overrides.transaction.validate_transaction"
         ),
         "before_submit": "india_compliance.public.py.delivery_note_doctype.delivery_note_submit",
-        "before_save": "india_compliance.public.py.delivery_note_doctype.delivery_note_save"
+        "before_save": "india_compliance.public.py.delivery_note_doctype.delivery_note_save",
+        "before_cancel": "india_compliance.public.py.delivery_note_doctype.delivery_note_cancel"
     },
     "Item": {"validate": "india_compliance.gst_india.overrides.item.validate_hsn_code"},
     "Payment Entry": {
