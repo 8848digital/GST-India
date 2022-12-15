@@ -36,9 +36,8 @@ def response_error_handling(response):
         errors = response.get('ErrorDetails')
     elif response.get('errorDetails'):
         errors.append(response.get('errorDetails'))
-    elif response.get('errors'):
-        if response.get('errors').get('errors'):
-            errors = response.get('errors').get('errors')
+    elif response.get('errors') and response.get('errors').get('errors'):
+            errors = response.get('errors').get('errors') 
     else:
         errors.append({'error_message':json.dumps(response)})
     c=1
