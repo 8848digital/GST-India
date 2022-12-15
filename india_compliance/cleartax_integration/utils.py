@@ -23,6 +23,8 @@ def error_response(err_msg):
 def response_error_handling(response):
     error = ""
     errors = []
+    if type(response) ==list:
+        response = response[0]
     if type(response) == str:
         return error_response(response)
     if type(response) == None:
