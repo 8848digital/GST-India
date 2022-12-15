@@ -16,6 +16,7 @@ def create_gst_invoice(**kwargs):
             doctype = "Purchase Invoice"
         invoice = frappe.get_doc(doctype,kwargs.get('invoice'))
         item_list = []
+        gst_round_off = frappe.get_value('GST Settings','round_off_gst_values')
         gst_settings_accounts = frappe.get_all("GST Account",
                 filters={'company':invoice.company},
                 fields=["cgst_account", "sgst_account", "igst_account", "cess_account"])
@@ -25,7 +26,8 @@ def create_gst_invoice(**kwargs):
             'invoice': invoice.as_dict(),
             'type': type,
             'item_list': item_list,
-            'gst_accounts':gst_settings_accounts
+            'gst_accounts':gst_settings_accounts,
+            'gst_round_off': gst_round_off
         }
         if type == 'SALE':
             data['company_address'] = get_dict('Address',invoice.company_address)

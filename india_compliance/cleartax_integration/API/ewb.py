@@ -10,6 +10,7 @@ def generate_e_waybill_by_irn(**kwargs):
         transporter_details = None
         invoice = frappe.get_doc('Sales Invoice',kwargs.get('invoice'))
         item_list = []
+        gst_round_off = frappe.get_value('GST Settings','round_off_gst_values')
         gst_settings_accounts = frappe.get_all("GST Account",
                 filters={'company':invoice.company},
                 fields=["cgst_account", "sgst_account", "igst_account", "cess_account"])
@@ -27,6 +28,7 @@ def generate_e_waybill_by_irn(**kwargs):
             'dispatch_address': get_dict('Address',invoice.dispatch_address_name),
             'item_list': item_list,
             'gst_accounts':gst_settings_accounts,
+            'gst_round_off': gst_round_off,
             'delivery_note': delivery_note,
             'transporter': get_dict('Supplier',transporter)
        }
@@ -74,6 +76,7 @@ def ewb_without_irn(**kwargs):
     try:
         delivery_note = frappe.get_doc('Delivery Note',kwargs.get('delivery_note'))
         item_list = []
+        gst_round_off = frappe.get_value('GST Settings','round_off_gst_values')
         gst_settings_accounts = frappe.get_all("GST Account",
                 filters={'company':delivery_note.company},
                 fields=["cgst_account", "sgst_account", "igst_account", "cess_account"])
@@ -87,7 +90,8 @@ def ewb_without_irn(**kwargs):
             'dispatch_address': get_dict('Address',delivery_note.dispatch_address_name),
             'transporter': get_dict('Supplier',delivery_note.transporter),
             'item_list': item_list,
-            'gst_accounts':gst_settings_accounts
+            'gst_accounts':gst_settings_accounts,
+            'gst_round_off': gst_round_off
         }
         return ewb_without_irn_request(data,delivery_note=kwargs.get('delivery_note'))
     except Exception as e:

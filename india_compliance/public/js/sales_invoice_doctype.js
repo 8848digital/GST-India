@@ -9,7 +9,6 @@ frappe.ui.form.on('Sales Invoice', {
 			callback: function (r) {
 				console.log(r.message)
 				if (r.message == true) {
-				   //console.log(frm.selected_doc.irn_cancelled);
 					if (frm.selected_doc.irn_cancelled == false && frm.selected_doc.irn == undefined) {
 						cur_frm.add_custom_button(__("IRN"), function () {
 							frappe.call({
@@ -24,7 +23,8 @@ frappe.ui.form.on('Sales Invoice', {
 										location.reload();
 									}
 									else {
-										frappe.throw(r.message.error)
+										// frappe.msgprint(r.message.error, raise_exception=True)
+										frappe.msgprint(r.message.error, raise_exception=True)
 									}
 								}
 							});
@@ -64,7 +64,8 @@ frappe.ui.form.on('Sales Invoice', {
 												location.reload();
 											}
 											else {
-												frappe.throw(r.message.error)
+												// frappe.msgprint(r.message.error, raise_exception=True)
+												frappe.msgprint(r.message.error, raise_exception=True)
 											}
 										}
 									})
@@ -87,7 +88,8 @@ frappe.ui.form.on('Sales Invoice', {
 									location.reload();
 								}
 								else {
-									frappe.throw(r.message.error)
+									// frappe.msgprint(r.message.error, raise_exception=True)
+									frappe.msgprint(r.message.error, raise_exception=True)
 								}
 							}
 						});
@@ -128,7 +130,8 @@ frappe.ui.form.on('Sales Invoice', {
 												location.reload();
 											}
 											else {
-												frappe.throw(r.message.error)
+												// frappe.msgprint(r.message.error, raise_exception=True)
+												frappe.msgprint(r.message.error, raise_exception=True)
 											}
 										}
 									})
@@ -162,7 +165,7 @@ frappe.ui.form.on('Sales Invoice', {
 										location.reload();
 									}
 									else {
-										frappe.throw(r.message.error)
+										frappe.msgprint(r.message.error, raise_exception=True)
 									}
 								}
 							});

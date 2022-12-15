@@ -12,6 +12,7 @@ def generate_irn(**kwargs):
         gst_settings_accounts = frappe.get_all("GST Account",
                 filters={'company':invoice.company},
                 fields=["cgst_account", "sgst_account", "igst_account", "cess_account"])
+        gst_round_off = frappe.get_value('GST Settings','round_off_gst_values')
         #add batch
         for row in invoice.items:
             item_list.append(get_dict('Item',row.item_code))
@@ -27,7 +28,8 @@ def generate_irn(**kwargs):
             'shipping_address': get_dict('Address',invoice.shipping_address_name),
             'dispatch_address': get_dict('Address',invoice.dispatch_address_name),
             'item_list': item_list,
-            'gst_accounts':gst_settings_accounts
+            'gst_accounts':gst_settings_accounts,
+            'gst_round_off': gst_round_off
         }
         return create_irn_request(data,invoice.name)
     except Exception as e:
@@ -52,7 +54,6 @@ def create_irn_request(data,inv):
                 headers['token'] = settings.get_password('production_auth_token')
 
         payload = json.dumps(data, indent=4, sort_keys=False, default=str)
-        frappe.logger('cleartax').exception(headers)
         response = requests.request(
             "POST", url, headers=headers, data=payload) 
         response = response.json()['message']
@@ -64,8 +65,6 @@ def create_irn_request(data,inv):
             return success_response()
         if response['response'][0]['document_status'] == 'IRN_CANCELLED': 
             return response_error_handling(json.loads(json.dumps(response['response'][0])))
-    except Exception as e:
-        return response_error_handling("IRN with this document number Already Cancelled!")
     except Exception as e:
         frappe.logger('cleartax').exception(e)
         return error_response(e)
@@ -105,13 +104,16 @@ def cancel_irn(**kwargs):
             "CnlRsn": reason,
             "CnlRem": data.get('remarks')
         }
-        company_address = frappe.db.get_value('Dynamic Link',{
-                'link_doctype': "Company", 
-                'link_name': frappe.get_value('Sales Invoice',inv,'company'), 
-                'parenttype': 'Address'
-                }, ['parent'])
-        addr = frappe.get_doc("Address",company_address)
-        data['gstin'] = addr.gstin
+        invoice = frappe.get_doc('Sales Invoice',inv)
+        gstin = frappe.get_value('Address',invoice.dispatch_address_name,'gstin')
+        if not gstin:
+            company_address = frappe.db.get_value('Dynamic Link',{
+                    'link_doctype': "Company", 
+                    'link_name': frappe.get_value('Sales Invoice',inv,'company'), 
+                    'parenttype': 'Address'
+                    }, ['parent'])
+            gstin = frappe.get_value("Address",company_address,'gstin')
+        data['gstin'] = gstin
         return cancel_irn_request(inv,data) 
     except Exception as e:
         frappe.logger('cleartax').exception(e)

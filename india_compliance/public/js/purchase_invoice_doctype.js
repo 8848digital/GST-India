@@ -23,7 +23,7 @@ frappe.ui.form.on('Purchase Invoice', {
 										location.reload();
 									}
 									else {
-										frappe.throw(r.message.error)
+										frappe.msgprint(r.message.error, raise_exception=True)
 									}
 								}
 							});
