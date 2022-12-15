@@ -42,10 +42,11 @@ doctype_js = {
 doctype_list_js = {
     "Sales Invoice": [
         "public/js/sales_invoice_list.js",
-#        "public/js/sales_invoice_list.js",
         "gst_india/client_scripts/e_waybill_actions.js",
         "gst_india/client_scripts/sales_invoice_list.js",
-    ]
+    ],
+    "Purchase Invoice": "public/js/purchase_invoice_list.js",
+    "Delivery Note": "public/js/delivery_note_list.js"
 }
 
 doc_events = {

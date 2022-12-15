@@ -128,3 +128,12 @@ def gst_cdn_request(data,id,type):
         frappe.logger('cleartax').exception(e)
         return error_response(e)
 
+@frappe.whitelist()
+def bulk_purchase_gst(**kwargs):
+    try:
+        data = json.loads(kwargs.get('data'))
+        for i in data:
+            frappe.enqueue("cleartax.cleartax.API.gst.create_gst_invoice",**{'invoice':i,'type'='PURCHASE'})
+        frappe.db.commit()
+    except Exception as e:
+        frappe.logger('sfa_online').exception(e)
