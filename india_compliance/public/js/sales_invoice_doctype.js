@@ -23,8 +23,8 @@ frappe.ui.form.on('Sales Invoice', {
 										location.reload();
 									}
 									else {
-										// frappe.msgprint(r.message.error, raise_exception=True)
-										frappe.msgprint(r.message.error, raise_exception=True)
+										// frappe.msgprint(r.message.error)
+										frappe.msgprint(r.message.error)
 									}
 								}
 							});
@@ -64,8 +64,8 @@ frappe.ui.form.on('Sales Invoice', {
 												location.reload();
 											}
 											else {
-												// frappe.msgprint(r.message.error, raise_exception=True)
-												frappe.msgprint(r.message.error, raise_exception=True)
+												// frappe.msgprint(r.message.error)
+												frappe.msgprint(r.message.error)
 											}
 										}
 									})
@@ -88,8 +88,8 @@ frappe.ui.form.on('Sales Invoice', {
 									location.reload();
 								}
 								else {
-									// frappe.msgprint(r.message.error, raise_exception=True)
-									frappe.msgprint(r.message.error, raise_exception=True)
+									// frappe.msgprint(r.message.error)
+									frappe.msgprint(r.message.error)
 								}
 							}
 						});
@@ -130,8 +130,8 @@ frappe.ui.form.on('Sales Invoice', {
 												location.reload();
 											}
 											else {
-												// frappe.msgprint(r.message.error, raise_exception=True)
-												frappe.msgprint(r.message.error, raise_exception=True)
+												// frappe.msgprint(r.message.error)
+												frappe.msgprint(r.message.error)
 											}
 										}
 									})
@@ -165,7 +165,7 @@ frappe.ui.form.on('Sales Invoice', {
 										location.reload();
 									}
 									else {
-										frappe.msgprint(r.message.error, raise_exception=True)
+										frappe.msgprint(r.message.error)
 									}
 								}
 							});

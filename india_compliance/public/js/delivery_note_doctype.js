@@ -24,7 +24,7 @@ frappe.ui.form.on('Delivery Note', {
 							location.reload();
 						}
 						else {
-							frappe.msgprint(r.message.error, raise_exception=True)
+							frappe.msgprint(r.message.error)
 						}
 					}
 				});
@@ -65,7 +65,7 @@ frappe.ui.form.on('Delivery Note', {
 										location.reload();
 									}
 									else {
-										frappe.msgprint(r.message.error, raise_exception=True)
+										frappe.msgprint(r.message.error)
 									}
 								}
 							})
@@ -108,7 +108,7 @@ frappe.ui.form.on('Delivery Note', {
 									location.reload();
 								}
 								else {
-									frappe.msgprint(r.message.error, raise_exception=True)
+									frappe.msgprint(r.message.error)
 								}
 							}
 						})
