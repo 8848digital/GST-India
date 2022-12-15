@@ -63,8 +63,7 @@ def create_irn_request(data,inv):
         if response['msg'] == 'Success':
             store_irn_details(inv,response['response'][0])
             return success_response()
-        if response['response'][0]['document_status'] == 'IRN_CANCELLED': 
-            return response_error_handling(json.loads(json.dumps(response['response'][0])))
+        return response_error_handling(json.loads(json.dumps(response['response'][0])))
     except Exception as e:
         frappe.logger('cleartax').exception(e)
         return error_response(e)
