@@ -1,7 +1,7 @@
-const erpnext_onload = frappe.listview_settings["Sales Invoice"].onload;
+const erp_onl = frappe.listview_settings["Sales Invoice"].onload;
 frappe.listview_settings["Sales Invoice"].onload = function (list_view) {
-    if (erpnext_onload) {
-        erpnext_onload(list_view);
+    if (erp_onl) {
+        erp_onl(list_view);
     }
         list_view.page.add_action_item(__("Generate EWB"), function (event) {
 			let selected = [];
