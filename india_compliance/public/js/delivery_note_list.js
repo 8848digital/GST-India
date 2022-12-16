@@ -1,6 +1,9 @@
-frappe.listview_settings['Delivery Note'] = {
-    onload: function(listview) {
-        listview.page.add_action_item(__("Generate EWB"), function (event) {
+const erpnext_onload = frappe.listview_settings["Sales Invoice"].onload;
+frappe.listview_settings["Sales Invoice"].onload = function (list_view) {
+    if (erpnext_onload) {
+        erpnext_onload(list_view);
+    }
+        list_view.page.add_action_item(__("Generate EWB"), function (event) {
 			let selected = [];
 
             for (let check of event.view.cur_list.$checks) {
@@ -14,10 +17,10 @@ frappe.listview_settings['Delivery Note'] = {
                 type: "POST",
                 callback: function(r) {
                     frappe.msgprint("EWB is being Generated!")
-                    listview.refresh();
+                    list_view.refresh();
                     }
                 })
 
 		});
     }
-}
+
