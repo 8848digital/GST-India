@@ -1,5 +1,9 @@
 frappe.ui.form.on('Sales Invoice', {
 	refresh(frm) {
+		if(frm.is_new()){
+			cur_frm.set_value("ewaybill","")
+			cur_frm.refresh_field("ewaybill")
+		}
 		if (frm.selected_doc.docstatus == 1) {
 		frappe.call({
 			method: "india_compliance.cleartax_integration.API.irn.e_invoicing_enabled",
