@@ -114,13 +114,9 @@ def gst_cdn_request(data,id,type):
         response_logger(data,response['response'],api,doctype,id,response_status)
         if response_status == 'Success':
             if type == 'SALE':
-                doc = frappe.get_doc('Sales Invoice',id)
-                if doc.is_return:
-                    doc.cdn=1
+                frappe.db.set_value('Sales Invoice',id,'cdn',1)
             else:
-                doc = frappe.get_doc('Purchase Invoice',id)
-                if doc.is_return:
-                    doc.cdn=1
+                frappe.db.set_value('Purchase Invoice',id,'cdn',1)
             doc.save(ignore_permissions=True)
             return success_response(response)
         return response_error_handling(error)
