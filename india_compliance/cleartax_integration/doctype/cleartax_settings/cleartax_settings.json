@@ -15,6 +15,7 @@
   "enterprise_section",
   "production_auth_token",
   "sandbox_auth_token",
+  "gst_auth_token",
   "tax_entity_list",
   "section_break_10",
   "e_invoicing",
@@ -87,12 +88,17 @@
    "fieldname": "host_url",
    "fieldtype": "Data",
    "label": "Host URL"
+  },
+  {
+   "fieldname": "gst_auth_token",
+   "fieldtype": "Password",
+   "label": "GST Auth Token"
   }
  ],
  "index_web_pages_for_search": 1,
  "issingle": 1,
  "links": [],
- "modified": "2022-10-20 12:32:10.640984",
+ "modified": "2022-12-16 08:28:58.410851",
  "modified_by": "Administrator",
  "module": "Cleartax Integration",
  "name": "Cleartax Settings",
