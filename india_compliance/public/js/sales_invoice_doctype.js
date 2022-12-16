@@ -3,6 +3,10 @@ frappe.ui.form.on('Sales Invoice', {
 		if(frm.is_new()){
 			cur_frm.set_value("ewaybill","")
 			cur_frm.refresh_field("ewaybill")
+			cur_frm.set_value("ewb_date","")
+			cur_frm.refresh_field("ewb_date")
+			cur_frm.set_value("eway_bill_validity","")
+			cur_frm.refresh_field("eway_bill_validity")
 		}
 		if (frm.selected_doc.docstatus == 1) {
 		frappe.call({
