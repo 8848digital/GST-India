@@ -318,7 +318,7 @@ def cancel_ewb_sc(**kwargs):
 def store_ewb_details(inv,data,response):
     try:
         response = response.get('govt_response')
-        if response.get('Status') == "GENERATED":
+        if response.get('Status') == "GENERATED" or response.get('Status')== 'PARTA_GENERATED':
             frappe.db.set_value('Sales Invoice',inv,'ewaybill', response.get('EwbNo'))
             frappe.db.set_value('Sales Invoice',inv,'ewb_date', response.get('EwbDt'))
             frappe.db.set_value('Sales Invoice',inv,'eway_bill_validity', response.get('EwbValidTill'))
