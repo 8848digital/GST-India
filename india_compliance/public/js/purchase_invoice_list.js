@@ -1,5 +1,5 @@
-const erp_onl = frappe.listview_settings["Sales Invoice"].onload;
-frappe.listview_settings["Sales Invoice"].onload = function (list_view) {
+const erp_onl = frappe.listview_settings["Purchase Invoice"].onload;
+frappe.listview_settings["Purchase Invoice"].onload = function (list_view) {
     if (erp_onl) {
         erp_onl(list_view);
     }
