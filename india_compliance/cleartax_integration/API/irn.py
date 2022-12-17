@@ -59,7 +59,7 @@ def create_irn_request(data,inv):
         response = response.json()['message']
         if response.get('error'):
             return error_response(response.get('error'))
-        response_logger(payload,response['response'],"GENERATE IRN","Sales Invoice",inv,response['msg'])
+        response_logger(response['request'],response['response'],"GENERATE IRN","Sales Invoice",inv,response['msg'])
         if response['msg'] == 'Success':
             store_irn_details(inv,response['response'][0])
             return success_response()
@@ -136,15 +136,14 @@ def cancel_irn_request(inv,data):
         payload = json.dumps(data, indent=4, sort_keys=False, default=str)
         response = requests.request(
             "POST", url, headers=headers, data=payload)
-        frappe.logger('cleartax').exception(response.json())
         response = response.json()['message']
         if response.get('error'):
             return error_response(response.get('error'))
         response_status = response['msg']
-        if response['msg'] == 'Success':
+        if response_status == 'Success':
             frappe.db.set_value('Sales Invoice',inv,'irn_cancelled',1)
             return success_response()
-        response_logger(payload,response,"CANCEL IRN","Sales Invoice",inv,response_status)
+        response_logger(response['request'],response['response'],"CANCEL IRN","Sales Invoice",inv,response_status)
         return response_error_handling(response)
     except Exception as e:
         frappe.logger('cleartax').exception(e)

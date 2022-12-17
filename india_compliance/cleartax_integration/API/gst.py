@@ -74,7 +74,7 @@ def gst_invoice_request(data,id,type):
         api = "GENERATE GST SINV" if type == 'SALE' else "GENERATE GST PINV"
         doctype = "Sales Invoice" if type == 'SALE' else "Purchase Invoice"
         response_status = response['msg']
-        response_logger(data,response['response'],api,doctype,id,response_status)
+        response_logger(response['request'],response['response'],api,doctype,id,response_status)
         if response_status == "Success":
             if type == 'SALE':
                 frappe.db.set_value('Sales Invoice',id,'gst_invoice',1)
@@ -111,14 +111,14 @@ def gst_cdn_request(data,id,type):
         response_status = response['msg']
         api = "GENERATE GST CDN"
         doctype = "Sales Invoice" if type == 'SALE' else "Purchase Invoice"
-        response_logger(data,response['response'],api,doctype,id,response_status)
+        response_logger(response['request'],response['response'],api,doctype,id,response_status)
         if response_status == 'Success':
             if type == 'SALE':
                 frappe.db.set_value('Sales Invoice',id,'cdn',1)
             else:
                 frappe.db.set_value('Purchase Invoice',id,'cdn',1)
             doc.save(ignore_permissions=True)
-            return success_response(response)
+            return success_response(response['response'])
         return response_error_handling(error)
     except Exception as e:
         frappe.logger('cleartax').exception(e)
