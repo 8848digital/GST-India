@@ -80,6 +80,7 @@ def gst_invoice_request(data,id,type):
                 frappe.db.set_value('Sales Invoice',id,'gst_invoice',1)
             else:
                 frappe.db.set_value('Purchase Invoice',id,'gst_invoice',1)
+            frappe.db.commit()
             return success_response(response['response'])
         return response_error_handling(response['response'])
     except Exception as e:
@@ -117,7 +118,7 @@ def gst_cdn_request(data,id,type):
                 frappe.db.set_value('Sales Invoice',id,'cdn',1)
             else:
                 frappe.db.set_value('Purchase Invoice',id,'cdn',1)
-            doc.save(ignore_permissions=True)
+            frappe.db.commit()
             return success_response(response['response'])
         return response_error_handling(error)
     except Exception as e:
@@ -130,6 +131,5 @@ def bulk_purchase_gst(**kwargs):
         data = json.loads(kwargs.get('data'))
         for i in data:
             frappe.enqueue("cleartax.cleartax.API.gst.create_gst_invoice",**{'invoice':i,'type':'PURCHASE'})
-        frappe.db.commit()
     except Exception as e:
         frappe.logger('sfa_online').exception(e)

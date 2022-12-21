@@ -138,6 +138,7 @@ def store_ewb_details_dn(delivery_note,data,response):
         frappe.db.set_value('Delivery Note',delivery_note,'ewb_date', response.get('govt_response').get('EwbDt'))
         frappe.db.set_value('Delivery Note',delivery_note,'ewb_valid_till', response.get('govt_response').get('EwbValidTill'))
         frappe.db.set_value('Delivery Note',delivery_note,'ewb_trans_id', response.get('transaction_id'))
+        frappe.db.commit()
         return success_response()
     return response_error_handling(response)
 
@@ -147,6 +148,7 @@ def store_ewb_details_sc(subcontracting_challan,data,response):
         frappe.db.set_value('Subcontracting Challan',subcontracting_challan,'ewb_date', response.get('govt_response').get('EwbDt'))
         frappe.db.set_value('Subcontracting Challan',subcontracting_challan,'ewb_valid_till', response.get('govt_response').get('EwbValidTill'))
         frappe.db.set_value('Subcontracting Challan',subcontracting_challan,'ewb_trans_id', response.get('transaction_id'))
+        frappe.db.commit()
         return success_response()
     return response_error_handling(response)
 
@@ -322,6 +324,7 @@ def store_ewb_details(inv,data,response):
             frappe.db.set_value('Sales Invoice',inv,'ewaybill', response.get('EwbNo'))
             frappe.db.set_value('Sales Invoice',inv,'ewb_date', response.get('EwbDt'))
             frappe.db.set_value('Sales Invoice',inv,'eway_bill_validity', response.get('EwbValidTill'))
+            frappe.db.commit()
             return success_response(response)
         return response_error_handling(response)
     except Exception as e:
@@ -375,7 +378,6 @@ def bulk_ewb(**kwargs):
         data = json.loads(kwargs.get('data'))
         for i in data:
             frappe.enqueue("cleartax.cleartax.API.ewb.generate_e_waybill_by_irn",**{'invoice':i})
-        frappe.db.commit()
     except Exception as e:
         frappe.logger('sfa_online').exception(e)
 
@@ -385,7 +387,6 @@ def bulk_ewb_dn(**kwargs):
         data = json.loads(kwargs.get('data'))
         for i in data:
             frappe.enqueue("cleartax.cleartax.API.ewb.ewb_without_irn",**{'delivery_note':i})
-        frappe.db.commit()
     except Exception as e:
         frappe.logger('sfa_online').exception(e)
 

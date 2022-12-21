@@ -78,6 +78,7 @@ def store_irn_details(inv,response):
         frappe.db.set_value("Sales Invoice",inv,'signed_qr_code', response.get('govt_response').get('SignedQRCode'))
         frappe.db.set_value("Sales Invoice",inv,'irn', response.get('govt_response').get('Irn'))
         frappe.db.set_value("Sales Invoice",inv,'irn_status', response.get('govt_response').get('Status'))
+        frappe.db.commit()
     except Exception as e:
         frappe.logger('cleartax').exception(e)
         return error_response(e)
@@ -162,6 +163,5 @@ def bulk_irn(**kwargs):
         data = json.loads(kwargs.get('data'))
         for i in data:
             frappe.enqueue("cleartax.cleartax.API.irn.generate_irn",**{'invoice':i})
-        frappe.db.commit()
     except Exception as e:
         frappe.logger('sfa_online').exception(e)
