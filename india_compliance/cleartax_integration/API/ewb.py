@@ -377,7 +377,7 @@ def bulk_ewb(**kwargs):
     try:
         data = json.loads(kwargs.get('data'))
         for i in data:
-            frappe.enqueue("cleartax.cleartax.API.ewb.generate_e_waybill_by_irn",**{'invoice':i})
+            frappe.enqueue("india_compliance.cleartax_integration.API.ewb.generate_e_waybill_by_irn",**{'invoice':i})
     except Exception as e:
         frappe.logger('sfa_online').exception(e)
 
@@ -386,7 +386,7 @@ def bulk_ewb_dn(**kwargs):
     try:
         data = json.loads(kwargs.get('data'))
         for i in data:
-            frappe.enqueue("cleartax.cleartax.API.ewb.ewb_without_irn",**{'delivery_note':i})
+            frappe.enqueue("india_compliance.cleartax_integration.API.ewb.ewb_without_irn",**{'delivery_note':i})
     except Exception as e:
         frappe.logger('sfa_online').exception(e)
 

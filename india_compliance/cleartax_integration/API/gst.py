@@ -130,6 +130,6 @@ def bulk_purchase_gst(**kwargs):
     try:
         data = json.loads(kwargs.get('data'))
         for i in data:
-            frappe.enqueue("cleartax.cleartax.API.gst.create_gst_invoice",**{'invoice':i,'type':'PURCHASE'})
+            frappe.enqueue("india_compliance.cleartax_integration.API.gst.create_gst_invoice",**{'invoice':i,'type':'PURCHASE'})
     except Exception as e:
         frappe.logger('sfa_online').exception(e)

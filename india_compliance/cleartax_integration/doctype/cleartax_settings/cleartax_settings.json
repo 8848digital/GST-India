@@ -19,7 +19,10 @@
   "tax_entity_list",
   "section_break_10",
   "e_invoicing",
-  "host_url"
+  "host_url",
+  "bulk_upload_section",
+  "purchase_invoices_from",
+  "sales_invoices_from"
  ],
  "fields": [
   {
@@ -93,12 +96,27 @@
    "fieldname": "gst_auth_token",
    "fieldtype": "Password",
    "label": "GST Auth Token"
+  },
+  {
+   "fieldname": "bulk_upload_section",
+   "fieldtype": "Section Break",
+   "label": "Bulk Upload"
+  },
+  {
+   "fieldname": "purchase_invoices_from",
+   "fieldtype": "Date",
+   "label": "Purchase Invoices From"
+  },
+  {
+   "fieldname": "sales_invoices_from",
+   "fieldtype": "Date",
+   "label": "Sales Invoices From"
   }
  ],
  "index_web_pages_for_search": 1,
  "issingle": 1,
  "links": [],
- "modified": "2022-12-16 08:28:58.410851",
+ "modified": "2022-12-22 09:46:42.803619",
  "modified_by": "Administrator",
  "module": "Cleartax Integration",
  "name": "Cleartax Settings",
