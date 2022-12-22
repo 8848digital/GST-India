@@ -11,16 +11,8 @@ frappe.ui.form.on('Cleartax Settings', {
 					sales_invoice: frm.selected_doc.sales_invoices_from
 				},
 				callback: function (r) {
-				//console.log(r.message)
-					if (r.message.msg == 'success') {
-						frappe.msgprint("IRN Created Successfully!")
-						location.reload();
+						frappe.msgprint("Documents Scheduled to be processed!")
 					}
-					else {
-						// frappe.msgprint(r.message.error)
-						frappe.msgprint(r.message.error)
-					}
-				}
 			});
 		});
 
