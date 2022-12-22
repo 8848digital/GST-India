@@ -60,7 +60,7 @@ def push_to_cleartax(**kwargs):
                             WHERE name NOT IN
                                 (SELECT log.document_name as name
                                 FROM
-                                    `tab Cleartax Api Log` as log)
+                                    `tabCleartax Api Log` as log)
                             AND
                                 inv.irn IS NOT NULL
                             AND inv.creation >= '%s'
