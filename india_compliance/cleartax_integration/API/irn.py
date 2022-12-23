@@ -105,10 +105,7 @@ def cancel_irn(**kwargs):
             "CnlRem": data.get('remarks')
         }
         invoice = frappe.get_doc('Sales Invoice',inv)
-        gstin = frappe.get_value('Address',invoice.dispatch_address_name,'gstin')
-        if not gstin:
-            gstin = frappe.get_value('Address',invoice.company_address_name,'gstin')
-        data['gstin'] = gstin
+        data['gstin'] = frappe.get_value('Address',invoice.company_address_name,'gstin')
         return cancel_irn_request(inv,data) 
     except Exception as e:
         frappe.logger('cleartax').exception(e)
