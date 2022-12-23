@@ -107,12 +107,7 @@ def cancel_irn(**kwargs):
         invoice = frappe.get_doc('Sales Invoice',inv)
         gstin = frappe.get_value('Address',invoice.dispatch_address_name,'gstin')
         if not gstin:
-            company_address = frappe.db.get_value('Dynamic Link',{
-                    'link_doctype': "Company", 
-                    'link_name': frappe.get_value('Sales Invoice',inv,'company'), 
-                    'parenttype': 'Address'
-                    }, ['parent'])
-            gstin = frappe.get_value("Address",company_address,'gstin')
+            gstin = frappe.get_value('Address',invoice.company_address_name,'gstin')
         data['gstin'] = gstin
         return cancel_irn_request(inv,data) 
     except Exception as e:
