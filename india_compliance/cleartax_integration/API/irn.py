@@ -79,6 +79,7 @@ def store_irn_details(inv,response):
         frappe.db.set_value("Sales Invoice",inv,'irn', response.get('govt_response').get('Irn'))
         frappe.db.set_value("Sales Invoice",inv,'irn_status', response.get('govt_response').get('Status'))
         frappe.db.commit()
+        frappe.enqueue("india_compliance.cleartax_integration.API.gst.create_gst_invoice",**{'invoice':inv,'type':'SALE'})
     except Exception as e:
         frappe.logger('cleartax').exception(e)
         return error_response(e)

@@ -73,3 +73,22 @@ def push_to_cleartax(**kwargs):
         purchase_invoices = frappe.get_all("Purchase Invoice",filters=[['gst_invoice','=',0],['docstatus','=',1],['creation','>=',kwargs.get('purchase_invoice')]])
         for i in purchase_invoices:
             frappe.enqueue("india_compliance.cleartax_integration.API.gst.create_gst_invoice",**{'invoice':i.name,'type':'PURCHASE'})
+
+@frappe.whitelist()
+def push_to_gst():
+    sales_invoices = """
+                            SELECT 
+                                inv.name as name
+                            FROM
+                                `tabSales Invoice` as inv
+                            WHERE name IN
+                                (SELECT log.document_name as name
+                                FROM
+                                    `tabCleartax Api Log` as log)
+                            AND
+                                inv.irn IS NOT NULL
+                            AND inv.docstatus = 1
+                            """
+    sales_invoices = frappe.db.sql(sales_invoices,as_dict=1)
+    for i in sales_invoices:
+        frappe.enqueue("india_compliance.cleartax_integration.API.gst.create_gst_invoice",**{'invoice':i.name,'type':'SALE'})
