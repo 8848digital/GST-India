@@ -117,40 +117,38 @@ def ewb_without_irn_request(data,delivery_note=None,subcontracting_challan=None)
         response = response.json()['message']
         if response.get('error'):
             return error_response(response.get('error'))
-        response_status = "Failed"
-        if response['response'].get('govt_response').get('Success') =='Y':
-            response_status = "Success"
+        response_status = response['msg']
         if delivery_note:
             response_logger(response['request'],response['response'],"GENERATE EWB WITHOUT IRN","Delivery Note",delivery_note,
                             response_status)
-            return store_ewb_details_dn(delivery_note,data,response)
+            if response_status == 'Success':
+                return store_ewb_details_dn(delivery_note,data,response['response'])
         if subcontracting_challan:
             response_logger(response['request'],response['response'],"GENERATE EWB WITHOUT IRN","Subcontracting Challan",subcontracting_challan,
                             response_status)
-            return store_ewb_details_sc(subcontracting_challan,data,response)
+            if response_status == 'Success':
+                return store_ewb_details_sc(subcontracting_challan,data,response['response'])
+        return response_error_handling(response['response'])
     except Exception as e:
         frappe.logger('cleartax').exception(e)
         return error_response(e) 
 
 def store_ewb_details_dn(delivery_note,data,response):
-    if response.get('govt_response').get('Success') =='Y':
-        frappe.db.set_value('Delivery Note',delivery_note,'ewaybill', response.get('govt_response').get('EwbNo'))
-        frappe.db.set_value('Delivery Note',delivery_note,'ewb_date', response.get('govt_response').get('EwbDt'))
-        frappe.db.set_value('Delivery Note',delivery_note,'ewb_valid_till', response.get('govt_response').get('EwbValidTill'))
-        frappe.db.set_value('Delivery Note',delivery_note,'ewb_trans_id', response.get('transaction_id'))
-        frappe.db.commit()
-        return success_response()
-    return response_error_handling(response)
+    frappe.db.set_value('Delivery Note',delivery_note,'ewaybill', response.get('govt_response').get('EwbNo'))
+    frappe.db.set_value('Delivery Note',delivery_note,'ewb_date', response.get('govt_response').get('EwbDt'))
+    frappe.db.set_value('Delivery Note',delivery_note,'ewb_valid_till', response.get('govt_response').get('EwbValidTill'))
+    frappe.db.set_value('Delivery Note',delivery_note,'ewb_trans_id', response.get('transaction_id'))
+    frappe.db.commit()
+    return success_response()
 
 def store_ewb_details_sc(subcontracting_challan,data,response):
-    if response.get('govt_response').get('Success') =='Y':
-        frappe.db.set_value('Subcontracting Challan',subcontracting_challan,'ewaybill', response.get('govt_response').get('EwbNo'))
-        frappe.db.set_value('Subcontracting Challan',subcontracting_challan,'ewb_date', response.get('govt_response').get('EwbDt'))
-        frappe.db.set_value('Subcontracting Challan',subcontracting_challan,'ewb_valid_till', response.get('govt_response').get('EwbValidTill'))
-        frappe.db.set_value('Subcontracting Challan',subcontracting_challan,'ewb_trans_id', response.get('transaction_id'))
-        frappe.db.commit()
-        return success_response()
-    return response_error_handling(response)
+    frappe.db.set_value('Subcontracting Challan',subcontracting_challan,'ewaybill', response.get('govt_response').get('EwbNo'))
+    frappe.db.set_value('Subcontracting Challan',subcontracting_challan,'ewb_date', response.get('govt_response').get('EwbDt'))
+    frappe.db.set_value('Subcontracting Challan',subcontracting_challan,'ewb_valid_till', response.get('govt_response').get('EwbValidTill'))
+    frappe.db.set_value('Subcontracting Challan',subcontracting_challan,'ewb_trans_id', response.get('transaction_id'))
+    frappe.db.commit()
+    return success_response()
+
 
 
 
