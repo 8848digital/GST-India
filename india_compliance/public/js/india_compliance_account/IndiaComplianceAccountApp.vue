@@ -1,16 +1,13 @@
 <template>
   <div class="india-compliance-account">
-    <div class="content">
-          <transition name="fade" v-if="isLoading">
-            <PreLoader />
+    <transition name="fade">
+      <div class="content">
+          <PreLoader v-if="isLoading" />
+          <transition name="fade" mode="out-in" v-else>
+            <router-view />
           </transition>
-
-          <router-view v-slot="{ Component }" v-else>
-            <transition name="fade" mode="out-in">
-              <component :is="Component" />
-            </transition>
-          </router-view>
       </div>
+    </transition>
     <TheFooter />
   </div>
 </template>
@@ -18,7 +15,6 @@
 <script>
 import PreLoader from "./components/PreLoader.vue";
 import TheFooter from "./components/TheFooter.vue";
-import { AUTH_ROUTES } from "./router";
 
 export default {
   components: { PreLoader, TheFooter },
@@ -37,29 +33,7 @@ export default {
   },
 
   async created() {
-    const guessRoute = to => {
-      const routeToCompare = in_list(AUTH_ROUTES, to.name) ? to.name : "home";
-      const guessedRoute = this.$store.getters.guessRouteName;
-
-      if (routeToCompare !== guessedRoute) {
-        return {
-          name: guessedRoute,
-          replace: true,
-        }
-      }
-    };
-
-    // check if user is logged in
-    await this.$store.dispatch("authenticate");
-
-    // redirect to appropriate page if current route is incorrect
-    const newGuess = guessRoute(this.$route);
-    if (newGuess) await this.$router.push(newGuess);
-
-    // add beforeEach hook to router
-    this.$router.beforeEach(guessRoute);
-
-    // finish loading
+    await this.$store.dispatch("initAuth");
     this.isLoading = false;
   },
 };

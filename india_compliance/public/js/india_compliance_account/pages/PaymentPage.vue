@@ -91,6 +91,11 @@ export default {
     };
   },
 
+  beforeRouteEnter(to, from, next) {
+    if (to.params.order) return next();
+    next({ name: "home", replace: true });
+  },
+
   computed: {
     billingGstin() {
       return this.billingDetails.billing_gstin;
@@ -328,10 +333,6 @@ export default {
         .querySelector("#payment-gateway iframe")
         .setAttribute("scrolling", "no");
     },
-  },
-
-  beforeRouteEnter(to) {
-    if (!to.params.order) return { name: "home", replace: true };
   },
 
   created() {

@@ -1,5 +1,5 @@
 <template>
-  <div class="mail-sent-page container text-center">
+  <div class="mail-sent-page contaier text-center">
     <img
       class="mail-box-img"
       src="/assets/india_compliance/images/mail-box.png"
@@ -52,9 +52,17 @@ export default {
     },
 
     async refresh() {
-      await this.$store.dispatch("authenticate");
+      await this.$store.dispatch("initAuth");
       this.$router.replace({ name: "auth" });
     }
+  },
+
+  beforeRouteEnter(to, from, next) {
+    next((vm) => {
+      if (!vm.$store.getters.hasSession)
+        return next({ name: "home", replace: true });
+      return next();
+    });
   },
 };
 </script>

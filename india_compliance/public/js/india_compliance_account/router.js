@@ -1,4 +1,4 @@
-import { createRouter, createWebHistory } from 'vue-router';
+import VueRouter from "vue-router";
 
 import AuthPage from "./pages/AuthPage.vue";
 import AccountPage from "./pages/AccountPage.vue";
@@ -35,9 +35,8 @@ const routes = [
     }
 ];
 
-export const router = createRouter({
-    history: createWebHistory("/app/india-compliance-account"),
+export default new VueRouter({
+    mode: "history",
+    base: "/app/india-compliance-account",
     routes: routes,
 });
-
-export const AUTH_ROUTES = ["auth", "mailSent"];
