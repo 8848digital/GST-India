@@ -92,3 +92,24 @@ def push_to_gst():
     sales_invoices = frappe.db.sql(sales_invoices,as_dict=1)
     for i in sales_invoices:
         frappe.enqueue("india_compliance.cleartax_integration.API.gst.create_gst_invoice",**{'invoice':i.name,'type':'SALE'})
+
+@frappe.whitelist()
+def retry_failed_pi():
+    pi_list = frappe.get_all('Cleartax APi Log',filters=[['api','in',['GENERATE GST PINV','GENERATE GST CDN']],['status','Failed']],fields=['document_name'])
+    for i in pi_list:
+            frappe.enqueue("india_compliance.cleartax_integration.API.gst.create_gst_invoice",**{'invoice':i.document_name,'type':'PURCHASE'})
+
+
+@frappe.whitelist()
+def retry_faield_si():
+    si_list = frappe.get_all('Cleartax APi Log',filters=[['api','in',['GENERATE GST SINV','GENERATE GST CDN']],['status','Failed']],fields=['document_name'])
+    for i in si_list:
+            frappe.enqueue("india_compliance.cleartax_integration.API.gst.create_gst_invoice",**{'invoice':i.document_name,'type':'SALE'})
+
+
+
+@frappe.whitelist()
+def push_pi_gst():
+    purchase_invoices = frappe.get_all('Purchase Invoice',{'gst_invoice':1})
+    for i in purchase_invoices:
+            frappe.enqueue("india_compliance.cleartax_integration.API.gst.create_gst_invoice",**{'invoice':i.name,'type':'PURCHASE'})
