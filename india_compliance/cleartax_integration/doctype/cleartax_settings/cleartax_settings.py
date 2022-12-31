@@ -70,7 +70,7 @@ def push_to_cleartax(**kwargs):
         for i in sales_invoices:
             frappe.enqueue("india_compliance.cleartax_integration.API.gst.create_gst_invoice",**{'invoice':i.name,'type':'SALE'})
     if kwargs.get('purchase_invoice'):
-        purchase_invoices = frappe.get_all("Purchase Invoice",filters=[['gst_invoice','=',0],['docstatus','=',1],['creation','>=',kwargs.get('purchase_invoice')]])
+        purchase_invoices = frappe.get_all("Purchase Invoice",filters=[['docstatus','=',1],['creation','>=',kwargs.get('purchase_invoice')]])
         for i in purchase_invoices:
             frappe.enqueue("india_compliance.cleartax_integration.API.gst.create_gst_invoice",**{'invoice':i.name,'type':'PURCHASE'})
 
