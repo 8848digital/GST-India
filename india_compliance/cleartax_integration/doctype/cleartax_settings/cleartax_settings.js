@@ -15,7 +15,7 @@ frappe.ui.form.on('Cleartax Settings', {
 					}
 			});
 		});
-		cur_frm.add_custom_button(__("PUSH GST"), function () {
+		cur_frm.add_custom_button(__("SYNC GST REGISTER"), function () {
 			frappe.call({
 				method: "india_compliance.cleartax_integration.doctype.cleartax_settings.cleartax_settings.push_to_gst",
 				callback: function (r) {
