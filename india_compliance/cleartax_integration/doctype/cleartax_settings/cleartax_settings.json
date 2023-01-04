@@ -71,12 +71,6 @@
    "label": "Sandbox Auth Token"
   },
   {
-   "fieldname": "tax_entity_list",
-   "fieldtype": "Table",
-   "label": "Tax Entity List",
-   "options": "Tax Entities"
-  },
-  {
    "fieldname": "section_break_10",
    "fieldtype": "Section Break"
   },
