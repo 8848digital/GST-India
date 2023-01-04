@@ -65,7 +65,7 @@ def gst_invoice_request(data,id,type):
             gstin = data.get('customer_address').get('gstin')
         if settings.enterprise:
             headers['token'] = settings.get_password('gst_auth_token')
-            headers['taxid'] = settings.tax_id(gstin)
+            #headers['taxid'] = settings.tax_id(gstin)
         data = json.dumps(data, indent=4, sort_keys=False, default=str)
         response = requests.request("PUT", url, headers=headers, data= data) 
         response = response.json()['message']
@@ -103,7 +103,7 @@ def gst_cdn_request(data,id,type):
             gstin = data.get('customer_address').get('gstin')
         if settings.enterprise:
             headers['token'] = settings.get_password('gst_auth_token')
-            headers['taxid'] = settings.tax_id(gstin)
+            #headers['taxid'] = settings.tax_id(gstin)
         data = json.dumps(data, indent=4, sort_keys=False, default=str)
         response = requests.request("PUT", url, headers=headers, data= data)
         response = response.json()['message']
