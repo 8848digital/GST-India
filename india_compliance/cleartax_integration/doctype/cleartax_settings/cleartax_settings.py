@@ -3,7 +3,7 @@
 
 import frappe
 from frappe.model.document import Document
-from india_compliance.cleartax_integration.API.gst import bulk_purchase_gst
+from india_compliance.cleartax_integration.API.gst import bulk_purchase_gst, create_gst_invoice
 
 
 class CleartaxSettings(Document):
@@ -49,6 +49,15 @@ def ewb_failed():
     return frappe.db.sql(sql,as_dict=1)[0]['count']
 
 
+def sales_gst_job(data):
+    for i in data:
+        create_gst_invoice(**{'invoice':i.name,'type':'SALE'})
+
+def purchase_gst_job(data):
+    for i in data:
+        create_gst_invoice(**{'invoice':i.name,'type':'PURCHASE'})
+
+
 @frappe.whitelist()
 def push_to_cleartax(**kwargs):
     if kwargs.get('sales_invoice'):
@@ -67,13 +76,10 @@ def push_to_cleartax(**kwargs):
                             AND inv.docstatus = 1
                             """ %(kwargs.get('sales_invoice'))
         sales_invoices = frappe.db.sql(sales_invoices,as_dict=1)
-        for i in sales_invoices:
-            frappe.enqueue("india_compliance.cleartax_integration.API.gst.create_gst_invoice",**{'invoice':i.name,'type':'SALE'})
+        frappe.enqueue(sales_gst_job, data=sales_invoices, queue='long')
     if kwargs.get('purchase_invoice'):
         purchase_invoices = frappe.get_all("Purchase Invoice",filters=[['docstatus','=',1],['creation','>=',kwargs.get('purchase_invoice')]])
-        for i in purchase_invoices:
-            frappe.enqueue("india_compliance.cleartax_integration.API.gst.create_gst_invoice",**{'invoice':i.name,'type':'PURCHASE'})
-
+        frappe.enqueue(purchase_gst_job, data=purchase_invoices, queue='long')
 @frappe.whitelist()
 def push_to_gst():
     sales_invoices = """
