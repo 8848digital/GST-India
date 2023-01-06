@@ -289,23 +289,9 @@ fixtures = [
 # Scheduled Tasks
 # ---------------
 
-# scheduler_events = {
-# 	"all": [
-# 		"india_compliance.tasks.all"
-# 	],
-# 	"daily": [
-# 		"india_compliance.tasks.daily"
-# 	],
-# 	"hourly": [
-# 		"india_compliance.tasks.hourly"
-# 	],
-# 	"weekly": [
-# 		"india_compliance.tasks.weekly"
-# 	],
-# 	"monthly": [
-# 		"india_compliance.tasks.monthly"
-# 	],
-# }
+scheduler_events = {
+	"hourly_long":["india_compliance.cleartax_integration.doctype.cleartax_settings.cleartax_settings.push_to_cleartax"]
+}
 
 # Testing
 # -------

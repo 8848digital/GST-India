@@ -59,8 +59,9 @@ def purchase_gst_job(data):
 
 
 @frappe.whitelist()
-def push_to_cleartax(**kwargs):
-    if kwargs.get('sales_invoice'):
+def push_to_cleartax():
+    doc = frappe.get_doc('Cleartax Settings')
+    if doc.sales_invoices_from:
         sales_invoices = """
                             SELECT 
                                 inv.name as name
@@ -74,12 +75,12 @@ def push_to_cleartax(**kwargs):
                                 inv.irn IS NOT NULL
                             AND inv.creation >= '%s'
                             AND inv.docstatus = 1
-                            """ %(kwargs.get('sales_invoice'))
+                            LIMIT 100
+                            """ %(doc.sales_invoices_from)
         sales_invoices = frappe.db.sql(sales_invoices,as_dict=1)
-        frappe.enqueue(sales_gst_job, data=sales_invoices, queue='long')
-    if kwargs.get('purchase_invoice'):
-        purchase_invoices = frappe.get_all("Purchase Invoice",filters=[['docstatus','=',1],['creation','>=',kwargs.get('purchase_invoice')]])
-        frappe.enqueue(purchase_gst_job, data=purchase_invoices, queue='long')
+        sales_gst_job(sales_invoices)
+
+        
 @frappe.whitelist()
 def push_to_gst():
     sales_invoices = """
