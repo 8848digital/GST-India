@@ -54,14 +54,16 @@ def gst_invoice_request(data,id,type):
     try:
         settings = frappe.get_doc('Cleartax Settings')
         url = settings.host_url
-        url+= "/api/method/cleartax.cleartax.API.gst.create_gst_invoice"
+        url+= "/api/method/cleartax.cleartax.API.gst."
         headers = {
             'sandbox': str(settings.sandbox),
             'Content-Type': 'application/json'
         }
         if type == 'SALE':
+            url+= 'gst_sales'
             gstin = data.get('company_address').get('gstin')
         else:
+            url+= 'gst_purchase'
             gstin = data.get('customer_address').get('gstin')
         if settings.enterprise:
             headers['token'] = settings.get_password('gst_auth_token')
