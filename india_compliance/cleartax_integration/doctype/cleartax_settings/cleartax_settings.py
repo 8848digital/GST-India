@@ -74,10 +74,11 @@ def push_to_cleartax():
                             AND
                                 inv.irn IS NOT NULL
                             AND inv.creation >= '%s'
-                            AND inv.docstatus = 1
+                            AND inv.docstatus NOT IN ('Draft', 'Cancelled')
                             LIMIT 100
                             """ %(doc.sales_invoices_from)
         sales_invoices = frappe.db.sql(sales_invoices,as_dict=1)
+        frappe.logger('cleartax').exception(doc.sales_invoices_from)
         sales_gst_job(sales_invoices)
 
         
