@@ -67,12 +67,9 @@ def push_to_cleartax():
                                 inv.name as name
                             FROM
                                 `tabSales Invoice` as inv
-                            WHERE name NOT IN
-                                (SELECT log.document_name as name
-                                FROM
-                                    `tabCleartax Api Log` as log)
-                            AND
+                            WHERE
                                 inv.irn IS NOT NULL
+                            AND inv.gst_invoice = 0
                             AND inv.creation >= '%s'
                             AND inv.docstatus NOT IN ('Draft', 'Cancelled')
                             LIMIT 100
