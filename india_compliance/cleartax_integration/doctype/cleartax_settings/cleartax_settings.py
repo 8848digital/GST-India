@@ -63,17 +63,18 @@ def push_to_cleartax():
     doc = frappe.get_doc('Cleartax Settings')
     if doc.sales_invoices_from:
         sales_invoices = """
-                            SELECT 
-                                inv.name as name
+                            SELECT
+                                log.document_name as name
                             FROM
-                                `tabSales Invoice` as inv
+                                `tabCleartax Api Log` as log
                             WHERE
-                                inv.irn IS NOT NULL
-                            AND inv.gst_invoice = 0
-                            AND inv.creation >= '%s'
-                            AND inv.docstatus NOT IN ('Draft', 'Cancelled')
-                            LIMIT 100
-                            """ %(doc.sales_invoices_from)
+                                log.status = 'Failed'
+                            AND
+                                log.api LIKE '%GENERATE GST SINV%'
+                            AND
+                                log.response LIKE '%Invalid GSTIN NRP, please provide a valid consignee GSTIN%'
+                            LIMIT 100            
+                            """
         sales_invoices = frappe.db.sql(sales_invoices,as_dict=1)
         frappe.logger('cleartax').exception(doc.sales_invoices_from)
         sales_gst_job(sales_invoices)

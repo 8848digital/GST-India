@@ -120,7 +120,7 @@ def gst_cdn_request(data,id,type):
                 frappe.db.set_value('Purchase Invoice',id,'cdn',1)
             frappe.db.commit()
             return success_response(response['response'])
-        return response_error_handling(error)
+        return response_error_handling(response['response'])
     except Exception as e:
         frappe.logger('cleartax').exception(e)
         return error_response(e)
