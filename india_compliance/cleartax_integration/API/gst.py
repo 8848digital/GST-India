@@ -65,11 +65,13 @@ def gst_invoice_request(data,id,type):
         else:
             url+= 'gst_purchase'
             gstin = data.get('customer_address').get('gstin')
+        headers['gstin'] = gstin
         if settings.enterprise:
             headers['token'] = settings.get_password('gst_auth_token')
-            #headers['taxid'] = settings.tax_id(gstin)
+            if settings.sandbox:
+                headers['token'] = settings.get_password('gst_sandbox_token')
         data = json.dumps(data, indent=4, sort_keys=False, default=str)
-        response = requests.request("PUT", url, headers=headers, data= data) 
+        response = requests.request("POST", url, headers=headers, data= data) 
         response = response.json()['message']
         if response.get('error'):
             return error_response(response.get('error'))
