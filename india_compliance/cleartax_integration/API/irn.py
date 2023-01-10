@@ -7,7 +7,7 @@ import json
 @frappe.whitelist(allow_guest=True)
 def generate_irn(**kwargs):
     try:
-        invoice = frappe.get_doc(get_doc('Sales Invoice',kwargs.get('invoice')))
+        invoice = frappe.get_doc('Sales Invoice',kwargs.get('invoice'))
         item_list = []
         gst_settings_accounts = frappe.get_all("GST Account",
                 filters={'company':invoice.company},
