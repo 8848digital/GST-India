@@ -81,7 +81,7 @@
    "options": "E Invoicing Eligible"
   },
   {
-   "default": "https://cleartax.frappe.cloud",
+   "default": "https://cleartaxv2.frappe.cloud",
    "fieldname": "host_url",
    "fieldtype": "Data",
    "label": "Host URL"
