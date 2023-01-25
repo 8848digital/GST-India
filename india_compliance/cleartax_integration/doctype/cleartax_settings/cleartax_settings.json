@@ -16,7 +16,7 @@
   "production_auth_token",
   "sandbox_auth_token",
   "gst_auth_token",
-  "tax_entity_list",
+  "gst_sandbox_token",
   "section_break_10",
   "e_invoicing",
   "host_url",
@@ -71,12 +71,6 @@
    "label": "Sandbox Auth Token"
   },
   {
-   "fieldname": "tax_entity_list",
-   "fieldtype": "Table",
-   "label": "Tax Entity List",
-   "options": "Tax Entities"
-  },
-  {
    "fieldname": "section_break_10",
    "fieldtype": "Section Break"
   },
@@ -87,7 +81,7 @@
    "options": "E Invoicing Eligible"
   },
   {
-   "default": "https://cleartax.frappe.cloud",
+   "default": "https://cleartaxv2.frappe.cloud",
    "fieldname": "host_url",
    "fieldtype": "Data",
    "label": "Host URL"
@@ -111,12 +105,17 @@
    "fieldname": "sales_invoices_from",
    "fieldtype": "Date",
    "label": "Sales Invoices From"
+  },
+  {
+   "fieldname": "gst_sandbox_token",
+   "fieldtype": "Password",
+   "label": "GST Sandbox Token"
   }
  ],
  "index_web_pages_for_search": 1,
  "issingle": 1,
  "links": [],
- "modified": "2022-12-22 09:46:42.803619",
+ "modified": "2023-01-09 15:49:53.558012",
  "modified_by": "Administrator",
  "module": "Cleartax Integration",
  "name": "Cleartax Settings",

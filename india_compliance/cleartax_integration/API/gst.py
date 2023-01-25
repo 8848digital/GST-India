@@ -40,7 +40,7 @@ def create_gst_invoice(**kwargs):
             data['shipping_address'] = get_dict('Address',invoice.shipping_address)
         if invoice.is_return:
             data['original_invoice'] = get_dict(doctype,invoice.return_against)
-            return gst_cdn_request(data,kwargs.get('invoice'),type)
+            # return gst_cdn_request(data,kwargs.get('invoice'),type)
         # if invoice.is_debit_note:
         #     data['original_invoice'] = get_dict('Sales Invoice',invoice.return_against)
         #     return gst_cdn_request(data,kwargs.get('invoice'),type)
@@ -54,22 +54,26 @@ def gst_invoice_request(data,id,type):
     try:
         settings = frappe.get_doc('Cleartax Settings')
         url = settings.host_url
-        url+= "/api/method/cleartax.cleartax.API.gst.create_gst_invoice"
+        url+= "/api/method/cleartax.cleartax.API.gst."
         headers = {
             'sandbox': str(settings.sandbox),
             'Content-Type': 'application/json'
         }
         if type == 'SALE':
+            url+= 'gst_sales'
             gstin = data.get('company_address').get('gstin')
         else:
+            url+= 'gst_purchase'
             gstin = data.get('customer_address').get('gstin')
+        headers['gstin'] = gstin
         if settings.enterprise:
             headers['token'] = settings.get_password('gst_auth_token')
-            headers['taxid'] = settings.tax_id(gstin)
+            if settings.sandbox:
+                headers['token'] = settings.get_password('gst_sandbox_token')
         data = json.dumps(data, indent=4, sort_keys=False, default=str)
-        response = requests.request("PUT", url, headers=headers, data= data) 
+        response = requests.request("POST", url, headers=headers, data= data) 
         response = response.json()['message']
-        if response.get('error'):
+        if response['response'].get('error'):
             return error_response(response.get('error'))
         api = "GENERATE GST SINV" if type == 'SALE' else "GENERATE GST PINV"
         doctype = "Sales Invoice" if type == 'SALE' else "Purchase Invoice"
@@ -81,7 +85,7 @@ def gst_invoice_request(data,id,type):
             else:
                 frappe.db.set_value('Purchase Invoice',id,'gst_invoice',1)
             frappe.db.commit()
-            return success_response(response['response'])
+            return success_response()
         return response_error_handling(response['response'])
     except Exception as e:
         frappe.logger('cleartax').exception(e)
@@ -103,7 +107,7 @@ def gst_cdn_request(data,id,type):
             gstin = data.get('customer_address').get('gstin')
         if settings.enterprise:
             headers['token'] = settings.get_password('gst_auth_token')
-            headers['taxid'] = settings.tax_id(gstin)
+            #headers['taxid'] = settings.tax_id(gstin)
         data = json.dumps(data, indent=4, sort_keys=False, default=str)
         response = requests.request("PUT", url, headers=headers, data= data)
         response = response.json()['message']
