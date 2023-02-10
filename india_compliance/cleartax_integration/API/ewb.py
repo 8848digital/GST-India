@@ -373,7 +373,8 @@ def get_delivery_note(doc):
 @frappe.whitelist()
 def bulk_ewb(**kwargs):
     try:
-        data = json.loads(kwargs.get('data'))
+        docnames = kwargs.get('data')
+        data = frappe.parse_json(docnames) if docnames.startswith("[") else [docnames]
         for i in data:
             frappe.enqueue("india_compliance.cleartax_integration.API.ewb.generate_e_waybill_by_irn",**{'invoice':i})
     except Exception as e:
@@ -382,7 +383,8 @@ def bulk_ewb(**kwargs):
 @frappe.whitelist()
 def bulk_ewb_dn(**kwargs):
     try:
-        data = json.loads(kwargs.get('data'))
+        docnames = kwargs.get('data')
+        data = frappe.parse_json(docnames) if docnames.startswith("[") else [docnames]
         for i in data:
             frappe.enqueue("india_compliance.cleartax_integration.API.ewb.ewb_without_irn",**{'delivery_note':i})
     except Exception as e:

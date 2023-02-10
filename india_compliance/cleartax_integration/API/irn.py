@@ -152,8 +152,9 @@ def e_invoicing_enabled(company):
 @frappe.whitelist()
 def bulk_irn(**kwargs):
     try:
-        data = json.loads(kwargs.get('data'))
+        docnames = kwargs.get('data')
+        data = frappe.parse_json(docnames) if docnames.startswith("[") else [docnames]
         for i in data:
             frappe.enqueue("india_compliance.cleartax_integration.API.irn.generate_irn",**{'invoice':i})
     except Exception as e:
-        frappe.logger('sfa_online').exception(e)
+        frappe.logger('cleartax').exception(e)
