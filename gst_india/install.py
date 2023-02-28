@@ -54,7 +54,7 @@ def after_install():
         )
         raise e
 
-    click.secho("Thank you for installing India Compliance!", fg="green")
+    click.secho("Thank you for installing Gst India!", fg="green")
 
 
 def run_post_install_patches():
