@@ -10,12 +10,12 @@
 		"@semantic-release/release-notes-generator",
 		[
 			"@semantic-release/exec", {
-				"prepareCmd": 'sed -ir -E "s/\"[0-9]+\.[0-9]+\.[0-9]+\"/\"${nextRelease.version}\"/" india_compliance/__init__.py'
+				"prepareCmd": 'sed -ir -E "s/\"[0-9]+\.[0-9]+\.[0-9]+\"/\"${nextRelease.version}\"/" gst_india/__init__.py'
 			}
 		],
 		[
 			"@semantic-release/git", {
-				"assets": ["india_compliance/__init__.py"],
+				"assets": ["gst_india/__init__.py"],
 				"message": "chore(release): Bumped to Version ${nextRelease.version}\n\n${nextRelease.notes}"
 			}
 		],

@@ -1,5 +1,5 @@
 from setuptools import setup
 
-name = "india_compliance"
+name = "gst_india"
 
 setup()

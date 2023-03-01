@@ -1,0 +1,8 @@
+[pre_model_sync]
+
+
+[post_model_sync]
+gst_india.patches.v14.set_default_for_overridden_accounts_setting
+execute:from gst_india.gst_india.setup import create_custom_fields; create_custom_fields()
+execute:from gst_india.gst_india.setup import create_property_setters; create_property_setters()
+gst_india.patches.post_install.update_custom_role_for_e_invoice_summary

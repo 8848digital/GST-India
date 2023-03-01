@@ -7,7 +7,7 @@ tags
 __pycache__/
 
 # docs
-india_compliance/docs/current
+gst_india/docs/current
 
 # JS
 dist/
