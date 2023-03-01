@@ -7,7 +7,7 @@ repos:
       rev: v4.0.1
       hooks:
           - id: trailing-whitespace
-            files: "india_compliance.*"
+            files: "gst_india.*"
             exclude: ".*json$|.*txt$|.*csv|.*md"
           - id: check-yaml
           - id: no-commit-to-branch

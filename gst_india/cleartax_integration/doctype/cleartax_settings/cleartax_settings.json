@@ -1,0 +1,138 @@
+{
+ "actions": [],
+ "allow_rename": 1,
+ "creation": "2022-10-20 12:29:13.937986",
+ "default_view": "List",
+ "doctype": "DocType",
+ "editable_grid": 1,
+ "engine": "InnoDB",
+ "field_order": [
+  "enable",
+  "automate",
+  "column_break_3",
+  "sandbox",
+  "enterprise",
+  "enterprise_section",
+  "production_auth_token",
+  "sandbox_auth_token",
+  "gst_auth_token",
+  "gst_sandbox_token",
+  "section_break_10",
+  "e_invoicing",
+  "host_url",
+  "bulk_upload_section",
+  "purchase_invoices_from",
+  "sales_invoices_from"
+ ],
+ "fields": [
+  {
+   "default": "0",
+   "fieldname": "enable",
+   "fieldtype": "Check",
+   "label": "Enable"
+  },
+  {
+   "default": "0",
+   "fieldname": "automate",
+   "fieldtype": "Check",
+   "label": "Automate"
+  },
+  {
+   "fieldname": "column_break_3",
+   "fieldtype": "Column Break"
+  },
+  {
+   "default": "0",
+   "fieldname": "sandbox",
+   "fieldtype": "Check",
+   "label": "Sandbox"
+  },
+  {
+   "default": "0",
+   "fieldname": "enterprise",
+   "fieldtype": "Check",
+   "label": "Enterprise"
+  },
+  {
+   "collapsible": 1,
+   "depends_on": "eval:doc.enterprise ==1",
+   "fieldname": "enterprise_section",
+   "fieldtype": "Section Break",
+   "label": "Enterprise Details"
+  },
+  {
+   "fieldname": "production_auth_token",
+   "fieldtype": "Password",
+   "label": "Production Auth Token"
+  },
+  {
+   "fieldname": "sandbox_auth_token",
+   "fieldtype": "Password",
+   "label": "Sandbox Auth Token"
+  },
+  {
+   "fieldname": "section_break_10",
+   "fieldtype": "Section Break"
+  },
+  {
+   "fieldname": "e_invoicing",
+   "fieldtype": "Table MultiSelect",
+   "label": "E Invoicing",
+   "options": "E Invoicing Eligible"
+  },
+  {
+   "default": "https://cleartaxv2.frappe.cloud",
+   "fieldname": "host_url",
+   "fieldtype": "Data",
+   "label": "Host URL"
+  },
+  {
+   "fieldname": "gst_auth_token",
+   "fieldtype": "Password",
+   "label": "GST Auth Token"
+  },
+  {
+   "fieldname": "bulk_upload_section",
+   "fieldtype": "Section Break",
+   "label": "Bulk Upload"
+  },
+  {
+   "fieldname": "purchase_invoices_from",
+   "fieldtype": "Date",
+   "label": "Purchase Invoices From"
+  },
+  {
+   "fieldname": "sales_invoices_from",
+   "fieldtype": "Date",
+   "label": "Sales Invoices From"
+  },
+  {
+   "fieldname": "gst_sandbox_token",
+   "fieldtype": "Password",
+   "label": "GST Sandbox Token"
+  }
+ ],
+ "index_web_pages_for_search": 1,
+ "issingle": 1,
+ "links": [],
+ "modified": "2023-01-09 15:49:53.558012",
+ "modified_by": "Administrator",
+ "module": "Cleartax Integration",
+ "name": "Cleartax Settings",
+ "owner": "Administrator",
+ "permissions": [
+  {
+   "create": 1,
+   "delete": 1,
+   "email": 1,
+   "print": 1,
+   "read": 1,
+   "role": "System Manager",
+   "share": 1,
+   "write": 1
+  }
+ ],
+ "sort_field": "modified",
+ "sort_order": "DESC",
+ "states": []
+}
