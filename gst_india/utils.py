@@ -70,3 +70,45 @@ def response_logger(payload,response,api,doc_type,doc_name,status="Failed"):
         frappe.db.commit()
     except Exception as e:
         frappe.logger('response').exception(e)
+
+def get_url():
+    if frappe.db.get_single_value('Cleartax Settings','enable'):
+        return frappe.db.get_single_value('Cleartax Settings','host_url')
+    elif frappe.db.get_single_value('Masters India Settings','enable'):
+        return frappe.db.get_single_value('Cleartax Settings','host_url')
+    frappe.throw("Please Enable Cleartax or Masters India GSP!")
+
+def set_headers():
+    if frappe.db.get_single_value('Cleartax Settings','enable'):
+        return cleartax_headers()
+    elif frappe.db.get_single_value('Masters India Settings','enable'):
+        return masters_india_headers()
+    frappe.throw("Please Enable Cleartax or Masters India GSP!")
+        
+
+def cleartax_headers():
+    doc = frappe.get_doc("Cleartax Settings")
+    headers = {
+        'sandbox': str(doc.sandbox),
+        'Content-Type': 'application/json'
+    }
+    if not doc.enterprise:
+        return headers
+    if doc.sandbox and doc.sandbox_auth_token:
+        headers['token'] = doc.get_password('sandbox_auth_token')
+        return headers
+    if doc.production_auth_token:
+        headers['token'] = doc.get_password('production_auth_token')
+    return headers
+
+
+def masters_india_headers():
+    doc = frappe.get_doc("Masters India Settings")
+    headers = {
+        'sandbox': str(doc.sandbox),
+        'Content-Type': 'application/json'
+    }
+    if doc.access_token:
+        headers['token'] = doc.access_token
+    return headers
+

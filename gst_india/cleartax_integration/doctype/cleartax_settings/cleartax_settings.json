@@ -81,7 +81,7 @@
    "options": "E Invoicing Eligible"
   },
   {
-   "default": "https://cleartaxv2.frappe.cloud",
+   "default": "https://cleartaxv2.frappe.cloud/api/method/cleartax.cleartax.API.",
    "fieldname": "host_url",
    "fieldtype": "Data",
    "label": "Host URL"
@@ -115,7 +115,7 @@
  "index_web_pages_for_search": 1,
  "issingle": 1,
  "links": [],
- "modified": "2023-01-09 15:49:53.558012",
+ "modified": "2023-03-03 11:48:49.648180",
  "modified_by": "Administrator",
  "module": "Cleartax Integration",
  "name": "Cleartax Settings",

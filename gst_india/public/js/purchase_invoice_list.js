@@ -10,7 +10,7 @@ frappe.listview_settings["Purchase Invoice"].onload = function (list_view) {
             selected.push(check.dataset.name);
         }
         frappe.call({
-            method: "gst_india.cleartax_integration.API.gst.bulk_purchase_gst",
+            method: "gst_india.API.gst.bulk_purchase_gst",
             args: {
                 data: selected
             },

@@ -1,6 +1,8 @@
 import frappe
 from frappe import *
-from gst_india.cleartax_integration.utils import success_response, error_response, response_error_handling, response_logger, get_dict
+from gst_india.utils import (success_response, error_response, 
+                             response_error_handling, response_logger, 
+                             get_dict, get_url, set_headers)
 import requests
 import json 
 
@@ -40,19 +42,9 @@ def generate_irn(**kwargs):
 
 def create_irn_request(data,inv):
     try:
-        settings = frappe.get_doc('Cleartax Settings')
-        url = settings.host_url
-        url+= "/api/method/cleartax.cleartax.API.irn.generate_irn"
-        headers = {
-            'sandbox': str(settings.sandbox),
-            'Content-Type': 'application/json'
-        }
-        if settings.enterprise:
-            if settings.sandbox:
-                headers['token'] = settings.get_password('sandbox_auth_token')
-            else:
-                headers['token'] = settings.get_password('production_auth_token')
-
+        url = get_url()
+        url+= "irn.generate_irn"
+        headers = set_headers()
         payload = json.dumps(data, indent=4, sort_keys=False, default=str)
         response = requests.request(
             "POST", url, headers=headers, data=payload) 
@@ -114,18 +106,9 @@ def cancel_irn(**kwargs):
 
 def cancel_irn_request(inv,data):
     try:
-        settings = frappe.get_doc('Cleartax Settings')
-        url = settings.host_url
-        url+= "/api/method/cleartax.cleartax.API.irn.cancel_irn"
-        headers = {
-            'sandbox': str(settings.sandbox),
-            'Content-Type': 'application/json'
-        }
-        if settings.enterprise:
-            if settings.sandbox:
-                headers['token'] = settings.get_password('sandbox_auth_token')
-            else:
-                headers['token'] = settings.get_password('production_auth_token')
+        url = get_url()
+        url+= "irn.cancel_irn"
+        headers = set_headers()
         payload = json.dumps(data, indent=4, sort_keys=False, default=str)
         response = requests.request(
             "POST", url, headers=headers, data=payload)
@@ -154,6 +137,6 @@ def bulk_irn(**kwargs):
     try:
         data = json.loads(kwargs.get('data'))
         for i in data:
-            frappe.enqueue("gst_india.cleartax_integration.API.irn.generate_irn",**{'invoice':i})
+            frappe.enqueue("gst_india.API.irn.generate_irn",**{'invoice':i})
     except Exception as e:
         frappe.logger('sfa_online').exception(e)

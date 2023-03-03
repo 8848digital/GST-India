@@ -12,7 +12,7 @@ frappe.ui.form.on('Purchase Invoice', {
 						if(button_name != ""){
 						cur_frm.add_custom_button(__(button_name), function () {
 							frappe.call({
-								method: "gst_india.cleartax_integration.API.gst.create_gst_invoice",
+								method: "gst_india.API.gst.create_gst_invoice",
 								args: {
 									invoice: frm.selected_doc.name,
 									type: 'PURCHASE'

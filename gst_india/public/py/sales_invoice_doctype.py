@@ -1,5 +1,5 @@
-from gst_india.cleartax_integration.API.irn import generate_irn, e_invoicing_enabled
-from gst_india.cleartax_integration.API.gst import create_gst_invoice
+from gst_india.API.irn import generate_irn, e_invoicing_enabled
+from gst_india.API.gst import create_gst_invoice
 import frappe 
 
 def sales_invoice_submit(doc, method=None):

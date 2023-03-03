@@ -290,7 +290,7 @@ fixtures = [
 # ---------------
 
 scheduler_events = {
-	"hourly_long":["gst_india.cleartax_integration.doctype.cleartax_settings.cleartax_settings.push_to_cleartax"]
+	"hourly_long":["gst_india.masters_india.doctype.masters_india_settings.masters_india_settings.update_access_token"]
 }
 
 # Testing

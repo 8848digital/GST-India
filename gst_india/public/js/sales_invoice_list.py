@@ -7,7 +7,7 @@ frappe.listview_settings['Sales Invoice'] = {
                 selected.push(check.dataset.name);
             }
             frappe.call({
-                method: "gst_india.cleartax_integration.API.irn.bulk_irn",
+                method: "gst_india.API.irn.bulk_irn",
                 args: {
                     data: selected
                 },
@@ -26,7 +26,7 @@ frappe.listview_settings['Sales Invoice'] = {
                 selected.push(check.dataset.name);
             }
             frappe.call({
-                method: "gst_india.cleartax_integration.API.ewb.bulk_ewb",
+                method: "gst_india.API.ewb.bulk_ewb",
                 args: {
                     data: selected
                 },

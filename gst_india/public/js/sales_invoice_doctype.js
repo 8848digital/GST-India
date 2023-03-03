@@ -10,7 +10,7 @@ frappe.ui.form.on('Sales Invoice', {
 		}
 		if (frm.selected_doc.docstatus == 1) {
 		frappe.call({
-			method: "gst_india.cleartax_integration.API.irn.e_invoicing_enabled",
+			method: "gst_india.API.irn.e_invoicing_enabled",
 			args: {
 				company: frm.selected_doc.company
 			},
@@ -20,7 +20,7 @@ frappe.ui.form.on('Sales Invoice', {
 					if (frm.selected_doc.irn_cancelled == false && frm.selected_doc.irn == undefined) {
 						cur_frm.add_custom_button(__("IRN"), function () {
 							frappe.call({
-								method: "gst_india.cleartax_integration.API.irn.generate_irn",
+								method: "gst_india.API.irn.generate_irn",
 								args: {
 									invoice: frm.selected_doc.name
 								},
@@ -60,7 +60,7 @@ frappe.ui.form.on('Sales Invoice', {
 								primary_action(values) {
 
 									frappe.call({
-										method: "gst_india.cleartax_integration.API.irn.cancel_irn",
+										method: "gst_india.API.irn.cancel_irn",
 										args: {
 											data: values,
 											invoice: frm.selected_doc.name
@@ -86,7 +86,7 @@ frappe.ui.form.on('Sales Invoice', {
 					if(frm.selected_doc.irn){
 					cur_frm.add_custom_button(__("Create E-way Bill by IRN"), function () {
 						frappe.call({
-							method: "gst_india.cleartax_integration.API.ewb.generate_e_waybill_by_irn",
+							method: "gst_india.API.ewb.generate_e_waybill_by_irn",
 							args: {
 								invoice: frm.selected_doc.name
 							},
@@ -126,7 +126,7 @@ frappe.ui.form.on('Sales Invoice', {
 								primary_action(values) {
 
 									frappe.call({
-										method: "gst_india.cleartax_integration.API.ewb.cancel_ewb",
+										method: "gst_india.API.ewb.cancel_ewb",
 										args: {
 											data: values,
 											invoice: frm.selected_doc.name
@@ -162,7 +162,7 @@ frappe.ui.form.on('Sales Invoice', {
 						if(button_name != ""){
 						cur_frm.add_custom_button(__(button_name), function () {
 							frappe.call({
-								method: "gst_india.cleartax_integration.API.gst.create_gst_invoice",
+								method: "gst_india.API.gst.create_gst_invoice",
 								args: {
 									invoice: frm.selected_doc.name,
 									type: 'SALE'

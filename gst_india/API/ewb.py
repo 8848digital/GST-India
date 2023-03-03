@@ -1,5 +1,7 @@
 import frappe
-from gst_india.cleartax_integration.utils import success_response, error_response, response_error_handling, response_logger,get_dict
+from gst_india.utils import (success_response, error_response, 
+                             response_error_handling, response_logger,
+                             get_dict,get_url,set_headers)
 from frappe import *
 import json
 import requests
@@ -40,18 +42,9 @@ def generate_e_waybill_by_irn(**kwargs):
 
 def create_ewb_request(inv,gstin,data):
     try:
-        settings = frappe.get_doc('Cleartax Settings')
-        url = settings.host_url
-        url+= "/api/method/cleartax.cleartax.API.ewb.generate_e_waybill_by_irn"
-        headers = {
-            'sandbox': str(settings.sandbox),
-            'Content-Type': 'application/json'
-        }
-        if settings.enterprise:
-            if settings.sandbox:
-                headers['token'] = settings.get_password('sandbox_auth_token')
-            else:
-                headers['token'] = settings.get_password('production_auth_token')
+        url = get_url()
+        url+= "ewb.generate_e_waybill_by_irn"
+        headers = set_headers()
         data = json.dumps(data, indent=4, sort_keys=False, default=str)
         response = requests.request(
             "POST", url, headers=headers, data=data)
@@ -99,18 +92,9 @@ def ewb_without_irn(**kwargs):
 
 def ewb_without_irn_request(data,delivery_note=None,subcontracting_challan=None):
     try:
-        settings = frappe.get_doc('Cleartax Settings')
-        url = settings.host_url
-        url+= "/api/method/cleartax.cleartax.API.ewb.ewb_without_irn"
-        headers = {
-            'sandbox': str(settings.sandbox),
-            'Content-Type': 'application/json'
-        }
-        if settings.enterprise:
-            if settings.sandbox:
-                headers['token'] = settings.get_password('sandbox_auth_token')
-            else:
-                headers['token'] = settings.get_password('production_auth_token')
+        url = get_url()
+        url+= "ewb.ewb_without_irn"
+        headers = set_headers()
         data = json.dumps(data, indent=4, sort_keys=False, default=str)
         response = requests.request(
             "POST", url, headers=headers, data=data)
@@ -186,18 +170,9 @@ def update_ewb_partb_sc(**kwargs):
 
 def partb_request(data,dn=None,sc=None):
     try:
-        settings = frappe.get_doc('Cleartax Settings')
-        url = settings.host_url
-        url+= "/api/method/cleartax.cleartax.API.ewb.update_ewb_partb"
-        headers = {
-            'sandbox': str(settings.sandbox),
-            'Content-Type': 'application/json'
-        }
-        if settings.enterprise:
-            if settings.sandbox:
-                headers['token'] = settings.get_password('sandbox_auth_token')
-            else:
-                headers['token'] = settings.get_password('production_auth_token')
+        url = get_url()
+        url+= "ewb.update_ewb_partb"
+        headers = set_headers()
         data = json.dumps(data, indent=4, sort_keys=False, default=str)    
         response = requests.request(
             "POST", url, headers=headers, data=data)
@@ -228,18 +203,9 @@ def partb_request(data,dn=None,sc=None):
 @frappe.whitelist()
 def cancel_ewb(**kwargs):
     try:
-        settings = frappe.get_doc('Cleartax Settings')
-        url = settings.host_url
-        url+= "/api/method/cleartax.cleartax.API.ewb.cancel_ewb"
-        headers = {
-            'sandbox': str(settings.sandbox),
-            'Content-Type': 'application/json'
-        }
-        if settings.enterprise:
-            if settings.sandbox:
-                headers['token'] = settings.get_password('sandbox_auth_token')
-            else:
-                headers['token'] = settings.get_password('production_auth_token')
+        url = get_url()
+        url+= "ewb.cancel_ewb"
+        headers = set_headers()
         invoice = frappe.get_doc('Sales Invoice', kwargs.get('invoice'))
         gstin = frappe.get_value('Address', invoice.company_address,'gstin')
         data = json.loads(kwargs.get('data'))
@@ -258,18 +224,9 @@ def cancel_ewb(**kwargs):
 @frappe.whitelist()
 def cancel_ewb_dn(**kwargs):
     try:
-        settings = frappe.get_doc('Cleartax Settings')
-        url = settings.host_url
-        url+= "/api/method/cleartax.cleartax.API.ewb.cancel_ewb"
-        headers = {
-            'sandbox': str(settings.sandbox),
-            'Content-Type': 'application/json'
-        }
-        if settings.enterprise:
-            if settings.sandbox:
-                headers['token'] = settings.get_password('sandbox_auth_token')
-            else:
-                headers['token'] = settings.get_password('production_auth_token')
+        url = get_url()
+        url+= "ewb.cancel_ewb"
+        headers = set_headers()
         deliver_note = frappe.get_doc('Delivery Note', kwargs.get('delivery_note'))
         gstin = frappe.get_value('Address', deliver_note.dispatch_address_name,'gstin')
         data = json.loads(kwargs.get('data'))
@@ -288,18 +245,9 @@ def cancel_ewb_dn(**kwargs):
 @frappe.whitelist()
 def cancel_ewb_sc(**kwargs):
     try:
-        settings = frappe.get_doc('Cleartax Settings')
-        url = settings.host_url
-        url+= "/api/method/cleartax.cleartax.API.ewb.cancel_ewb"
-        headers = {
-            'sandbox': str(settings.sandbox),
-            'Content-Type': 'application/json'
-        }
-        if settings.enterprise:
-            if settings.sandbox:
-                headers['token'] = settings.get_password('sandbox_auth_token')
-            else:
-                headers['token'] = settings.get_password('production_auth_token')
+        url = get_url()
+        url+= "ewb.cancel_ewb"
+        headers = set_headers()
         sc = frappe.get_doc('Subcontracting Challan', kwargs.get('doc'))
         gstin = frappe.get_value('Address', sc.billing_address,'gstin')
         data = json.loads(kwargs.get('data'))
@@ -375,7 +323,7 @@ def bulk_ewb(**kwargs):
     try:
         data = json.loads(kwargs.get('data'))
         for i in data:
-            frappe.enqueue("gst_india.cleartax_integration.API.ewb.generate_e_waybill_by_irn",**{'invoice':i})
+            frappe.enqueue("gst_india.API.ewb.generate_e_waybill_by_irn",**{'invoice':i})
     except Exception as e:
         frappe.logger('sfa_online').exception(e)
 
@@ -384,7 +332,7 @@ def bulk_ewb_dn(**kwargs):
     try:
         data = json.loads(kwargs.get('data'))
         for i in data:
-            frappe.enqueue("gst_india.cleartax_integration.API.ewb.ewb_without_irn",**{'delivery_note':i})
+            frappe.enqueue("gst_india.API.ewb.ewb_without_irn",**{'delivery_note':i})
     except Exception as e:
         frappe.logger('sfa_online').exception(e)
 

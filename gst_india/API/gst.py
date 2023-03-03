@@ -2,7 +2,9 @@ import frappe
 import requests
 import json
 from frappe import *
-from gst_india.cleartax_integration.utils import success_response, error_response, response_error_handling, response_logger, get_dict
+from gst_india.utils import (success_response, error_response, 
+                             response_error_handling, response_logger, 
+                             get_dict,get_url,set_headers)
 
 
 @frappe.whitelist()
@@ -52,13 +54,9 @@ def create_gst_invoice(**kwargs):
 
 def gst_invoice_request(data,id,type):
     try:
-        settings = frappe.get_doc('Cleartax Settings')
-        url = settings.host_url
-        url+= "/api/method/cleartax.cleartax.API.gst."
-        headers = {
-            'sandbox': str(settings.sandbox),
-            'Content-Type': 'application/json'
-        }
+        url = get_url()
+        url+= "gst."
+        headers = set_headers()
         if type == 'SALE':
             url+= 'gst_sales'
             gstin = data.get('company_address').get('gstin')
@@ -66,10 +64,6 @@ def gst_invoice_request(data,id,type):
             url+= 'gst_purchase'
             gstin = data.get('customer_address').get('gstin')
         headers['gstin'] = gstin
-        if settings.enterprise:
-            headers['token'] = settings.get_password('gst_auth_token')
-            if settings.sandbox:
-                headers['token'] = settings.get_password('gst_sandbox_token')
         data = json.dumps(data, indent=4, sort_keys=False, default=str)
         response = requests.request("POST", url, headers=headers, data= data) 
         response = response.json()['message']
@@ -94,20 +88,13 @@ def gst_invoice_request(data,id,type):
 
 def gst_cdn_request(data,id,type):
     try:
-        settings = frappe.get_doc('Cleartax Settings')
-        url = settings.host_url
-        url+= "/api/method/cleartax.cleartax.API.gst.create_gst_invoice"
-        headers = {
-            'sandbox': str(settings.sandbox),
-            'Content-Type': 'application/json'
-        }
+        url = get_url()
+        url+= "gst.create_gst_invoice"
+        headers = set_headers()
         if type == 'SALE':
             gstin = data.get('company_address').get('gstin')
         else:
             gstin = data.get('customer_address').get('gstin')
-        if settings.enterprise:
-            headers['token'] = settings.get_password('gst_auth_token')
-            #headers['taxid'] = settings.tax_id(gstin)
         data = json.dumps(data, indent=4, sort_keys=False, default=str)
         response = requests.request("PUT", url, headers=headers, data= data)
         response = response.json()['message']
@@ -134,6 +121,6 @@ def bulk_purchase_gst(**kwargs):
     try:
         data = json.loads(kwargs.get('data'))
         for i in data:
-            frappe.enqueue("gst_india.cleartax_integration.API.gst.create_gst_invoice",**{'invoice':i,'type':'PURCHASE'})
+            frappe.enqueue("gst_india.API.gst.create_gst_invoice",**{'invoice':i,'type':'PURCHASE'})
     except Exception as e:
         frappe.logger('sfa_online').exception(e)

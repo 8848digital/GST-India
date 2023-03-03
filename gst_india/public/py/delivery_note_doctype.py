@@ -1,4 +1,4 @@
-from gst_india.cleartax_integration.API.ewb import ewb_without_irn
+from gst_india.API.ewb import ewb_without_irn
 import frappe 
 
 def delivery_note_submit(doc, method=None):
