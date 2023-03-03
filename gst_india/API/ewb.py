@@ -1,7 +1,7 @@
 import frappe
 from gst_india.utils import (success_response, error_response, 
                              response_error_handling, response_logger,
-                             get_dict,get_url,set_headers)
+                             get_dict,get_url,set_headers,process_request)
 from frappe import *
 import json
 import requests
@@ -48,15 +48,8 @@ def create_ewb_request(inv,gstin,data):
         data = json.dumps(data, indent=4, sort_keys=False, default=str)
         response = requests.request(
             "POST", url, headers=headers, data=data)
-        response = response.json()['message']
-        if response.get('error'):
-            return error_response(response.get('error'))
-        response_status = response['msg']
-        response_logger(response['request'],response['response'],"GENERATE EWB BY IRN","Sales Invoice",inv.name,
-                        response_status)
-        if response_status == "Success":
-            return store_ewb_details(inv.name,data,response['response'][0])
-        return response_error_handling(response['response'])
+        response = process_request(response,'GENERATE EWB BY IRN',"Sales Invoice",inv.name)
+        return store_ewb_details(inv.name,data,response['response'][0])
     except Exception as e:
         frappe.logger('cleartax').exception(e)
         return error_response(e)
@@ -98,20 +91,12 @@ def ewb_without_irn_request(data,delivery_note=None,subcontracting_challan=None)
         data = json.dumps(data, indent=4, sort_keys=False, default=str)
         response = requests.request(
             "POST", url, headers=headers, data=data)
-        response = response.json()['message']
-        if response.get('error'):
-            return error_response(response.get('error'))
-        response_status = response['msg']
         if delivery_note:
-            response_logger(response['request'],response['response'],"GENERATE EWB WITHOUT IRN","Delivery Note",delivery_note,
-                            response_status)
-            if response_status == 'Success':
-                return store_ewb_details_dn(delivery_note,data,response['response'])
-        if subcontracting_challan:
-            response_logger(response['request'],response['response'],"GENERATE EWB WITHOUT IRN","Subcontracting Challan",subcontracting_challan,
-                            response_status)
-            if response_status == 'Success':
-                return store_ewb_details_sc(subcontracting_challan,data,response['response'])
+            response = process_request(response,'GENERATE EWB WITHOUT IRN',"Delivery Note",delivery_note)
+            return store_ewb_details_dn(delivery_note,data,response['response'])
+        elif subcontracting_challan:
+            response = process_request(response,'GENERATE EWB WITHOUT IRN',"Subcontracting Challan",subcontracting_challan)
+            return store_ewb_details_sc(subcontracting_challan,data,response['response'])
         return response_error_handling(response['response'])
     except Exception as e:
         frappe.logger('cleartax').exception(e)
@@ -176,22 +161,13 @@ def partb_request(data,dn=None,sc=None):
         data = json.dumps(data, indent=4, sort_keys=False, default=str)    
         response = requests.request(
             "POST", url, headers=headers, data=data)
-        response = response.json()['message']
-        if response.get('error'):
-            return error_response(response.get('error'))
-        response_status = response['status']
         if dn:
-            response_logger(response['request'],response['response'],"UPDATE PART B","Delivery Note",dn,response_status)
+            response = process_request(response,"UPDATE PART B","Delivery Note",dn)
+            frappe.db.set_value('Delivery Note',dn,'update_partb',1)
         elif sc:
-            response_logger(response['request'],response['response'],"UPDATE PART B","Subcontracting Challan",sc,response_status)
-        if response_status == 'Success':
-            if dn:
-                frappe.db.set_value('Delivery Note',dn,'update_partb',1)
-            elif sc:
-                frappe.db.set_value('Subcontracting Challan',sc,'update_partb',1)
-            return success_response(response['response'])
-        else:
-            return response_error_handling(response['response'])
+            response = process_request(response,"UPDATE PART B","Subcontracting Challan",sc)
+            frappe.db.set_value('Subcontracting Challan',sc,'update_partb',1)
+        return success_response(response['response'])
     except Exception as e:
         frappe.logger('cleartax').exception(e)
         return error_response(e)
@@ -281,18 +257,14 @@ def store_ewb_details(inv,data,response):
 
 
 def cancel_ewb_request(headers,url,data,invoice=None,delivery_note=None,sc=None):
-    data = json.dumps(data, indent=4, sort_keys=False, default=str)
-    response = requests.request(
-            "POST", url, headers=headers, data=data)
-    response = response.json()['message']
-    doctype = "Sales Invoice" if invoice else "Delivery Note"
-    docname = invoice if invoice else delivery_note
-    response_status = "Failed"
-    if response.get('error'):
-        return error_response(response.get('error'))
-    if response['response'].get('ewbStatus') == 'CANCELLED':
-        response_status = "Success"
-        response_logger(response['request'],response['response'],"CANCEL EWB",doctype,docname,response_status)
+    try:
+        data = json.dumps(data, indent=4, sort_keys=False, default=str)
+        response = requests.request(
+                "POST", url, headers=headers, data=data)
+        response = response.json()['message']
+        doctype = "Sales Invoice" if invoice else "Delivery Note"
+        docname = invoice if invoice else delivery_note
+        response = process_request(response,"CANCEL EWB",doctype,docname)
         if invoice:
             frappe.db.set_value('Sales Invoice',invoice,'eway_bill_cancelled',1)
         elif delivery_note:
@@ -300,8 +272,10 @@ def cancel_ewb_request(headers,url,data,invoice=None,delivery_note=None,sc=None)
         elif sc:
             frappe.db.set_value('Subcontracting Challan',sc,'eway_bill_cancelld',1)
         return success_response(data="EWB Cancelled Successfully!")
-    return response_error_handling(response) 
-
+    except Exception as e:
+        frappe.logger('cleartax').exception(e)
+        return error_response(e)
+   
 
 
 def get_delivery_note(doc):

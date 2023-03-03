@@ -28,7 +28,7 @@ def response_error_handling(response):
     if type(response) == str:
         return error_response(response)
     if type(response) == None:
-        return error_message("No response received!")
+        return error_response("No response received!")
     if response.get('govt_response'):
         if response.get('govt_response').get('ErrorDetails'):
             errors = response.get('govt_response').get('ErrorDetails')
@@ -49,13 +49,17 @@ def response_error_handling(response):
 
 
         
-def response_logger(payload,response,api,doc_type,doc_name,status="Failed"):
+def response_logger(response_data,api,doc_type,doc_name):
     try:
-        response = json.dumps(response, indent=4, sort_keys=False, default=str)
+        payload = response_data['request']
+        response = response_data['response']
+        api = api 
+        status = response_data['msg']
+        response_json = json.dumps(response, indent=4, sort_keys=False, default=str)
         if frappe.db.exists('Cleartax Api Log',{'document_name':doc_name,'api':api}):
             doc = frappe.get_doc('Cleartax Api Log',{'document_name':doc_name,'api':api})
             doc.request_data = payload
-            doc.response = response
+            doc.response = response_json
             doc.status = status
             doc.save(ignore_permissions=True)
         else:
@@ -64,7 +68,7 @@ def response_logger(payload,response,api,doc_type,doc_name,status="Failed"):
             doc.document_name = doc_name
             doc.api = api
             doc.request_data = payload
-            doc.response = response
+            doc.response = response_json
             doc.status = status
             doc.insert(ignore_permissions=True)
         frappe.db.commit()
@@ -112,3 +116,13 @@ def masters_india_headers():
         headers['token'] = doc.access_token
     return headers
 
+
+def process_request(request,api,doc_type,doc_name):
+    response = response.json()['message']
+    response_logger(response,api,doc_type,doc_name)
+    if response.get('error'):
+        frappe.throw(response.get('error'))
+    if response['msg'] or response['status'] != 'Success':
+        frappe.throw(response_error_handling(json.loads(json.dumps(response['response']))))
+    return response
+    

@@ -4,7 +4,7 @@ import json
 from frappe import *
 from gst_india.utils import (success_response, error_response, 
                              response_error_handling, response_logger, 
-                             get_dict,get_url,set_headers)
+                             get_dict,get_url,set_headers,process_request)
 
 
 @frappe.whitelist()
@@ -66,21 +66,15 @@ def gst_invoice_request(data,id,type):
         headers['gstin'] = gstin
         data = json.dumps(data, indent=4, sort_keys=False, default=str)
         response = requests.request("POST", url, headers=headers, data= data) 
-        response = response.json()['message']
-        if response['response'].get('error'):
-            return error_response(response.get('error'))
         api = "GENERATE GST SINV" if type == 'SALE' else "GENERATE GST PINV"
         doctype = "Sales Invoice" if type == 'SALE' else "Purchase Invoice"
-        response_status = response['msg']
-        response_logger(response['request'],response['response'],api,doctype,id,response_status)
-        if response_status == "Success":
-            if type == 'SALE':
-                frappe.db.set_value('Sales Invoice',id,'gst_invoice',1)
-            else:
-                frappe.db.set_value('Purchase Invoice',id,'gst_invoice',1)
-            frappe.db.commit()
-            return success_response()
-        return response_error_handling(response['response'])
+        response = process_request(response,api,doctype,id)
+        if type == 'SALE':
+            frappe.db.set_value('Sales Invoice',id,'gst_invoice',1)
+        else:
+            frappe.db.set_value('Purchase Invoice',id,'gst_invoice',1)
+        frappe.db.commit()
+        return success_response()
     except Exception as e:
         frappe.logger('cleartax').exception(e)
         return error_response(e)
@@ -97,21 +91,15 @@ def gst_cdn_request(data,id,type):
             gstin = data.get('customer_address').get('gstin')
         data = json.dumps(data, indent=4, sort_keys=False, default=str)
         response = requests.request("PUT", url, headers=headers, data= data)
-        response = response.json()['message']
-        if response.get('error'):
-            return error_response(response.get('error'))
-        response_status = response['msg']
         api = "GENERATE GST CDN"
         doctype = "Sales Invoice" if type == 'SALE' else "Purchase Invoice"
-        response_logger(response['request'],response['response'],api,doctype,id,response_status)
-        if response_status == 'Success':
-            if type == 'SALE':
-                frappe.db.set_value('Sales Invoice',id,'cdn',1)
-            else:
-                frappe.db.set_value('Purchase Invoice',id,'cdn',1)
-            frappe.db.commit()
-            return success_response(response['response'])
-        return response_error_handling(response['response'])
+        response = process_request(response,api,doctype,id)
+        if type == 'SALE':
+            frappe.db.set_value('Sales Invoice',id,'cdn',1)
+        else:
+            frappe.db.set_value('Purchase Invoice',id,'cdn',1)
+        frappe.db.commit()
+        return success_response(response['response'])
     except Exception as e:
         frappe.logger('cleartax').exception(e)
         return error_response(e)
