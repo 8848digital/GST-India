@@ -30,7 +30,7 @@ It works on top of [ERPNext](https://github.com/frappe/erpnext) and the [Frappe 
 
 ## Installation
 
-Once you've [set up a Frappe site](https://frappeframework.com/docs/v14/user/en/installation/), installing India Compliance is simple:
+Once you've [set up a Frappe site](https://frappeframework.com/docs/v14/user/en/installation/), installing GST India is simple:
 
 
 1. Download the app using the Bench CLI
@@ -42,7 +42,7 @@ Once you've [set up a Frappe site](https://frappeframework.com/docs/v14/user/en/
 2. Install the app on your site
 
   ```bash
-  bench --site [site name] install-app india_compliance
+  bench --site [site name] install-app gst_india
   ```
 
 ## Setup Instructions
