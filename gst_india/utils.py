@@ -79,7 +79,7 @@ def get_url():
     if frappe.db.get_single_value('Cleartax Settings','enable'):
         return frappe.db.get_single_value('Cleartax Settings','host_url')
     elif frappe.db.get_single_value('Masters India Settings','enable'):
-        return frappe.db.get_single_value('Cleartax Settings','host_url')
+        return frappe.db.get_single_value('Masters India Settings','host_url')
     frappe.throw("Please Enable Cleartax or Masters India GSP!")
 
 def set_headers():
@@ -113,11 +113,12 @@ def masters_india_headers():
         'Content-Type': 'application/json'
     }
     if doc.access_token:
-        headers['token'] = doc.access_token
+        headers['token'] = doc.get_password('access_token')
     return headers
 
 
-def process_request(request,api,doc_type,doc_name):
+def process_request(response,api,doc_type,doc_name):
+    frappe.logger('masters').exception(response.json())
     response = response.json()['message']
     response_logger(response,api,doc_type,doc_name)
     if response.get('error'):
@@ -126,3 +127,10 @@ def process_request(request,api,doc_type,doc_name):
         frappe.throw(response_error_handling(json.loads(json.dumps(response['response']))))
     return response
     
+
+def get_gsp():
+    if frappe.db.get_single_value('Cleartax Settings','enable'):
+        return 1
+    elif frappe.db.get_single_value('Masters India Settings','enable'):
+        return 0
+    frappe.throw("Please Enable Cleartax or Masters India GSP!")
