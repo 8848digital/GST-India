@@ -92,12 +92,12 @@ def ewb_without_irn(**kwargs):
             'gst_accounts':gst_settings_accounts,
             'gst_round_off': gst_round_off
         }
-        return ewb_without_irn_request(data,delivery_note=kwargs.get('delivery_note'))
+        return ewb_without_irn_request(data,doctype='Delivery Note',doc=kwargs.get('delivery_note'))
     except Exception as e:
         frappe.logger('cleartax').exception(e)
         return error_response(e)
 
-def ewb_without_irn_request(data,delivery_note=None,subcontracting_challan=None):
+def ewb_without_irn_request(data,doctype,doc):
     try:
         settings = frappe.get_doc('Cleartax Settings')
         url = settings.host_url
@@ -118,16 +118,16 @@ def ewb_without_irn_request(data,delivery_note=None,subcontracting_challan=None)
         if response.get('error'):
             return error_response(response.get('error'))
         response_status = response['msg']
-        if delivery_note:
-            response_logger(response['request'],response['response'],"GENERATE EWB WITHOUT IRN","Delivery Note",delivery_note,
+        if doctype == 'Delivery Note':
+            response_logger(response['request'],response['response'],"GENERATE EWB WITHOUT IRN","Delivery Note",doc,
                             response_status)
             if response_status == 'Success':
-                return store_ewb_details_dn(delivery_note,data,response['response'])
-        if subcontracting_challan:
-            response_logger(response['request'],response['response'],"GENERATE EWB WITHOUT IRN","Subcontracting Challan",subcontracting_challan,
+                return store_ewb_details_dn(doc,data,response['response'])
+        if doctype == 'Subcontracting Challan':
+            response_logger(response['request'],response['response'],"GENERATE EWB WITHOUT IRN","Subcontracting Challan",doc,
                             response_status)
             if response_status == 'Success':
-                return store_ewb_details_sc(subcontracting_challan,data,response['response'])
+                return store_ewb_details_sc(doc,data,response['response'])
         return response_error_handling(response['response'])
     except Exception as e:
         frappe.logger('cleartax').exception(e)
@@ -162,7 +162,7 @@ def update_ewb_partb(**kwargs):
             'dispatch_address': get_dict('Address', delivery_note.dispatch_address_name),
             'shipping_address': get_dict('Address',delivery_note.shipping_address_name)
         }
-        return partb_request(data,dn=kwargs.get('delivery_note'))
+        return partb_request(data,doctype='dn',doc=kwargs.get('delivery_note'))
     except Exception as e:
         frappe.logger('cleartax').exception(e)
         return error_response(e)
@@ -178,13 +178,13 @@ def update_ewb_partb_sc(**kwargs):
             'dispatch_address': get_dict('Address', sc.billing_address),
             'shipping_address': get_dict('Address',sc.shipping_address)
         }
-        return partb_request(data,sc=kwargs.get('doc'))
+        return partb_request(data,doctype='sc',doc=kwargs.get('doc'))
     except Exception as e:
         frappe.logger('cleartax').exception(e)
         return error_response(e)
 
 
-def partb_request(data,dn=None,sc=None):
+def partb_request(data,doctype,doc):
     try:
         settings = frappe.get_doc('Cleartax Settings')
         url = settings.host_url
@@ -205,15 +205,15 @@ def partb_request(data,dn=None,sc=None):
         if response.get('error'):
             return error_response(response.get('error'))
         response_status = response['status']
-        if dn:
-            response_logger(response['request'],response['response'],"UPDATE PART B","Delivery Note",dn,response_status)
-        elif sc:
-            response_logger(response['request'],response['response'],"UPDATE PART B","Subcontracting Challan",sc,response_status)
+        if doctype=='dn':
+            response_logger(response['request'],response['response'],"UPDATE PART B","Delivery Note",doc,response_status)
+        elif doctype=='sc':
+            response_logger(response['request'],response['response'],"UPDATE PART B","Subcontracting Challan",doc,response_status)
         if response_status == 'Success':
-            if dn:
-                frappe.db.set_value('Delivery Note',dn,'update_partb',1)
-            elif sc:
-                frappe.db.set_value('Subcontracting Challan',sc,'update_partb',1)
+            if doctype=='dn':
+                frappe.db.set_value('Delivery Note',doc,'update_partb',1)
+            elif doctype=='sc':
+                frappe.db.set_value('Subcontracting Challan',doc,'update_partb',1)
             return success_response(response['response'])
         else:
             return response_error_handling(response['response'])
@@ -250,7 +250,7 @@ def cancel_ewb(**kwargs):
                     'gstin': gstin,
                     'invoice': invoice.name
                 }
-        return cancel_ewb_request(headers,url,data,invoice.name)
+        return cancel_ewb_request(headers,url,data,doctype='invoice',docname=invoice.name)
     except Exception as e:
         frappe.logger('cleartax').exception(e)
         return error_response(e)
@@ -279,7 +279,7 @@ def cancel_ewb_dn(**kwargs):
                     "cancelRmrk" : data.get('remarks'),
                     "gstin":gstin
                 }
-        return cancel_ewb_request(headers,url,data,delivery_note=kwargs.get('delivery_note'))
+        return cancel_ewb_request(headers,url,data,doctype='delivery_note',docname=kwargs.get('delivery_note'))
     except Exception as e:
         frappe.logger('cleartax').exception(e)
         return error_response(e)
@@ -309,7 +309,7 @@ def cancel_ewb_sc(**kwargs):
                     "cancelRmrk" : data.get('remarks'),
                     "gstin":gstin
                 }
-        return cancel_ewb_request(headers,url,data,sc=kwargs.get('doc'))
+        return cancel_ewb_request(headers,url,data,doctype='sc',docname=kwargs.get('doc'))
     except Exception as e:
         frappe.logger('cleartax').exception(e)
         return error_response(e)
@@ -332,25 +332,23 @@ def store_ewb_details(inv,data,response):
 
 
 
-def cancel_ewb_request(headers,url,data,invoice=None,delivery_note=None,sc=None):
+def cancel_ewb_request(headers,url,data,doctype,docname):
     data = json.dumps(data, indent=4, sort_keys=False, default=str)
     response = requests.request(
             "POST", url, headers=headers, data=data)
     response = response.json()['message']
-    doctype = "Sales Invoice" if invoice else "Delivery Note"
-    docname = invoice if invoice else delivery_note
     response_status = "Failed"
     if response.get('error'):
         return error_response(response.get('error'))
     if response['response'].get('ewbStatus') == 'CANCELLED':
         response_status = "Success"
         response_logger(response['request'],response['response'],"CANCEL EWB",doctype,docname,response_status)
-        if invoice:
-            frappe.db.set_value('Sales Invoice',invoice,'eway_bill_cancelled',1)
-        elif delivery_note:
-            frappe.db.set_value('Delivery Note',delivery_note,'eway_bill_cancelled',1)
-        elif sc:
-            frappe.db.set_value('Subcontracting Challan',sc,'eway_bill_cancelld',1)
+        if doctype=='invoice':
+            frappe.db.set_value('Sales Invoice',docname,'eway_bill_cancelled',1)
+        elif doctype=='delivery_note':
+            frappe.db.set_value('Delivery Note',docname,'eway_bill_cancelled',1)
+        elif doctype=='sc':
+            frappe.db.set_value('Subcontracting Challan',docname,'eway_bill_cancelld',1)
         return success_response(data="EWB Cancelled Successfully!")
     return response_error_handling(response) 
 
@@ -409,6 +407,76 @@ def sub_con_ewb(**kwargs):
             'item_list': item_list,
             'gst_accounts':gst_settings_accounts
         }
-        return ewb_without_irn_request(data,subcontracting_challan=kwargs.get('subcontracting_challan'))
+        return ewb_without_irn_request(data,doctype='Subcontracting Challan',doc=kwargs.get('subcontracting_challan'))
     except Exception as e:
         frappe.logger('cleartax').exception(e)
+
+
+@frappe.whitelist()
+def shipment_ewb(**kwargs):
+    try:
+        sh = frappe.get_doc('Shipment',kwargs.get('shipment'))
+        item_list = []
+        gst_settings_accounts = frappe.get_all("GST Account",
+                filters={'company':sh.company},
+                fields=["cgst_account", "sgst_account", "igst_account", "cess_account"])
+        for row in sh.items:
+            item_list.append(get_dict('Item',row.item_code))
+        data = {
+            'shipment':  sh.as_dict(),
+            'pickup_address': get_dict('Address',sh.pickup_address_name),
+            'delivery_address': get_dict('Address',sh.delivery_address_name),
+            'transporter': get_dict('Supplier',sh.transporter),
+            'item_list': item_list,
+            'gst_accounts':gst_settings_accounts
+        }
+        return ewb_without_irn_request(data,doctype='Shipment',doc=kwargs.get('subcontracting_challan'))
+    except Exception as e:
+        frappe.logger('cleartax').exception(e)
+
+
+@frappe.whitelist()
+def update_ewb_partb_sh(**kwargs):
+    try:
+        sh = frappe.get_doc('Shipment', kwargs.get('doc'))
+        data = {
+            'data' : json.loads(kwargs.get('data')),
+            'delivery_note': sh.as_dict(),
+            'dispatch_address': get_dict('Address', sh.pickup_address_name),
+            'shipping_address': get_dict('Address',sh.delivery_address_name)
+        }
+        return partb_request(data,doctype='sh',doc=kwargs.get('doc'))
+    except Exception as e:
+        frappe.logger('cleartax').exception(e)
+        return error_response(e)
+    
+
+
+@frappe.whitelist()
+def cancel_ewb_sh(**kwargs):
+    try:
+        settings = frappe.get_doc('Cleartax Settings')
+        url = settings.host_url
+        url+= "/api/method/cleartax.cleartax.API.ewb.cancel_ewb"
+        headers = {
+            'sandbox': str(settings.sandbox),
+            'Content-Type': 'application/json'
+        }
+        if settings.enterprise:
+            if settings.sandbox:
+                headers['token'] = settings.get_password('sandbox_auth_token')
+            else:
+                headers['token'] = settings.get_password('production_auth_token')
+        sh = frappe.get_doc('Shipment', kwargs.get('doc'))
+        gstin = frappe.get_value('Address', sh.billing_address,'gstin')
+        data = json.loads(kwargs.get('data'))
+        data = {
+                    "ewbNo": sh.ewaybill,
+                    "cancelRsnCode":data.get('reason'),
+                    "cancelRmrk" : data.get('remarks'),
+                    "gstin":gstin
+                }
+        return cancel_ewb_request(headers,url,data,doctype='sh',doc=kwargs.get('doc'))
+    except Exception as e:
+        frappe.logger('cleartax').exception(e)
+        return error_response(e)
