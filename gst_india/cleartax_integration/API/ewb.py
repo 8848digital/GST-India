@@ -128,6 +128,11 @@ def ewb_without_irn_request(data,doctype,doc):
                             response_status)
             if response_status == 'Success':
                 return store_ewb_details_sc(doc,data,response['response'])
+        if doctype == 'Shipment':
+            response_logger(response['request'],response['response'],"GENERATE EWB WITHOUT IRN","Shipment",doc,
+                            response_status)
+            if response_status == 'Success':
+                return store_ewb_details_sh(doc,data,response['response'])
         return response_error_handling(response['response'])
     except Exception as e:
         frappe.logger('cleartax').exception(e)
@@ -150,7 +155,13 @@ def store_ewb_details_sc(subcontracting_challan,data,response):
     return success_response()
 
 
-
+def store_ewb_details_sh(doc,data,response):
+    frappe.db.set_value('Shipment',doc,'ewaybill', response.get('govt_response').get('EwbNo'))
+    frappe.db.set_value('Shipment',doc,'ewb_date', response.get('govt_response').get('EwbDt'))
+    frappe.db.set_value('Shipment',doc,'ewb_valid_till', response.get('govt_response').get('EwbValidTill'))
+    frappe.db.set_value('Shipment',doc,'ewb_trans_id', response.get('transaction_id'))
+    frappe.db.commit()
+    return success_response()
 
 @frappe.whitelist()
 def update_ewb_partb(**kwargs):
@@ -349,6 +360,9 @@ def cancel_ewb_request(headers,url,data,doctype,docname):
             frappe.db.set_value('Delivery Note',docname,'eway_bill_cancelled',1)
         elif doctype=='sc':
             frappe.db.set_value('Subcontracting Challan',docname,'eway_bill_cancelld',1)
+        elif doctype=='sh':
+            frappe.db.set_value('Shipment',docname,'eway_bill_cancelld',1)
+            
         return success_response(data="EWB Cancelled Successfully!")
     return response_error_handling(response) 
 
