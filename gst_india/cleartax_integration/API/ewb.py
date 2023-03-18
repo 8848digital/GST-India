@@ -436,7 +436,7 @@ def shipment_ewb(**kwargs):
         gst_settings_accounts = frappe.get_all("GST Account",
                 filters={'company':sh.delivery_company},
                 fields=["cgst_account", "sgst_account", "igst_account", "cess_account"])
-        for row in sh.items:
+        for row in sh.shipment_item:
             item_list.append(get_dict('Item',row.item_code))
         data = {
             'shipment':  sh.as_dict(),
