@@ -93,7 +93,7 @@ frappe.ui.form.on('Shipment', {
 					primary_action(values) {
 
 						frappe.call({
-							method: "gst_india.cleartax_integration.API.ewb.cancel_ewb_dn",
+							method: "gst_india.cleartax_integration.API.ewb.cancel_ewb_sh",
 							args: {
 								data: values,
 								delivery_note: frm.selected_doc.name

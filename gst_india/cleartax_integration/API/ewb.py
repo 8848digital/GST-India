@@ -102,6 +102,8 @@ def ewb_without_irn_request(data,doctype,doc):
         settings = frappe.get_doc('Cleartax Settings')
         url = settings.host_url
         url+= "/api/method/cleartax.cleartax.API.ewb.ewb_without_irn"
+        if doctype == 'Shipment':
+            url +='_sh'
         headers = {
             'sandbox': str(settings.sandbox),
             'Content-Type': 'application/json'
@@ -438,13 +440,15 @@ def shipment_ewb(**kwargs):
             item_list.append(get_dict('Item',row.item_code))
         data = {
             'shipment':  sh.as_dict(),
-            'pickup_address': get_dict('Address',sh.pickup_address_name),
-            'delivery_address': get_dict('Address',sh.delivery_address_name),
+            'billing_address': get_dict('Address',sh.billing_address),
+            'customer_address': get_dict('Address',sh.customer_address),
+            'dispatch_address': get_dict('Address',sh.pickup_address_name),
+            'shipping_address': get_dict('Address',sh.delivery_address_name),
             'transporter': get_dict('Supplier',sh.transporter),
             'item_list': item_list,
             'gst_accounts':gst_settings_accounts
         }
-        return ewb_without_irn_request(data,doctype='Shipment',doc=kwargs.get('subcontracting_challan'))
+        return ewb_without_irn_request(data,doctype='Shipment',doc=kwargs.get('shipment'))
     except Exception as e:
         frappe.logger('cleartax').exception(e)
 
