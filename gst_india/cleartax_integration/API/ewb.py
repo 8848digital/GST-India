@@ -434,7 +434,7 @@ def shipment_ewb(**kwargs):
         sh = frappe.get_doc('Shipment',kwargs.get('shipment'))
         item_list = []
         gst_settings_accounts = frappe.get_all("GST Account",
-                filters={'company':sh.company},
+                filters={'company':sh.delivery_company},
                 fields=["cgst_account", "sgst_account", "igst_account", "cess_account"])
         for row in sh.items:
             item_list.append(get_dict('Item',row.item_code))
@@ -448,6 +448,7 @@ def shipment_ewb(**kwargs):
             'item_list': item_list,
             'gst_accounts':gst_settings_accounts
         }
+        frappe.logger('cleartax').exception(data)
         return ewb_without_irn_request(data,doctype='Shipment',doc=kwargs.get('shipment'))
     except Exception as e:
         frappe.logger('cleartax').exception(e)
