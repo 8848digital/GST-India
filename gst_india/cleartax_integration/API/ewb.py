@@ -440,9 +440,9 @@ def shipment_ewb(**kwargs):
             item_list.append(get_dict('Item',row.item_code))
         data = {
             'shipment':  sh.as_dict(),
-            'billing_address': get_dict('Address',sh.billing_address),
+            'billing_address': get_dict('Address',sh.pickup_address_name),
             'customer_address': get_dict('Address',sh.customer_address),
-            'dispatch_address': get_dict('Address',sh.pickup_address_name),
+            'dispatch_address': get_dict('Address',sh.port_address),
             'shipping_address': get_dict('Address',sh.delivery_address_name),
             'transporter': get_dict('Supplier',sh.transporter),
             'item_list': item_list,

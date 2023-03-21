@@ -1,5 +1,15 @@
 frappe.ui.form.on('Shipment', {
 	refresh(frm) {
+		cur_frm.fields_dict['port_address'].get_query = function(doc) {
+			return {
+				filters: [["Dynamic Link","link_name","=",doc.pickup_supplier]]
+			}
+		}
+		cur_frm.fields_dict['customer_address'].get_query = function(doc) {
+			return {
+				filters: [["Dynamic Link","link_name","=",doc.delivery_company]]
+			}
+		}
 		if (frm.selected_doc.docstatus == 1){
 		// Eway - Bill generation
 		var enabled = 0
