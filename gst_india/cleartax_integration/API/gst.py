@@ -72,6 +72,7 @@ def gst_invoice_request(data,id,type):
                 headers['token'] = settings.get_password('gst_sandbox_token')
         data = json.dumps(data, indent=4, sort_keys=False, default=str)
         response = requests.request("POST", url, headers=headers, data= data) 
+        frappe.logger('cleartax').exception(response.json())
         response = response.json()['message']
         if response['response'].get('error'):
             return error_response(response.get('error'))
