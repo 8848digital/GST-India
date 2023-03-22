@@ -3,7 +3,7 @@ from gst_india.cleartax_integration.API.gst import create_gst_invoice
 import frappe 
 
 def sales_invoice_submit(doc, method=None):
-    if frappe.get_value('Cleartax Settings', 'Cleartax Settings','automate'):
+    if frappe.db.get_single_value('Cleartax Settings','automate'):
         if e_invoicing_enabled(company=doc.company):
             generate_irn(**{'invoice':doc.name})
         else:
