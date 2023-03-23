@@ -114,9 +114,9 @@ doc_events = {
             "gst_india.gst_india.overrides.transaction.validate_transaction"
         ),
     },
-    # "Shipment":{
-    #     "before_save": "gst_india.public.py.shipment.before_save"
-    # },
+    "Shipment":{
+        "before_save": "gst_india.public.py.shipment.before_save"
+    },
     "Supplier": {
         "validate": [
             "gst_india.gst_india.overrides.supplier.update_transporter_gstin",
