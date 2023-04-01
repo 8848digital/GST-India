@@ -41,7 +41,6 @@ def create_irn_request(data,inv):
         payload = json.dumps(data, indent=4, sort_keys=False, default=str)
         response = requests.request(
             "POST", url, headers=headers, data=payload) 
-        frappe.logger('masters').exception(response.json())
         response = utils.process_request(response,'GENERATE IRN',"Sales Invoice",inv)
         store_irn_details(inv,response['response'])
         return utils.success_response()
@@ -62,7 +61,7 @@ def store_irn_details(inv,response):
 
 def store_irn_ms(inv,response):
     try:
-        response = response.get('result').get('message')
+        response = response.get('results').get('message')
         frappe.db.set_value("Sales Invoice", inv, {
             'acknowledgement_number': response.get('AckNo'),
             'acknowledgement_date': response.get('AckDt'),
@@ -101,13 +100,13 @@ def cancel_irn(**kwargs):
         data = json.loads(kwargs.get('data'))
         reason = data.get('reason')
         if reason == 'Duplicate':
-            reason =1
+            reason ='1'
         elif reason == 'Data entry mistake':
-            reason=2
+            reason='2'
         elif reason == 'Order Cancelled':
-            reason=3 
+            reason='3' 
         elif reason == 'Others':
-            reason=4
+            reason='4'
         data = {
             'irn': frappe.get_value('Sales Invoice', inv, 'irn'),
             "CnlRsn": reason,

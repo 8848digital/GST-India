@@ -118,13 +118,14 @@ def masters_india_headers():
 
 
 def process_request(response,api,doc_type,doc_name):
-    frappe.logger('masters').exception(response.json())
     response = response.json()['message']
     response_logger(response,api,doc_type,doc_name)
+    if response['msg'] == 'Success':
+        return response
     if response.get('error'):
         frappe.throw(response.get('error'))
     if response['msg'] or response['status'] != 'Success':
-        frappe.throw(response_error_handling(json.loads(json.dumps(response['response']))))
+        frappe.throw(response_error_handling(response['response']))
     return response
     
 
