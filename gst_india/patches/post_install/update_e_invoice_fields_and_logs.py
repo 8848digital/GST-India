@@ -9,10 +9,10 @@ def execute():
     global user
     user = frappe.session.user
 
-    migrate_e_waybill_fields()
-    migrate_e_invoice_fields()
-    migrate_e_invoice_request_log()
-    delete_e_invoice_fields()
+    # migrate_e_waybill_fields()
+    # migrate_e_invoice_fields()
+    # migrate_e_invoice_request_log()
+    # delete_e_invoice_fields()
 
 
 def migrate_e_waybill_fields():
