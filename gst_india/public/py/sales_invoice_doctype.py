@@ -4,7 +4,9 @@ import frappe
 
 def sales_invoice_submit(doc, method=None):
     if frappe.db.get_single_value('Cleartax Settings','automate'):
+        frappe.logger('cl').exception('tg1')
         if e_invoicing_enabled(company=doc.company):
+            frappe.logger('cl').exception('tg2')
             generate_irn(**{'invoice':doc.name})
         else:
             create_gst_invoice(**{'invoice':doc.name,'type':"SALE"})
