@@ -61,10 +61,9 @@ def create_irn_request(data,inv):
             return error_response(response.get('error'))
         response_logger(response['request'],response['response'],"GENERATE IRN","Sales Invoice",inv,response['msg'])
         if response['msg'] == 'Success':
+            frappe.logger('cl').exception('called1')
             store_irn_details(inv,response['response'][0])
-            frappe.db.commit()
             return success_response()
-        frappe.db.commit()
         return response_error_handling(json.loads(json.dumps(response['response'][0])))
     except Exception as e:
         frappe.logger('cleartax').exception(e)
@@ -74,6 +73,7 @@ def create_irn_request(data,inv):
 @frappe.whitelist()
 def store_irn_details(inv,response):
     try:
+        frappe.logger('cl').exception('called')
         frappe.db.set_value("Sales Invoice",inv,'acknowledgement_number', response.get('govt_response').get("AckNo"))
         frappe.db.set_value("Sales Invoice",inv,'acknowledgement_date', response.get('govt_response').get('AckDt'))
         frappe.db.set_value("Sales Invoice",inv,'signed_invoice', response.get('govt_response').get('SignedInvoice'))
@@ -156,7 +156,7 @@ def irn_bulk_processing(**kwargs):
         data = json.loads(kwargs.get('data'))
         for i in data:
             generate_irn(**{'invoice':i})
-        frappe.msgprint("Bulk IRN Generation Complete! Please check API Logs for more info.")
+        frappe.publish_realtime("Bulk IRN Generation Complete! Please check API Logs for more info.")
     except Exception as e:
         frappe.logger('sfa_online').exception(e)
 
