@@ -107,7 +107,7 @@ function is_gstin_check_digit_valid(gstin) {
 }
 
 
-frappe.realtime.on("bulk_irn", (data) => {
+frappe.realtime.on("bulk_irn", () => {
         frappe.show_alert({
             message: __("Bulk Generation of IRN is Complete!"),
             indicator: "success",
