@@ -6,7 +6,7 @@ frappe.listview_settings["Purchase Invoice"].onload = function (list_view) {
     list_view.page.add_action_item(__("GST Invoice"), function (event) {
         let selected = [];
 
-        for (let check of event.view.cur_list.$checks) {
+        for (let check of cur_list.$checks) {
             selected.push(check.dataset.name);
         }
         frappe.call({
