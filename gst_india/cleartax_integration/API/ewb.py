@@ -411,7 +411,7 @@ def bulk_ewb(**kwargs):
 @frappe.whitelist()
 def bulk_ewb_dn(**kwargs):
     try:
-        frappe.enqueue("gst_india.cleartax_integration.API.ewb.ewb_without_irn",**{'data':kwargs.get('data')})
+        frappe.enqueue("gst_india.cleartax_integration.API.ewb.bulk_ewb_dn_processing",**{'data':kwargs.get('data')})
     except Exception as e:
         frappe.logger('sfa_online').exception(e)
 
