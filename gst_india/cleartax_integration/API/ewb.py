@@ -383,23 +383,35 @@ def get_delivery_note(doc):
             return frappe.get_doc('Transporter Details',td).as_dict()
         return {}
 
+def bulk_ewb_processing(**kwargs):
+    try:
+        data = json.loads(kwargs.get('data'))
+        for i in data:
+            generate_e_waybill_by_irn(**{'invoice':i})
+        frappe.publish_realtime("bulk_ewb")
+    except Exception as e:
+        frappe.logger('sfa_online').exception(e)
 
+def bulk_ewb_dn_processing(**kwargs):
+    try:
+        data = json.loads(kwargs.get('data'))
+        for i in data:
+            ewb_without_irn(**{'delivery_note':i})
+        frappe.publish_realtime("bulk_ewb")
+    except Exception as e:
+        frappe.logger('sfa_online').exception(e)
 
 @frappe.whitelist()
 def bulk_ewb(**kwargs):
     try:
-        data = json.loads(kwargs.get('data'))
-        for i in data:
-            frappe.enqueue("gst_india.cleartax_integration.API.ewb.generate_e_waybill_by_irn",**{'invoice':i})
+        frappe.enqueue("gst_india.cleartax_integration.API.ewb.bulk_ewb_processing",**{'data':kwargs.get('data')})
     except Exception as e:
         frappe.logger('sfa_online').exception(e)
 
 @frappe.whitelist()
 def bulk_ewb_dn(**kwargs):
     try:
-        data = json.loads(kwargs.get('data'))
-        for i in data:
-            frappe.enqueue("gst_india.cleartax_integration.API.ewb.ewb_without_irn",**{'delivery_note':i})
+        frappe.enqueue("gst_india.cleartax_integration.API.ewb.ewb_without_irn",**{'data':kwargs.get('data')})
     except Exception as e:
         frappe.logger('sfa_online').exception(e)
 

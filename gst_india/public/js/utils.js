@@ -107,9 +107,21 @@ function is_gstin_check_digit_valid(gstin) {
 }
 
 $(document).on('app_ready', function () {
-frappe.realtime.on("bulk_irn", () => {
+    frappe.realtime.on("bulk_irn", () => {
         frappe.show_alert({
             message: __("Bulk Generation of IRN is Complete!"),
+            indicator: "success",
+        });
+    });
+    frappe.realtime.on("bulk_ewb", () => {
+        frappe.show_alert({
+            message: __("Bulk Generation of EWB is Complete!"),
+            indicator: "success",
+        });
+    });
+    frappe.realtime.on("bulk_gst", () => {
+        frappe.show_alert({
+            message: __("Bulk Generation of GST is Complete!"),
             indicator: "success",
         });
     });
