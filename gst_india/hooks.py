@@ -104,8 +104,8 @@ doc_events = {
     "Sales Invoice": {
         "onload": "gst_india.gst_india.overrides.sales_invoice.onload",
         "validate": "gst_india.gst_india.overrides.sales_invoice.validate",
-        "on_submit": "gst_india.gst_india.overrides.sales_invoice.on_submit", 
-        "before_submit":"gst_india.public.py.sales_invoice_doctype.sales_invoice_submit",
+        "on_submit": ["gst_india.gst_india.overrides.sales_invoice.on_submit",
+                      "gst_india.public.py.sales_invoice_doctype.sales_invoice_submit"], 
         "before_cancel": "gst_india.public.py.sales_invoice_doctype.sales_invoice_cancel",
         "before_save": "gst_india.public.py.sales_invoice_doctype.sales_invoice_save"
     },
