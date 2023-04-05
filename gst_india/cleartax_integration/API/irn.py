@@ -163,8 +163,6 @@ def irn_bulk_processing(**kwargs):
 @frappe.whitelist()
 def bulk_irn(**kwargs):
     try:
-        data = json.loads(kwargs.get('data'))
-        for i in data:
-            frappe.enqueue("gst_india.cleartax_integration.API.irn.irn_bulk_processing",**{'data':kwargs.get('data')})
+        frappe.enqueue("gst_india.cleartax_integration.API.irn.irn_bulk_processing",**{'data':kwargs.get('data')})
     except Exception as e:
         frappe.logger('sfa_online').exception(e)
