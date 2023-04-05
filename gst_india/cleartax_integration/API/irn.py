@@ -151,11 +151,20 @@ def e_invoicing_enabled(company):
     
     return False
 
+def irn_bulk_processing(**kwargs):
+    try:
+        data = json.loads(kwargs.get('data'))
+        for i in data:
+            generate_irn(**{'invoice':i})
+        frappe.msgprint("Bulk IRN Generation Complete! Please check API Logs for more info.")
+    except Exception as e:
+        frappe.logger('sfa_online').exception(e)
+
 @frappe.whitelist()
 def bulk_irn(**kwargs):
     try:
         data = json.loads(kwargs.get('data'))
         for i in data:
-            frappe.enqueue("gst_india.cleartax_integration.API.irn.generate_irn",**{'invoice':i})
+            frappe.enqueue("gst_india.cleartax_integration.API.irn.irn_bulk_processing",**{'data':kwargs.get('data')})
     except Exception as e:
         frappe.logger('sfa_online').exception(e)
