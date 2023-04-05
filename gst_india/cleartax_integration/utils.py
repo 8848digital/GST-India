@@ -67,6 +67,5 @@ def response_logger(payload,response,api,doc_type,doc_name,status="Failed"):
             doc.response = response
             doc.status = status
             doc.insert(ignore_permissions=True)
-        frappe.db.commit()
     except Exception as e:
         frappe.logger('response').exception(e)

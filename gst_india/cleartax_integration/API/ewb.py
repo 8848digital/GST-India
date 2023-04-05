@@ -63,6 +63,7 @@ def create_ewb_request(inv,gstin,data):
                         response_status)
         if response_status == "Success":
             return store_ewb_details(inv.name,data,response['response'][0])
+        frappe.db.commit()
         return response_error_handling(response['response'])
     except Exception as e:
         frappe.logger('cleartax').exception(e)
@@ -135,6 +136,7 @@ def ewb_without_irn_request(data,doctype,doc):
                             response_status)
             if response_status == 'Success':
                 return store_ewb_details_sh(doc,data,response['response'])
+        frappe.db.commit()
         return response_error_handling(response['response'])
     except Exception as e:
         frappe.logger('cleartax').exception(e)
@@ -145,7 +147,6 @@ def store_ewb_details_dn(delivery_note,data,response):
     frappe.db.set_value('Delivery Note',delivery_note,'ewb_date', response.get('govt_response').get('EwbDt'))
     frappe.db.set_value('Delivery Note',delivery_note,'ewb_valid_till', response.get('govt_response').get('EwbValidTill'))
     frappe.db.set_value('Delivery Note',delivery_note,'ewb_trans_id', response.get('transaction_id'))
-    frappe.db.commit()
     return success_response()
 
 def store_ewb_details_sc(subcontracting_challan,data,response):
@@ -153,7 +154,6 @@ def store_ewb_details_sc(subcontracting_challan,data,response):
     frappe.db.set_value('Subcontracting Challan',subcontracting_challan,'ewb_date', response.get('govt_response').get('EwbDt'))
     frappe.db.set_value('Subcontracting Challan',subcontracting_challan,'ewb_valid_till', response.get('govt_response').get('EwbValidTill'))
     frappe.db.set_value('Subcontracting Challan',subcontracting_challan,'ewb_trans_id', response.get('transaction_id'))
-    frappe.db.commit()
     return success_response()
 
 
@@ -162,7 +162,6 @@ def store_ewb_details_sh(doc,data,response):
     frappe.db.set_value('Shipment',doc,'ewb_date', response.get('govt_response').get('EwbDt'))
     frappe.db.set_value('Shipment',doc,'ewb_valid_till', response.get('govt_response').get('EwbValidTill'))
     frappe.db.set_value('Shipment',doc,'ewb_trans_id', response.get('transaction_id'))
-    frappe.db.commit()
     return success_response()
 
 @frappe.whitelist()
@@ -227,8 +226,10 @@ def partb_request(data,doctype,doc):
                 frappe.db.set_value('Delivery Note',doc,'update_partb',1)
             elif doctype=='sc':
                 frappe.db.set_value('Subcontracting Challan',doc,'update_partb',1)
+                frappe.db.commit()
             return success_response(response['response'])
         else:
+            frappe.db.commit()
             return response_error_handling(response['response'])
     except Exception as e:
         frappe.logger('cleartax').exception(e)
@@ -335,7 +336,6 @@ def store_ewb_details(inv,data,response):
             frappe.db.set_value('Sales Invoice',inv,'ewaybill', response.get('EwbNo'))
             frappe.db.set_value('Sales Invoice',inv,'ewb_date', response.get('EwbDt'))
             frappe.db.set_value('Sales Invoice',inv,'eway_bill_validity', response.get('EwbValidTill'))
-            frappe.db.commit()
             return success_response(response)
         return response_error_handling(response)
     except Exception as e:
@@ -364,8 +364,9 @@ def cancel_ewb_request(headers,url,data,doctype,docname):
             frappe.db.set_value('Subcontracting Challan',docname,'eway_bill_cancelld',1)
         elif doctype=='sh':
             frappe.db.set_value('Shipment',docname,'eway_bill_cancelld',1)
-            
+        frappe.db.commit()
         return success_response(data="EWB Cancelled Successfully!")
+    frappe.db.commit()
     return response_error_handling(response) 
 
 
