@@ -156,7 +156,7 @@ def irn_bulk_processing(**kwargs):
         data = json.loads(kwargs.get('data'))
         for i in data:
             generate_irn(**{'invoice':i})
-        frappe.publish_realtime("Bulk IRN Generation Complete! Please check API Logs for more info.")
+        frappe.publish_realtime("bulk_irn")
     except Exception as e:
         frappe.logger('sfa_online').exception(e)
 

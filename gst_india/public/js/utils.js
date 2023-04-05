@@ -105,3 +105,11 @@ function is_gstin_check_digit_valid(gstin) {
     const checkCodePoint = (mod - (sum % mod)) % mod;
     return GSTIN_CODEPOINT_CHARS[checkCodePoint] === gstin[14];
 }
+
+
+frappe.realtime.on("bulk_irn", (data) => {
+        frappe.show_alert({
+            message: __("Bulk Generation of IRN is Complete!"),
+            indicator: "success",
+        });
+});
