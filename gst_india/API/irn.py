@@ -3,6 +3,7 @@ from frappe import *
 import gst_india.utils as utils
 import requests
 import json 
+from gst_india.API.ewb import get_delivery_note
 
 @frappe.whitelist(allow_guest=True)
 def generate_irn(**kwargs):
@@ -26,6 +27,10 @@ def generate_irn(**kwargs):
             'gst_accounts':gst_settings_accounts,
             'gst_round_off': gst_round_off
         }
+        if kwargs.get('ewb') == '1':
+            delivery_note = get_delivery_note(invoice)
+            data['transporter'] = utils.get_dict('Supplier',delivery_note.transporter)
+            data['delivery_note'] = delivery_note
         return create_irn_request(data,invoice.name)
     except Exception as e:
         frappe.logger('cleartax').exception(e)
@@ -70,6 +75,12 @@ def store_irn_ms(inv,response):
             'irn':  response.get('Irn'),
             'irn_status':  response.get('status')
             })
+        if response.get('EwbNo'):
+             frappe.db.set_value("Sales Invoice", inv, {
+                'ewaybill': response.get('EwbNo'),
+                'ewb_date': response.get('EwbDt'),
+                'eway_bill_validity':  response.get('EwbValidTill')
+                })
         frappe.db.commit()
     except Exception as e:
         frappe.logger('cleartax').exception(e)

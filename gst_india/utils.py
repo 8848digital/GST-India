@@ -118,7 +118,9 @@ def masters_india_headers():
 
 
 def process_request(response,api,doc_type,doc_name):
+    frappe.logger('masters').exception(response)
     response = response.json()['message']
+    frappe.logger('masters').exception(response)
     response_logger(response,api,doc_type,doc_name)
     if response['msg'] == 'Success':
         return response
@@ -129,9 +131,18 @@ def process_request(response,api,doc_type,doc_name):
     return response
     
 
+
+@frappe.whitelist()
 def get_gsp():
     if frappe.db.get_single_value('Cleartax Settings','enable'):
         return 1
     elif frappe.db.get_single_value('Masters India Settings','enable'):
         return 0
     frappe.throw("Please Enable Cleartax or Masters India GSP!")
+
+def automate():
+    gsp = get_gsp() 
+    if gsp == 1:
+        return frappe.db.get_single_value('Cleartax Settings','automate')
+    elif gsp == 0:
+        return frappe.db.get_single_value('Masters India Settings','automate')

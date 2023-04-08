@@ -1,9 +1,11 @@
 from gst_india.API.irn import generate_irn, e_invoicing_enabled
 from gst_india.API.gst import create_gst_invoice
 import frappe 
+from gst_india.utils import automate
+
 
 def sales_invoice_submit(doc, method=None):
-    if frappe.db.get_single_value('Cleartax Settings','automate'):
+    if automate():
         if e_invoicing_enabled(company=doc.company):
             generate_irn(**{'invoice':doc.name})
         else:

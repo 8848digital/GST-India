@@ -83,24 +83,59 @@ frappe.ui.form.on('Sales Invoice', {
 							d.show();
 						});
 					}
+					frappe.call({
+						method:"gst_india.utils.get_gsp",
+						callback: function (r) {
+							if (r.message == 0){
+								cur_frm.add_custom_button(__("IRN and EWB"), function () {
+									frappe.call({
+										method: "gst_india.API.irn.generate_irn",
+										args: {
+											invoice: frm.selected_doc.name,
+											ewb: '1'
+										},
+										callback: function (r) {
+										
+											if (r.message.msg == 'success') {
+												frappe.msgprint("IRN and EWB Created Successfully!")
+												location.reload();
+											}
+											else {
+												frappe.msgprint(r.message.error)
+											}
+										}
+									});
+							},__('Create'));
+						}
+					}
+					});
 					if(frm.selected_doc.irn){
 					cur_frm.add_custom_button(__("Create E-way Bill by IRN"), function () {
 						frappe.call({
-							method: "gst_india.API.ewb.generate_e_waybill_by_irn",
-							args: {
-								invoice: frm.selected_doc.name
-							},
-							callback: function (r) {
-								if (r.message.msg == 'success') {
-									frappe.msgprint("Eway Bill Created Successfully!")
-									location.reload();
+							method:"gst_india.utils.get_gsp",
+						callback: function (r) {
+							if (r.message ==1){
+							frappe.call({
+								method: "gst_india.API.ewb.generate_e_waybill_by_irn",
+								args: {
+									invoice: frm.selected_doc.name
+								},
+								callback: function (r) {
+									if (r.message.msg == 'success') {
+										frappe.msgprint("Eway Bill Created Successfully!")
+										location.reload();
+									}
+									else {
+										// frappe.msgprint(r.message.error)
+										frappe.msgprint(r.message.error)
+									}
 								}
-								else {
-									// frappe.msgprint(r.message.error)
-									frappe.msgprint(r.message.error)
-								}
-							}
-						});
+							})
+						}
+
+						}
+					})
+						
 					}, __('Create'));
 					cur_frm.page.set_inner_btn_group_as_primary(__('Create'));}
 
