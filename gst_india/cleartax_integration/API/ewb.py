@@ -10,7 +10,7 @@ def generate_e_waybill_by_irn(**kwargs):
         transporter_details = None
         invoice = frappe.get_doc('Sales Invoice',kwargs.get('invoice'))
         item_list = []
-        gst_round_off = frappe.get_value('GST Settings','round_off_gst_values')
+        gst_round_off = frappe.db.get_single_value('GST Settings','round_off_gst_values')
         gst_settings_accounts = frappe.get_all("GST Account",
                 filters={'company':invoice.company},
                 fields=["cgst_account", "sgst_account", "igst_account", "cess_account"])
@@ -75,7 +75,7 @@ def ewb_without_irn(**kwargs):
     try:
         delivery_note = frappe.get_doc('Delivery Note',kwargs.get('delivery_note'))
         item_list = []
-        gst_round_off = frappe.get_value('GST Settings','round_off_gst_values')
+        gst_round_off = frappe.db.get_single_value('GST Settings','round_off_gst_values')
         gst_settings_accounts = frappe.get_all("GST Account",
                 filters={'company':delivery_note.company},
                 fields=["cgst_account", "sgst_account", "igst_account", "cess_account"])
