@@ -184,6 +184,8 @@ def cancel_ewb(**kwargs):
         headers = set_headers()
         invoice = frappe.get_doc('Sales Invoice', kwargs.get('invoice'))
         gstin = frappe.get_value('Address', invoice.company_address,'gstin')
+        if headers['sandbox'] == '1':
+            gstin = '09AAAPG7885R002'
         data = json.loads(kwargs.get('data'))
         data = {
                     "ewbNo": invoice.ewaybill,
