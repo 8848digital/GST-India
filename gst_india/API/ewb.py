@@ -5,6 +5,7 @@ from gst_india.utils import (success_response, error_response,
 from frappe import *
 import json
 import requests
+from datetime import datetime
 
 @frappe.whitelist()
 def generate_e_waybill_by_irn(**kwargs):
@@ -103,10 +104,10 @@ def ewb_without_irn_request(data,delivery_note=None,subcontracting_challan=None)
         return error_response(e) 
 
 def store_ewb_details_dn(delivery_note,data,response):
-    frappe.db.set_value('Delivery Note',delivery_note,'ewaybill', response.get('govt_response').get('EwbNo'))
-    frappe.db.set_value('Delivery Note',delivery_note,'ewb_date', response.get('govt_response').get('EwbDt'))
-    frappe.db.set_value('Delivery Note',delivery_note,'ewb_valid_till', response.get('govt_response').get('EwbValidTill'))
-    frappe.db.set_value('Delivery Note',delivery_note,'ewb_trans_id', response.get('transaction_id'))
+    response = response['results']['message']
+    frappe.db.set_value('Delivery Note',delivery_note,'ewaybill', response.get('ewayBillNo'))
+    frappe.db.set_value('Delivery Note',delivery_note,'ewb_date', datetime.strptime(response.get('ewayBillDate'),'%d/%m/%Y %H:%M:%S %p'))
+    frappe.db.set_value('Delivery Note',delivery_note,'ewb_valid_till', datetime.strptime(response.get('validUpto'),'%d/%m/%Y %H:%M:%S %p'))
     frappe.db.commit()
     return success_response()
 

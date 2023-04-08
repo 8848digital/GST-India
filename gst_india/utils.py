@@ -23,6 +23,8 @@ def error_response(err_msg):
 def response_error_handling(response):
     error = ""
     errors = []
+    if response.get('results').get('errorMessage'):
+        return error_response(response.get('results').get('errorMessage'))
     if type(response) ==list:
         response = response[0]
     if type(response) == str:
@@ -127,7 +129,9 @@ def process_request(response,api,doc_type,doc_name):
     if response.get('error'):
         frappe.throw(response.get('error'))
     if response['msg'] or response['status'] != 'Success':
-        frappe.throw(response_error_handling(response['response']))
+        error = response_error_handling(response.get('response'))
+        frappe.logger('masters').exception(error)
+        frappe.throw(error)
     return response
     
 
