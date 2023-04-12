@@ -16,6 +16,7 @@ before_tests = "gst_india.tests.before_tests"
 boot_session = "gst_india.boot.set_bootinfo"
 
 app_include_js = "gst_india.bundle.js"
+setup_wizard_requires = "assets/gst_india/js/setup_wizard.js"
 setup_wizard_stages = "gst_india.audit_trail.setup.get_setup_wizard_stages"
 
 doctype_js = {
@@ -225,7 +226,7 @@ audit_trail_doctypes = [
     # Additional ERPNext DocTypes that constitute "Books of Account"
     "POS Invoice",
     # India Compliance DocTypes that make GL Entries
-    "Bill of Entry",
+    # "Bill of Entry",
 ]
 
 override_doctype_dashboards = {

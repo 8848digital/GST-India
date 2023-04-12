@@ -1,11 +1,15 @@
 import frappe
+from frappe import _
 from frappe.custom.doctype.custom_field.custom_field import create_custom_fields
 
 from gst_india.audit_trail.constants.custom_fields import CUSTOM_FIELDS
 from gst_india.audit_trail.utils import (
+    enable_audit_trail,
     get_audit_trail_doctypes,
     is_audit_trail_enabled,
 )
+
+# Hooks
 
 
 def setup_fixtures():
@@ -27,10 +31,34 @@ def create_property_setters_for_versioning():
             }
         )
         property_setter.flags.ignore_permissions = True
-        property_setter.flags.for_audit_trail = True
         property_setter.insert()
 
 
 def after_migrate():
     if is_audit_trail_enabled():
         create_property_setters_for_versioning()
+
+
+# Setup Wizard
+
+
+def get_setup_wizard_stages(args=None):
+    if frappe.db.exists("Company"):
+        return []
+
+    fail_msg = _("Failed to enable Audit Trail")
+
+    return [
+        {
+            "status": _("Wrapping up"),
+            "fail_msg": fail_msg,
+            "tasks": [
+                {"fn": configure_audit_trail, "args": args, "fail_msg": fail_msg}
+            ],
+        },
+    ]
+
+
+def configure_audit_trail(args):
+    if args.enable_audit_trail:
+        enable_audit_trail()
