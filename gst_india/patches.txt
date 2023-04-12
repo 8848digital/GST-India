@@ -7,6 +7,5 @@ execute:from gst_india.gst_india.setup import create_custom_fields; create_custo
 execute:from gst_india.gst_india.setup import create_property_setters; create_property_setters()
 gst_india.patches.post_install.update_custom_role_for_e_invoice_summary
 gst_india.patches.v14.account_settings #new
-execute:from gst_india.audit_trail.setup import setup_fixtures; 
-setup_fixtures()
-gst_india.patches.v14.set_default_for_audit_trail_notification
+execute:from gst_india.audit_trail.setup import setup_fixtures; setup_fixtures() #new
+gst_india.patches.v14.set_default_for_audit_trail_notification #new
