@@ -11,10 +11,12 @@ app_license = "MIT"
 required_apps = ["erpnext"]
 
 after_install = "gst_india.install.after_install"
+after_migrate = "gst_india.audit_trail.setup.after_migrate"
 before_tests = "gst_india.tests.before_tests"
 boot_session = "gst_india.boot.set_bootinfo"
 
 app_include_js = "gst_india.bundle.js"
+setup_wizard_stages = "gst_india.audit_trail.setup.get_setup_wizard_stages"
 
 doctype_js = {
     "Address": "gst_india/client_scripts/address.js",
@@ -38,7 +40,9 @@ doctype_js = {
     ],
     "Supplier": "gst_india/client_scripts/supplier.js",
     "Shipment": "public/js/shipment_doctype.js",
-    "Purchase Invoice" : "public/js/purchase_invoice_doctype.js"
+    "Purchase Invoice" : "public/js/purchase_invoice_doctype.js",
+    "Accounts Settings": "audit_trail/client_scripts/accounts_settings.js",
+    "Customize Form": "audit_trail/client_scripts/customize_form.js",
 }
 doctype_list_js = {
     "Sales Invoice": [
@@ -139,6 +143,17 @@ doc_events = {
             "gst_india.gst_india.overrides.transaction.validate_transaction"
         ),
     },
+    "Accounts Settings": {
+        "validate": "gst_india.audit_trail.overrides.accounts_settings.validate"
+    },
+    "Property Setter": {
+        "validate": "gst_india.audit_trail.overrides.property_setter.validate",
+        "on_trash": "gst_india.audit_trail.overrides.property_setter.on_trash",
+    },
+    "Version": {
+        "validate": "gst_india.audit_trail.overrides.version.validate",
+        "on_trash": "gst_india.audit_trail.overrides.version.on_trash",
+    },
 }
 
 
@@ -173,6 +188,45 @@ jinja = {
         "gst_india.gst_india.utils.jinja.get_non_zero_fields",
     ],
 }
+
+override_doctype_class = {
+    "Customize Form": (
+        "gst_india.audit_trail.overrides.customize_form.CustomizeForm"
+    ),
+}
+# DocTypes for which Audit Trail must be maintained
+audit_trail_doctypes = [
+    # To track the "Enable Audit Trail" setting
+    "Accounts Settings",
+    # ERPNext DocTypes that make GL Entries
+    "Dunning",
+    "Invoice Discounting",
+    "Journal Entry",
+    "Payment Entry",
+    "Period Closing Voucher",
+    "Process Deferred Accounting",
+    "Purchase Invoice",
+    "Sales Invoice",
+    "Asset",
+    "Asset Capitalization",
+    "Asset Repair",
+    "Loan Balance Adjustment",
+    "Loan Disbursement",
+    "Loan Interest Accrual",
+    "Loan Refund",
+    "Loan Repayment",
+    "Loan Write Off",
+    "Delivery Note",
+    "Landed Cost Voucher",
+    "Purchase Receipt",
+    "Stock Entry",
+    "Stock Reconciliation",
+    "Subcontracting Receipt",
+    # Additional ERPNext DocTypes that constitute "Books of Account"
+    "POS Invoice",
+    # India Compliance DocTypes that make GL Entries
+    "Bill of Entry",
+]
 
 override_doctype_dashboards = {
     "Sales Invoice": (
