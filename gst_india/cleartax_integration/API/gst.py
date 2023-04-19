@@ -71,14 +71,10 @@ def gst_invoice_request(data,id,type):
             if settings.sandbox:
                 headers['token'] = settings.get_password('gst_sandbox_token')
         data = json.dumps(data, indent=4, sort_keys=False, default=str)
-        frappe.logger('purchase').exception(headers)
-        frappe.logger('purchase').exception(data)
-        frappe.logger('purchase').exception(url)
         response = requests.request("POST", url, headers=headers, data= data) 
-        frappe.logger('cleartax').exception(response.json())
         response = response.json()['message']
-        if response['response'].get('error'):
-            return error_response(response.get('error'))
+        if response.get('response').get('error'):
+            return error_response(response.get('response').get('error'))
         api = "GENERATE GST SINV" if type == 'SALE' else "GENERATE GST PINV"
         doctype = "Sales Invoice" if type == 'SALE' else "Purchase Invoice"
         response_status = response['msg']
@@ -91,7 +87,7 @@ def gst_invoice_request(data,id,type):
             frappe.db.commit()
             return success_response()
         frappe.db.commit()
-        return response_error_handling(response['response'])
+        return response_error_handling(response.get('response'))
     except Exception as e:
         frappe.logger('cleartax').exception(e)
         return error_response(e)
