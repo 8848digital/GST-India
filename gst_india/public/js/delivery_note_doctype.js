@@ -32,6 +32,63 @@ frappe.ui.form.on('Delivery Note', {
 			cur_frm.page.set_inner_btn_group_as_primary(__('Create'));
 		}
 		else if (frm.selected_doc.eway_bill_cancelled == false && frm.selected_doc.ewaybill) {
+			cur_frm.add_custom_button(__("Extend EWB"), function () {
+				let d1 = new frappe.ui.Dialog({
+					title: "Extend Ewaybill",
+					fields: [
+						{
+							label: 'Reason',
+							fieldname: 'reason',
+							fieldtype: "Select",
+							options: ["NATURAL_CALAMITY", "TRANSSHIPMENT", "OTHERS", "ACCIDENT", "LAW_ORDER_SITUATION"]
+						},
+						{
+							label: 'Consignment Status',
+							fieldname: 'status',
+							fieldtype: "Select",
+							options: ["MOVEMENT","TRANSIT"]
+						},
+						{
+							label: 'Transit Type',
+							fieldname: 'type',
+							fieldtype: "Select",
+							depends_on: "eval:doc.status=='TRANSIT'",
+							options: ["ROAD",
+							"WAREHOUSE",
+							"OTHERS",
+							"NONE"]
+						},
+						{
+							label: 'Remarks',
+							fieldname: 'remarks',
+							fieldtype: "Data"
+						}
+					],
+					primary_action_label: 'Extend',
+					primary_action(values) {
+
+						frappe.call({
+							method: "gst_india.cleartax_integration.API.ewb.extend_ewb",
+							args: {
+								data: values,
+								delivery_note: frm.selected_doc.name
+							},
+							type: "POST",
+							callback: function (r) {
+								if (r.message.msg == 'Success') {
+									frappe.msgprint("Eway Bill Extended Successfully!")
+									location.reload();
+								}
+								else {
+									frappe.msgprint(r.message.error)
+								}
+							}
+						})
+						d.hide();
+					}
+				})
+				d1.show();
+			});
 			if (frm.selected_doc.update_partb == 0) {
 				cur_frm.add_custom_button(__("Update PARTB"), function () {
 					let d1 = new frappe.ui.Dialog({
