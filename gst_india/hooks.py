@@ -20,7 +20,8 @@ setup_wizard_requires = "assets/gst_india/js/setup_wizard.js"
 setup_wizard_stages = "gst_india.audit_trail.setup.get_setup_wizard_stages"
 
 doctype_js = {
-    "Address": "gst_india/client_scripts/address.js",
+    "Address": ["gst_india/client_scripts/address.js",
+                "public/js/address_doctype.js"],
     "Company": "gst_india/client_scripts/company.js",
     "Customer": "gst_india/client_scripts/customer.js",
     "Delivery Note": [

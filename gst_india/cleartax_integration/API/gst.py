@@ -6,6 +6,41 @@ from gst_india.cleartax_integration.utils import success_response, error_respons
 
 
 @frappe.whitelist()
+def gstin_info(**kwargs):
+    try:
+        settings = frappe.get_doc('Cleartax Settings')
+        for company in settings.e_invoicing:
+            if company.get('company'):
+                gstin = frappe.get_value('Company',company.get('company'),'gstin')
+                break
+        url = settings.host_url
+        url+= "/api/method/cleartax.cleartax.API.gst."
+        url+= 'gstin_info'
+        data = {
+            'gstin': kwargs.get('gstin'),
+            'company_gstin': gstin
+        } 
+        headers = {
+            'sandbox': str(settings.sandbox),
+            'Content-Type': 'application/json'
+        }
+        if settings.enterprise:
+            headers['token'] = settings.get_password('gst_auth_token')
+            if settings.sandbox:
+                headers['token'] = settings.get_password('gst_sandbox_token')
+        data = json.dumps(data, indent=4, sort_keys=False, default=str)
+        response = requests.request("GET", url, headers=headers, data= data) 
+        response = response.json()['message']
+        frappe.logger('cleartax').exception(response)
+        if response['msg'] != 'Success':
+            return "GSTIN Details Not Found!"
+        return response['response']
+    except Exception as e:
+        frappe.logger('cleartax').exception(e)
+        return error_response(e)
+
+
+@frappe.whitelist()
 def create_gst_invoice(**kwargs):
     try:
         invoice = kwargs.get('invoice')
