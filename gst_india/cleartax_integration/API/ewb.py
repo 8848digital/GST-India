@@ -55,6 +55,7 @@ def create_ewb_request(inv,gstin,data):
         data = json.dumps(data, indent=4, sort_keys=False, default=str)
         response = requests.request(
             "POST", url, headers=headers, data=data)
+        frappe.logger('ewb').exception(response.json())
         response = response.json()['message']
         if response.get('error'):
             return error_response(response.get('error'))
