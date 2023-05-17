@@ -25,9 +25,9 @@ def gstin_info(**kwargs):
             'Content-Type': 'application/json'
         }
         if settings.enterprise:
-            headers['token'] = settings.get_password('sandbox_auth_token')
+            headers['token'] = settings.get_password('production_auth_token')
             if settings.sandbox:
-                headers['token'] = settings.get_password('production_auth_token')
+                headers['token'] = settings.get_password('sandbox_auth_token)
         data = json.dumps(data, indent=4, sort_keys=False, default=str)
         response = requests.request("GET", url, headers=headers, data= data) 
         response = response.json()['message']
