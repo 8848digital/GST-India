@@ -6,7 +6,11 @@ frappe.ui.form.on("Address","check_details", function(frm) {
                     gstin: frm.selected_doc.gstin
                 },
                 callback: function (r) {
+                    console.log(r)
                     let data = r.message
+                    console.log(data)
+                    console.log(data.floorNumber)
+                    console.log(data['floorNumber'])
                     let line1 = ""
                     if(data.floorNumber){
                         line1 = line1 + data.floorNumber
