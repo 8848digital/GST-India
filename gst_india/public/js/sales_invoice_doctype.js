@@ -15,7 +15,6 @@ frappe.ui.form.on('Sales Invoice', {
 				company: frm.selected_doc.company
 			},
 			callback: function (r) {
-				console.log(r.message)
 				if (r.message == true) {
 					if (frm.selected_doc.irn_cancelled == false && frm.selected_doc.irn == undefined) {
 						cur_frm.add_custom_button(__("IRN"), function () {
@@ -25,13 +24,11 @@ frappe.ui.form.on('Sales Invoice', {
 									invoice: frm.selected_doc.name
 								},
 								callback: function (r) {
-								//console.log(r.message)
 									if (r.message.msg == 'success') {
 										frappe.msgprint("IRN Created Successfully!")
 										location.reload();
 									}
 									else {
-										// frappe.msgprint(r.message.error)
 										frappe.msgprint(r.message.error)
 									}
 								}
@@ -150,7 +147,7 @@ frappe.ui.form.on('Sales Invoice', {
 						});
 					}
 				}
-				else {
+				// else {
 					let button_name = ""
 					if (frm.selected_doc.gst_invoice == false) {
 						button_name = "GST Invoice"
@@ -180,7 +177,7 @@ frappe.ui.form.on('Sales Invoice', {
 						}, __('Create'));
 						cur_frm.page.set_inner_btn_group_as_primary(__('Create'));}
 					
-				}
+				// }
 			}
 		});
 
