@@ -6,22 +6,19 @@ frappe.ui.form.on("Address","check_details", function(frm) {
                     gstin: frm.selected_doc.gstin
                 },
                 callback: function (r) {
-                    console.log(r)
-                    let data = r.message
-                    console.log(data)
-                    console.log(data.floorNumber)
-                    console.log(data['floorNumber'])
                     let line1 = ""
-                    if(data.floorNumber){
-                        line1 = line1 + data.floorNumber
+                    if(r.message.floorNumber){
+                        line1 = line1 + r.message.floorNumber
                     }
-                    if(data.buildingNumber){
-                        line1 = line1 + ","+ buildingNumber 
+                    if(r.message.buildingNumber){
+                        line1 = line1 + ","+ r.message.buildingNumber 
                     }
-                    if(data.buildingName){
-                        line1 = line1 + ","+ buildingName
+                    if(r.message.buildingName){
+                        line1 = line1 + ","+ r.message.buildingName
                     }
                     frm.set_value('address_line1',line1);
+                    frm.set_value('address_line2',r.message.street);
+                    frm.set_value('pincode',r.message.pincode);
                 }
             });
         });
