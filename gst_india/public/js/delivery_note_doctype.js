@@ -75,7 +75,7 @@ frappe.ui.form.on('Delivery Note', {
 							},
 							type: "POST",
 							callback: function (r) {
-								if (r.message.msg == 'Success') {
+								if (r.message.msg == 'success') {
 									frappe.msgprint("Eway Bill Extended Successfully!")
 									location.reload();
 								}
