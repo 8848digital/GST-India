@@ -84,7 +84,7 @@ frappe.ui.form.on('Delivery Note', {
 								}
 							}
 						})
-						d.hide();
+						d1.hide();
 					}
 				})
 				d1.show();
