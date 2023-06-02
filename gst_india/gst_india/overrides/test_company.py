@@ -3,7 +3,7 @@ import re
 import frappe
 from frappe.tests.utils import FrappeTestCase
 
-from gst_india.gst_india.overrides.company import make_default_tax_templates
+from india_compliance.gst_india.overrides.company import make_default_tax_templates
 
 
 class TestCompanyFixtures(FrappeTestCase):
@@ -38,7 +38,6 @@ class TestCompanyFixtures(FrappeTestCase):
             re.compile(r"^(.*does not exist yet.*)$"),
             make_default_tax_templates,
             "Random Company Name",
-            "India",
         )
 
     def test_tax_defaults_setup(self):

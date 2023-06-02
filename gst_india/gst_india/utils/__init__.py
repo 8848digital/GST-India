@@ -5,7 +5,7 @@ from titlecase import titlecase as _titlecase
 import frappe
 from frappe import _
 from frappe.desk.form.load import get_docinfo, run_onload
-from frappe.utils import cstr, get_datetime, get_time_zone
+from frappe.utils import cstr, get_datetime, get_system_timezone
 from erpnext.controllers.taxes_and_totals import (
     get_itemised_tax,
     get_itemised_taxable_amount,
@@ -20,13 +20,14 @@ from gst_india.gst_india.constants import (
     STATE_NUMBERS,
     TCS,
     TIMEZONE,
+    UOM_MAP,
 )
 
 
 def get_state(state_number):
     """Get state from State Number"""
 
-    state_number = str(state_number)
+    state_number = str(state_number).zfill(2)
 
     for state, code in STATE_NUMBERS.items():
         if code == state_number:
@@ -94,11 +95,17 @@ def get_gstin_list(party, party_type="Company"):
     return gstin_list
 
 
-def validate_gstin(gstin, label="GSTIN", is_tcs_gstin=False):
+def validate_gstin(
+    gstin,
+    label="GSTIN",
+    *,
+    is_tcs_gstin=False,
+    is_transporter_id=False,
+):
     """
     Validate GSTIN with following checks:
     - Length should be 15
-    - Validate GSTIN Check Digit
+    - Validate GSTIN Check Digit (except for Unique Common Enrolment Number for Transporters)
     - Validate GSTIN of e-Commerce Operator (TCS) (Based on is_tcs_gstin)
     """
 
@@ -113,7 +120,8 @@ def validate_gstin(gstin, label="GSTIN", is_tcs_gstin=False):
             title=_("Invalid {0}").format(label),
         )
 
-    validate_gstin_check_digit(gstin, label)
+    if not (is_transporter_id and gstin.startswith("88")):
+        validate_gstin_check_digit(gstin, label)
 
     if is_tcs_gstin and not TCS.match(gstin):
         frappe.throw(
@@ -190,6 +198,28 @@ def validate_gstin_check_digit(gstin, label="GSTIN"):
                 """Invalid {0}! The check digit validation has failed. Please ensure you've typed the {0} correctly."""
             ).format(label)
         )
+
+
+def is_overseas_doc(doc):
+    return is_overseas_transaction(doc.doctype, doc.gst_category, doc.place_of_supply)
+
+
+def is_overseas_transaction(doctype, gst_category, place_of_supply):
+    if gst_category == "SEZ":
+        return True
+
+    if doctype in SALES_DOCTYPES:
+        return is_foreign_transaction(gst_category, place_of_supply)
+
+    return gst_category == "Overseas"
+
+
+def is_foreign_doc(doc):
+    return is_foreign_transaction(doc.gst_category, doc.place_of_supply)
+
+
+def is_foreign_transaction(gst_category, place_of_supply):
+    return gst_category == "Overseas" and place_of_supply == "96-Other Countries"
 
 
 def get_itemised_tax_breakup_data(doc, account_wise=False, hsn_wise=False):
@@ -298,24 +328,21 @@ def get_gst_accounts_by_type(company, account_type, throw=True):
         ).format(frappe.bold(account_type), frappe.bold(company)),
         frappe.DoesNotExistError,
     )
+    
+def delete_old_fields(fields, doctypes):
+    if isinstance(fields, str):
+        fields = (fields,)
 
+    if isinstance(doctypes, str):
+        doctypes = (doctypes,)
 
-def get_all_gst_accounts(company):
-    if not company:
-        frappe.throw(_("Please set Company first"))
-
-    settings = frappe.get_cached_doc("GST Settings")
-
-    accounts_list = []
-    for row in settings.gst_accounts:
-        if row.company != company:
-            continue
-
-        for account in GST_ACCOUNT_FIELDS:
-            if gst_account := row.get(account):
-                accounts_list.append(gst_account)
-
-    return accounts_list
+    frappe.db.delete(
+        "Custom Field",
+        {
+            "fieldname": ("in", fields),
+            "dt": ("in", doctypes),
+        },
+    )
 
 
 def toggle_custom_fields(custom_fields, show):
@@ -349,6 +376,24 @@ def toggle_custom_fields(custom_fields, show):
             frappe.clear_cache(doctype=doctype)
 
 
+def get_all_gst_accounts(company):
+    if not company:
+        frappe.throw(_("Please set Company first"))
+
+    settings = frappe.get_cached_doc("GST Settings")
+
+    accounts_list = []
+    for row in settings.gst_accounts:
+        if row.company != company:
+            continue
+
+        for account in GST_ACCOUNT_FIELDS:
+            if gst_account := row.get(account):
+                accounts_list.append(gst_account)
+
+    return accounts_list
+
+
 def parse_datetime(value, day_first=False):
     """Convert IST string to offset-naive system time"""
 
@@ -356,7 +401,7 @@ def parse_datetime(value, day_first=False):
         return
 
     parsed = parser.parse(value, dayfirst=day_first)
-    system_tz = get_time_zone()
+    system_tz = get_system_timezone()
 
     if system_tz == TIMEZONE:
         return parsed.replace(tzinfo=None)
@@ -374,7 +419,7 @@ def as_ist(value=None):
     """Convert system time to offset-naive IST time"""
 
     parsed = get_datetime(value)
-    system_tz = get_time_zone()
+    system_tz = get_system_timezone()
 
     if system_tz == TIMEZONE:
         return parsed
@@ -407,22 +452,6 @@ def get_titlecase_version(word, all_caps=False, **kwargs):
         return word
 
 
-def delete_old_fields(fields, doctypes):
-    if isinstance(fields, str):
-        fields = (fields,)
-
-    if isinstance(doctypes, str):
-        doctypes = (doctypes,)
-
-    frappe.db.delete(
-        "Custom Field",
-        {
-            "fieldname": ("in", fields),
-            "dt": ("in", doctypes),
-        },
-    )
-
-
 def is_api_enabled(settings=None):
     if not settings:
         settings = frappe.get_cached_value(
@@ -437,3 +466,33 @@ def is_api_enabled(settings=None):
 
 def can_enable_api(settings):
     return settings.api_secret or frappe.conf.ic_api_secret
+
+
+def get_gst_uom(uom, settings=None):
+    """Returns the GST UOM from ERPNext UOM"""
+    settings = settings or frappe.get_cached_doc("GST Settings")
+
+    for row in settings.get("gst_uom_map"):
+        if row.uom == uom:
+            return row.gst_uom.split("(")[0].strip()
+
+    uom = uom.upper()
+    if uom in UOM_MAP:
+        return uom
+
+    return next((k for k, v in UOM_MAP.items() if v == uom), "OTH")
+
+
+def get_place_of_supply_options(*, as_list=False, with_other_countries=False):
+    options = []
+
+    for state_name, state_number in STATE_NUMBERS.items():
+        options.append(f"{state_number}-{state_name}")
+
+    if with_other_countries:
+        options.append("96-Other Countries")
+
+    if as_list:
+        return options
+
+    return "\n".join(sorted(options))

@@ -1,7 +1,7 @@
 frappe.pages["india-compliance-account"].on_page_load = async function (wrapper) {
     await frappe.require([
-        "india_compliance_account.bundle.js",
-        "india_compliance_account.bundle.css",
+        "gst_india_account.bundle.js",
+        "gst_india_account.bundle.css",
     ]);
 
     new ic.pages.IndiaComplianceAccountPage(wrapper);
