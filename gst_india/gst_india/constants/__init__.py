@@ -74,6 +74,8 @@ STATE_NUMBERS = {
     "West Bengal": "19",
 }
 
+OVERSEAS_GST_CATEGORIES = {"Overseas", "SEZ"} 
+
 GST_UOMS = {
     "Bottle": "BTL (Bottles)",
     "Dozen": "DOZ (Dozens)",
