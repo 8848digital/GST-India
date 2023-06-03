@@ -46,6 +46,12 @@ def make_default_customs_accounts(company):
         default_fieldname="default_customs_expense_account",
     )
 
+def create_default_tax_templates(doc, method=None):
+    if not frappe.flags.country_change:
+        return
+
+    make_default_tax_templates(doc.name, doc.country)
+
 
 @frappe.whitelist()
 def make_default_tax_templates(company: str):

@@ -33,6 +33,8 @@ doctype_js = {
     "Item": "gst_india/client_scripts/item.js",
     "Journal Entry": "gst_india/client_scripts/journal_entry.js",
     "Payment Entry": "gst_india/client_scripts/payment_entry.js",
+    "Purchase Invoice": ["gst_india/client_scripts/purchase_invoice.js",
+                         "public/js/purchase_invoice_doctype.js"],
     "Sales Invoice": [
          "public/js/sales_invoice_doctype.js",
 #        "public/js/sales_invoice_doctype.js",
@@ -42,7 +44,6 @@ doctype_js = {
     ],
     "Supplier": "gst_india/client_scripts/supplier.js",
     "Shipment": "public/js/shipment_doctype.js",
-    "Purchase Invoice" : "public/js/purchase_invoice_doctype.js",
     "Accounts Settings": "audit_trail/client_scripts/accounts_settings.js",
     "Customize Form": "audit_trail/client_scripts/customize_form.js",
 }
@@ -196,6 +197,16 @@ override_doctype_class = {
         "gst_india.audit_trail.overrides.customize_form.CustomizeForm"
     ),
 }
+
+
+# DocTypes to be ignored while clearing transactions of a Company
+company_data_to_be_ignored = ["GST Account", "GST Credential"]
+
+# Links to these doctypes will be ignored when deleting a document
+ignore_links_on_delete = ["e-Waybill Log", "e-Invoice Log"]
+
+accounting_dimension_doctypes = ["Bill of Entry", "Bill of Entry Item"]
+
 # DocTypes for which Audit Trail must be maintained
 audit_trail_doctypes = [
     # To track the "Enable Audit Trail" setting
@@ -227,7 +238,7 @@ audit_trail_doctypes = [
     # Additional ERPNext DocTypes that constitute "Books of Account"
     "POS Invoice",
     # India Compliance DocTypes that make GL Entries
-    # "Bill of Entry",
+    "Bill of Entry",
 ]
 
 override_doctype_dashboards = {
