@@ -100,6 +100,8 @@ class BillofEntry(Document):
         total_taxes = 0
 
         round_off_accounts = get_round_off_applicable_accounts(self.company, [])
+        if not round_off_accounts:
+            round_off_accounts = []
         for tax in self.taxes:
             if tax.charge_type == "On Net Total":
                 tax.tax_amount = self.get_tax_amount(tax.item_wise_tax_rates)
