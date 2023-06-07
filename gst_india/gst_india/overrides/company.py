@@ -50,7 +50,7 @@ def create_default_tax_templates(doc, method=None):
     if not frappe.flags.country_change:
         return
 
-    make_default_tax_templates(doc.name, doc.country)
+    make_default_tax_templates(doc.name)
 
 
 @frappe.whitelist()
