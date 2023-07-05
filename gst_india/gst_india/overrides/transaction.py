@@ -140,7 +140,7 @@ def validate_gst_accounts(doc, is_sales_transaction=False):
     - SEZ / Inter-State supplies should not have CGST or SGST account
     - Intra-State supplies should not have IGST account
     """
-
+    frappe.logger('jiotax').exception(doc.taxes)
     if not doc.taxes:
         return
 
