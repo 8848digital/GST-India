@@ -221,45 +221,102 @@ def is_foreign_doc(doc):
 def is_foreign_transaction(gst_category, place_of_supply):
     return gst_category == "Overseas" and place_of_supply == "96-Other Countries"
 
+def is_hsn_wise_breakup_needed(doctype):
+    if frappe.get_meta(doctype).has_field("gst_hsn_code") and frappe.get_cached_value(
+        "GST Settings", None, "hsn_wise_tax_breakup"
+    ):
+        return True
 
-def get_itemised_tax_breakup_data(doc, account_wise=False, hsn_wise=False):
-    itemised_tax = get_itemised_tax(doc.taxes, with_tax_account=account_wise)
+def get_itemised_tax_breakup_data(doc):
+    itemised_tax = get_itemised_tax(doc.taxes)
+    taxable_amounts = get_itemised_taxable_amount(doc.items)
 
-    itemised_taxable_amount = get_itemised_taxable_amount(doc.items)
+    if is_hsn_wise_breakup_needed(doc.doctype + " Item"):
+        return get_hsn_wise_breakup(doc, itemised_tax, taxable_amounts)
 
-    if not frappe.get_meta(doc.doctype + " Item").has_field("gst_hsn_code"):
-        return itemised_tax, itemised_taxable_amount
+    return get_item_wise_breakup(itemised_tax, taxable_amounts)
 
-    hsn_wise_in_gst_settings = frappe.db.get_single_value(
-        "GST Settings", "hsn_wise_tax_breakup"
-    )
+def get_item_wise_breakup(itemised_tax, taxable_amounts):
+    itemised_tax_data = []
+    for item_code, taxes in itemised_tax.items():
+        itemised_tax_data.append(
+            frappe._dict(
+                {
+                    "item": item_code,
+                    "taxable_amount": taxable_amounts.get(item_code),
+                    **taxes,
+                }
+            )
+        )
 
-    tax_breakup_hsn_wise = hsn_wise or hsn_wise_in_gst_settings
-    if tax_breakup_hsn_wise:
-        item_hsn_map = frappe._dict()
-        for d in doc.items:
-            item_hsn_map.setdefault(d.item_code or d.item_name, d.get("gst_hsn_code"))
+    return itemised_tax_data
 
-    hsn_tax = {}
-    for item, taxes in itemised_tax.items():
-        item_or_hsn = item if not tax_breakup_hsn_wise else item_hsn_map.get(item)
-        hsn_tax.setdefault(item_or_hsn, frappe._dict())
-        for tax_desc, tax_detail in taxes.items():
-            key = tax_desc
-            if account_wise:
-                key = tax_detail.get("tax_account")
-            hsn_tax[item_or_hsn].setdefault(key, {"tax_rate": 0, "tax_amount": 0})
-            hsn_tax[item_or_hsn][key]["tax_rate"] = tax_detail.get("tax_rate")
-            hsn_tax[item_or_hsn][key]["tax_amount"] += tax_detail.get("tax_amount")
+def get_hsn_wise_breakup(doc, itemised_tax, taxable_amounts):
+    hsn_tax_data = frappe._dict()
+    considered_items = set()
+    for item in doc.items:
+        item_code = item.item_code or item.item_name
+        if item_code in considered_items:
+            continue
 
-    # set taxable amount
-    hsn_taxable_amount = frappe._dict()
-    for item in itemised_taxable_amount:
-        item_or_hsn = item if not tax_breakup_hsn_wise else item_hsn_map.get(item)
-        hsn_taxable_amount.setdefault(item_or_hsn, 0)
-        hsn_taxable_amount[item_or_hsn] += itemised_taxable_amount.get(item)
+        hsn_code = item.gst_hsn_code
+        tax_row = itemised_tax.get(item_code, {})
+        tax_rate = next(iter(tax_row.values()), {}).get("tax_rate", 0)
 
-    return hsn_tax, hsn_taxable_amount
+        hsn_tax = hsn_tax_data.setdefault(
+            (hsn_code, tax_rate),
+            frappe._dict({"item": hsn_code, "taxable_amount": 0}),
+        )
+
+        hsn_tax.taxable_amount += taxable_amounts.get(item_code, 0)
+        for tax_account, tax_details in tax_row.items():
+            hsn_tax.setdefault(
+                tax_account, frappe._dict({"tax_rate": 0, "tax_amount": 0})
+            )
+            hsn_tax[tax_account].tax_rate = tax_details.get("tax_rate")
+            hsn_tax[tax_account].tax_amount += tax_details.get("tax_amount")
+
+        considered_items.add(item_code)
+
+    return list(hsn_tax_data.values())
+# def get_itemised_tax_breakup_data(doc, account_wise=False, hsn_wise=False):
+#     itemised_tax = get_itemised_tax(doc.taxes, with_tax_account=account_wise)
+
+#     itemised_taxable_amount = get_itemised_taxable_amount(doc.items)
+
+#     if not frappe.get_meta(doc.doctype + " Item").has_field("gst_hsn_code"):
+#         return itemised_tax, itemised_taxable_amount
+
+#     hsn_wise_in_gst_settings = frappe.db.get_single_value(
+#         "GST Settings", "hsn_wise_tax_breakup"
+#     )
+
+#     tax_breakup_hsn_wise = hsn_wise or hsn_wise_in_gst_settings
+#     if tax_breakup_hsn_wise:
+#         item_hsn_map = frappe._dict()
+#         for d in doc.items:
+#             item_hsn_map.setdefault(d.item_code or d.item_name, d.get("gst_hsn_code"))
+
+#     hsn_tax = {}
+#     for item, taxes in itemised_tax.items():
+#         item_or_hsn = item if not tax_breakup_hsn_wise else item_hsn_map.get(item)
+#         hsn_tax.setdefault(item_or_hsn, frappe._dict())
+#         for tax_desc, tax_detail in taxes.items():
+#             key = tax_desc
+#             if account_wise:
+#                 key = tax_detail.get("tax_account")
+#             hsn_tax[item_or_hsn].setdefault(key, {"tax_rate": 0, "tax_amount": 0})
+#             hsn_tax[item_or_hsn][key]["tax_rate"] = tax_detail.get("tax_rate")
+#             hsn_tax[item_or_hsn][key]["tax_amount"] += tax_detail.get("tax_amount")
+
+#     # set taxable amount
+#     hsn_taxable_amount = frappe._dict()
+#     for item in itemised_taxable_amount:
+#         item_or_hsn = item if not tax_breakup_hsn_wise else item_hsn_map.get(item)
+#         hsn_taxable_amount.setdefault(item_or_hsn, 0)
+#         hsn_taxable_amount[item_or_hsn] += itemised_taxable_amount.get(item)
+
+#     return hsn_tax, hsn_taxable_amount
 
 
 def get_place_of_supply(party_details, doctype):
