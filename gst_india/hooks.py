@@ -126,7 +126,7 @@ doc_events = {
     },
     "Supplier": {
         "validate": [
-            "gst_india.gst_india.overrides.supplier.update_transporter_gstin",
+            "gst_india.gst_india.overrides.supplier.validate",
             "gst_india.gst_india.overrides.party.validate_party",
         ],
         "after_insert": (
