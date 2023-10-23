@@ -23,6 +23,7 @@ def validate_gst_transporter_id(doc):
     if doc.gstin:
         if not doc.gst_transporter_id:
             doc.gst_transporter_id = doc.gstin
+            frappe.log_error("gst_transporter_id",doc.gst_transporter_id)
             frappe.msgprint(
                 _(
                     "GST Transporter ID has been updated to {0} as per the default"
