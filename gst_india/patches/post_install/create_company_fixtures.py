@@ -19,4 +19,5 @@ def execute():
 
         # GST fixtures
         if not frappe.db.exists("GST Account", {"company": company}):
-            make_default_tax_templates(company)
+            pass
+            # make_default_tax_templates(company)
