@@ -9,21 +9,21 @@ def get_property_setters():
             ["Reversal Of ITC"],
             prepend=False,
         ),
-        get_options_property_setter(
-            "Delivery Note",
-            "naming_series",
-            ["DN-.YY.-", "DRET-.YY.-", ""],
-        ),
-        get_options_property_setter(
-            "Sales Invoice",
-            "naming_series",
-            ["SINV-.YY.-", "SRET-.YY.-", ""],
-        ),
-        get_options_property_setter(
-            "Purchase Invoice",
-            "naming_series",
-            ["PINV-.YY.-", "PRET-.YY.-", ""],
-        ),
+        # get_options_property_setter(
+        #     "Delivery Note",
+        #     "naming_series",
+        #     ["DN-.YY.-", "DRET-.YY.-", ""],
+        # ),
+        # get_options_property_setter(
+        #     "Sales Invoice",
+        #     "naming_series",
+        #     ["SINV-.YY.-", "SRET-.YY.-", ""],
+        # ),
+        # get_options_property_setter(
+        #     "Purchase Invoice",
+        #     "naming_series",
+        #     ["PINV-.YY.-", "PRET-.YY.-", ""],
+        # ),
         get_options_property_setter(
             "Journal Entry Account",
             "reference_type",
