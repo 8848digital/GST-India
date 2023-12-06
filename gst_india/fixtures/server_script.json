@@ -1,0 +1,18 @@
+[
+ {
+  "allow_guest": 0,
+  "api_method": null,
+  "cron_format": null,
+  "disabled": 0,
+  "docstatus": 0,
+  "doctype": "Server Script",
+  "doctype_event": "After Save (Submitted Document)",
+  "event_frequency": "All",
+  "modified": "2023-12-06 18:57:19.335372",
+  "module": "Cleartax Integration",
+  "name": "GST import Supplier",
+  "reference_doctype": "Purchase Invoice",
+  "script": "if doc.import_supplier ==1:\n    if doc.gst_import_supplier_gst_details:\n        for item in doc.gst_import_supplier_gst_details:\n            # if item.item_rate and not item.item_amount:\n            #     item.item_amount=float(item.qty)*float(item.item_rate)\n            if item.item_amount:\n                item.item_rate=float(item.item_amount)/float(item.qty)",
+  "script_type": "DocType Event"
+ }
+]
