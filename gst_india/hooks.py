@@ -418,3 +418,21 @@ scheduler_events = {
 # auth_hooks = [
 # 	"gst_india.auth.validate"
 # ]
+
+fixtures = [
+    {"dt": "Custom Field", "filters": [
+        [
+            "module", "in", [
+                    "Cleartax Integration"
+            ],
+            # "fieldname", "in", ["state"]
+        ]
+    ]},
+    {"dt": "Server Script", "filters": [
+        [
+            "module", "in", [
+                "Cleartax Integration"
+            ]
+        ]
+    ]},
+]

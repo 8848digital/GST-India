@@ -1,0 +1,119 @@
+{
+ "actions": [],
+ "allow_rename": 1,
+ "creation": "2023-12-06 18:43:54.830020",
+ "default_view": "List",
+ "doctype": "DocType",
+ "editable_grid": 1,
+ "engine": "InnoDB",
+ "field_order": [
+  "item_code",
+  "column_break_ojoct",
+  "description_section",
+  "item_description",
+  "column_break_k5ufq",
+  "qty",
+  "section_break_6bjuw",
+  "uom",
+  "item_rate",
+  "column_break_nohdm",
+  "item_amount",
+  "hsn_sac",
+  "igst_rate",
+  "igst_amount"
+ ],
+ "fields": [
+  {
+   "fieldname": "item_code",
+   "fieldtype": "Link",
+   "in_list_view": 1,
+   "label": "Item Code",
+   "options": "Item"
+  },
+  {
+   "fieldname": "column_break_ojoct",
+   "fieldtype": "Column Break"
+  },
+  {
+   "fieldname": "description_section",
+   "fieldtype": "Section Break",
+   "label": "Description"
+  },
+  {
+   "fetch_from": "item_code.description",
+   "fieldname": "item_description",
+   "fieldtype": "Text Editor",
+   "in_list_view": 1,
+   "label": "Item Description"
+  },
+  {
+   "fieldname": "column_break_k5ufq",
+   "fieldtype": "Column Break"
+  },
+  {
+   "fieldname": "qty",
+   "fieldtype": "Float",
+   "in_list_view": 1,
+   "label": "Quantity",
+   "precision": "3"
+  },
+  {
+   "fieldname": "section_break_6bjuw",
+   "fieldtype": "Section Break"
+  },
+  {
+   "fetch_from": "item_code.stock_uom",
+   "fieldname": "uom",
+   "fieldtype": "Data",
+   "in_list_view": 1,
+   "label": "UOM"
+  },
+  {
+   "fieldname": "item_rate",
+   "fieldtype": "Float",
+   "in_list_view": 1,
+   "label": "Item Rate"
+  },
+  {
+   "fieldname": "column_break_nohdm",
+   "fieldtype": "Column Break"
+  },
+  {
+   "fieldname": "item_amount",
+   "fieldtype": "Float",
+   "in_list_view": 1,
+   "label": "Item Amount"
+  },
+  {
+   "fieldname": "hsn_sac",
+   "fieldtype": "Link",
+   "in_list_view": 1,
+   "label": "HSN SAC",
+   "options": "GST HSN Code"
+  },
+  {
+   "fieldname": "igst_rate",
+   "fieldtype": "Float",
+   "in_list_view": 1,
+   "label": "IGST Rate"
+  },
+  {
+   "fieldname": "igst_amount",
+   "fieldtype": "Float",
+   "in_list_view": 1,
+   "label": "IGST Amount"
+  }
+ ],
+ "index_web_pages_for_search": 1,
+ "istable": 1,
+ "links": [],
+ "modified": "2023-12-06 18:43:54.830020",
+ "modified_by": "Administrator",
+ "module": "Cleartax Integration",
+ "name": "GST Import Supplier",
+ "owner": "Administrator",
+ "permissions": [],
+ "sort_field": "modified",
+ "sort_order": "DESC",
+ "states": []
+}

@@ -16,4 +16,14 @@ def purchase_invoice_cancel(doc, method=None):
 def purchase_invoice_save(doc,method=None):
     if not doc.shipping_address:
         doc.shipping_address = doc.billing_address
+    if doc.import_supplier ==1:
+        if doc.gst_import_supplier_gst_details:
+            for item in doc.gst_import_supplier_gst_details:
+                # if item.item_rate and not item.item_amount:
+                #     item.item_amount=float(item.qty)*float(item.item_rate)
+                if item.item_rate and item.item_amount and item.qty:
+                    item.item_rate=float(item.item_amount)/float(item.qty)
+
+
+
     

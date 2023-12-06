@@ -132,7 +132,7 @@ def get_valid_accounts(company, is_sales_transaction=False):
     return all_valid_accounts, intra_state_accounts, inter_state_accounts
 
 
-def validate_gst_accounts(doc, is_sales_transaction=False):
+# def validate_gst_accounts(doc, is_sales_transaction=False):
     """
     Validate GST accounts
     - Only Valid Accounts should be allowed
@@ -267,6 +267,189 @@ def validate_gst_accounts(doc, is_sales_transaction=False):
 
         if row.charge_type == "On Previous Row Total":
             previous_row_references.add(row.row_id)
+
+    if len(previous_row_references) > 1:
+        _throw(
+            _(
+                "Only one row can be selected as a Reference Row for GST Accounts with"
+                " Charge Type <strong>On Previous Row Total</strong>"
+            ),
+            title=_("Invalid Reference Row"),
+        )
+
+    return all_valid_accounts
+
+
+
+def validate_gst_accounts(doc, is_sales_transaction=False):
+    """
+    Validate GST accounts
+    - Only Valid Accounts should be allowed
+    - No GST account should be specified for transactions where Company GSTIN = Party GSTIN
+    - If export is made without GST, then no GST account should be specified
+    - SEZ / Inter-State supplies should not have CGST or SGST account
+    - Intra-State supplies should not have IGST account
+    """
+
+    if not doc.taxes:
+        return
+
+    if not (
+        rows_to_validate := [
+            row
+            for row in doc.taxes
+            if row.tax_amount and row.account_head in get_all_gst_accounts(doc.company)
+        ]
+    ):
+        return
+
+    # Helper functions
+
+    def _get_matched_idx(rows_to_search, account_head_list):
+        return next(
+            (
+                row.idx
+                for row in rows_to_search
+                if row.account_head in account_head_list
+            ),
+            None,
+        )
+
+    def _throw(message, title=None):
+        frappe.throw(message, title=title or _("Invalid GST Account"))
+
+    all_valid_accounts, intra_state_accounts, inter_state_accounts = get_valid_accounts(
+        doc.company, is_sales_transaction
+    )
+
+    # Company GSTIN = Party GSTIN
+    party_gstin = (
+        doc.billing_address_gstin if is_sales_transaction else doc.supplier_gstin
+    )
+    if (
+        party_gstin
+        and doc.company_gstin == party_gstin
+        and (idx := _get_matched_idx(rows_to_validate, all_valid_accounts))
+    ):
+        _throw(
+            _(
+                "Cannot charge GST in Row #{0} since Company GSTIN and Party GSTIN are"
+                " same"
+            ).format(idx)
+        )
+
+    # Sales / Purchase Validations
+
+    if is_sales_transaction:
+        if is_export_without_payment_of_gst(doc) and (
+            idx := _get_matched_idx(rows_to_validate, all_valid_accounts)
+        ):
+            _throw(
+                _(
+                    "Cannot charge GST in Row #{0} since export is without"
+                    " payment of GST"
+                ).format(idx)
+            )
+
+        if doc.get("is_reverse_charge") and (
+            idx := _get_matched_idx(rows_to_validate, all_valid_accounts)
+        ):
+            _throw(
+                _(
+                    "Cannot charge GST in Row #{0} since supply is under reverse charge"
+                ).format(idx)
+            )
+
+    elif doc.gst_category == "Registered Composition" and (
+        idx := _get_matched_idx(rows_to_validate, all_valid_accounts)
+    ):
+        _throw(
+            _(
+                "Cannot claim Input GST in Row #{0} since purchase is being made from a"
+                " dealer registered under Composition Scheme"
+            ).format(idx)
+        )
+
+    elif not doc.is_reverse_charge:
+        frappe.log_error("is_reverse_charge",str(doc.is_reverse_charge))
+
+        if idx := _get_matched_idx(
+            rows_to_validate,
+            get_gst_accounts_by_type(doc.company, "Reverse Charge").values(),
+        ):
+            frappe.log_error("validate_gst_accounts",idx)
+            frappe.log_error("rows_to_validate",rows_to_validate)
+            frappe.log_error("rc",get_gst_accounts_by_type(doc.company, "Reverse Charge").values())
+        
+            _throw(
+                _(
+                    "Cannot use Reverse Charge Account in Row #{0} since purchase is"
+                    " without Reverse Charge"
+                ).format(idx)
+            )
+
+        if not doc.supplier_gstin and (
+            idx := _get_matched_idx(rows_to_validate, all_valid_accounts)
+        ):
+            _throw(
+                _(
+                    "Cannot charge GST in Row #{0} since purchase is from a Supplier"
+                    " without GSTIN"
+                ).format(idx)
+            )
+
+    is_inter_state = is_inter_state_supply(doc)
+    previous_row_references = set()
+
+    for row in rows_to_validate:
+        account_head = row.account_head
+
+        if account_head not in all_valid_accounts:
+            _throw(
+                _("{0} is not a valid GST account for this transaction").format(
+                    bold(account_head)
+                ),
+            )
+
+        # Inter State supplies should not have CGST or SGST account
+        if is_inter_state:
+            if account_head in intra_state_accounts:
+                _throw(
+                    _(
+                        "Row #{0}: Cannot charge CGST/SGST for inter-state supplies"
+                    ).format(row.idx),
+                )
+
+        # Intra State supplies should not have IGST account
+        elif account_head in inter_state_accounts:
+            _throw(
+                _("Row #{0}: Cannot charge IGST for intra-state supplies").format(
+                    row.idx
+                ),
+            )
+
+        if row.charge_type == "On Previous Row Amount":
+            _throw(
+                _(
+                    "Row #{0}: Charge Type cannot be <strong>On Previous Row"
+                    " Amount</strong> for a GST Account"
+                ).format(row.idx),
+                title=_("Invalid Charge Type"),
+            )
+
+        if row.charge_type == "On Previous Row Total":
+            previous_row_references.add(row.row_id)
+
+    if not is_inter_state:
+        used_accounts = set(row.account_head for row in rows_to_validate)
+        if used_accounts and not set(intra_state_accounts[:2]).issubset(used_accounts):
+            _throw(
+                _(
+                    "Cannot use only one of CGST or SGST account for intra-state"
+                    " supplies"
+                ),
+                title=_("Invalid GST Accounts"),
+            )
 
     if len(previous_row_references) > 1:
         _throw(
