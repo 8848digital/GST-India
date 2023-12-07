@@ -75,10 +75,7 @@ def create_gst_invoice(**kwargs):
             data['shipping_address'] = get_dict('Address',invoice.shipping_address)
         if invoice.is_return:
             data['original_invoice'] = get_dict(doctype,invoice.return_against)
-            # return gst_cdn_request(data,kwargs.get('invoice'),type)
-        # if invoice.is_debit_note:
-        #     data['original_invoice'] = get_dict('Sales Invoice',invoice.return_against)
-        #     return gst_cdn_request(data,kwargs.get('invoice'),type)
+
         return gst_invoice_request(data,kwargs.get('invoice'),type)
     except Exception as e:
         frappe.logger('cleartax').exception(e)
@@ -103,8 +100,8 @@ def gst_invoice_request(data,id,type):
         headers['gstin'] = gstin
         if settings.enterprise:
             headers['token'] = settings.get_password('gst_auth_token')
-            if settings.sandbox:
-                headers['token'] = settings.get_password('gst_sandbox_token')
+        if settings.sandbox:
+            headers['token'] = settings.get_password('gst_sandbox_token')
         data = json.dumps(data, indent=4, sort_keys=False, default=str)
         response = requests.request("POST", url, headers=headers, data= data) 
         response = response.json()['message']

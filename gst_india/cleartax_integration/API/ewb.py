@@ -94,8 +94,6 @@ def ewb_without_irn(**kwargs):
             'gst_accounts':gst_settings_accounts,
             'gst_round_off': gst_round_off
         }
-        frappe.log_error("data",data)
-        frappe.log_error("doc",kwargs.get('delivery_note'))
         return ewb_without_irn_request(data,doctype='Delivery Note',doc=kwargs.get('delivery_note'))
     except Exception as e:
         frappe.logger('cleartax').exception(e)
