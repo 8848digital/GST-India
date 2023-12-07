@@ -26,5 +26,8 @@ def sales_invoice_save(doc,method=None):
         doc.shipping_address_name = doc.customer_address
     if not doc.dispatch_address_name:
         doc.dispatch_address_name = doc.company_address
+    if doc.gst_category == "Unregistered":
+        if doc.taxes_and_charges_added <= 0:
+            doc.custom_non_gst = 1
 
 
