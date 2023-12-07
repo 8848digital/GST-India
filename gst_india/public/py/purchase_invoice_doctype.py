@@ -23,6 +23,9 @@ def purchase_invoice_save(doc,method=None):
                 #     item.item_amount=float(item.qty)*float(item.item_rate)
                 if item.item_rate and item.item_amount and item.qty:
                     item.item_rate=float(item.item_amount)/float(item.qty)
+    if doc.gst_category == "Unregistered":
+        if doc.taxes_and_charges_added <= 0:
+            doc.custom_non_gst = 1
 
 
 
