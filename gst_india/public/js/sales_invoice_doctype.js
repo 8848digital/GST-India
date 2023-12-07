@@ -121,7 +121,6 @@ frappe.ui.form.on('Sales Invoice', {
 								],
 								primary_action_label: 'Submit',
 								primary_action(values) {
-
 									frappe.call({
 										method: "gst_india.cleartax_integration.API.ewb.cancel_ewb",
 										args: {
@@ -147,7 +146,6 @@ frappe.ui.form.on('Sales Invoice', {
 						});
 					}
 				}
-				// else {
 					let button_name = ""
 					if (frm.selected_doc.gst_invoice == false) {
 						button_name = "GST Invoice"
