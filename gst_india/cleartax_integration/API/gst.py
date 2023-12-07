@@ -128,6 +128,7 @@ def gst_invoice_request(data,id,type):
         return error_response(e)
 
 
+
 def gst_cdn_request(data,id,type):
     try:
         settings = frappe.get_doc('Cleartax Settings')
