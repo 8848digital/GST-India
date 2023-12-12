@@ -300,7 +300,7 @@
   "is_system_generated": 0,
   "is_virtual": 0,
   "label": "Export Bill Number",
-  "length": 30,
+  "length": 10,
   "mandatory_depends_on": "eval: doc.custom_export_customer == 1",
   "modified": "2023-12-13 00:14:18.804162",
   "module": "Cleartax Integration",
