@@ -62,3 +62,16 @@ def get_setup_wizard_stages(args=None):
 def configure_audit_trail(args):
     if args.enable_audit_trail:
         enable_audit_trail()
+
+
+def before_migrate():
+    pi_field_list=["Purchase Invoice-custom_gst_import_supplier_gst_details",
+                "Purchase Invoice-custom_import_supplier",
+                "Purchase Invoice-custom_bill_of_entry_port_code",
+                "Purchase Invoice-custom_bill_of_entry_date",
+                "Purchase Invoice-custom_bill_of_entry_number",
+                "Purchase Invoice-custom_gst_import_supplier_gst_details_section",
+                "Purchase Invoice-custom_type_of_import"]
+    dn_field_list=["Delivery Note-custom_import_supplier"]
+    si_field_list=["Sales Invoice-custom_import_supplier"]
+    pass

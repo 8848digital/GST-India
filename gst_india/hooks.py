@@ -12,6 +12,7 @@ required_apps = ["erpnext"]
 
 after_install = "gst_india.install.after_install"
 after_migrate = "gst_india.audit_trail.setup.after_migrate"
+before_migrate = "gst_india.audit_trail.setup.before_migrate"
 before_tests = "gst_india.tests.before_tests"
 boot_session = "gst_india.boot.set_bootinfo"
 
