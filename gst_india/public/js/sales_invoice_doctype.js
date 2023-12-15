@@ -70,7 +70,6 @@ frappe.ui.form.on('Sales Invoice', {
 													location.reload();
 												}
 												else {
-													// frappe.msgprint(r.message.error)
 													frappe.msgprint(r.message.error)
 												}
 											}
@@ -94,7 +93,6 @@ frappe.ui.form.on('Sales Invoice', {
 											location.reload();
 										}
 										else {
-											// frappe.msgprint(r.message.error)
 											frappe.msgprint(r.message.error)
 										}
 									}
@@ -136,7 +134,7 @@ frappe.ui.form.on('Sales Invoice', {
 													location.reload();
 												}
 												else {
-													// frappe.msgprint(r.message.error)
+
 													frappe.msgprint(r.message.error)
 												}
 											}
@@ -188,7 +186,6 @@ frappe.ui.form.on('Sales Invoice', {
 						cur_frm.page.set_inner_btn_group_as_primary(__('Create'));
 					}
 
-					// }
 				}
 			});
 
