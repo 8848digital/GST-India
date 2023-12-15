@@ -100,8 +100,6 @@ def validate_billing_address_gstin(doc):
 
 
 def on_submit(doc, method=None):
-    #update GST invoice Checkboxx Before Submit
-    frappe.db.set_value("Sales Invoice",doc.name,"gst_invoice",1)
     if getattr(doc, "_submitted_from_ui", None) or not doc.company_gstin:
         return
 
