@@ -73,7 +73,7 @@ def create_irn_request(data,inv):
 @frappe.whitelist()
 def store_irn_details(inv,response):
     try:
-        frappe.db.set_value("Sales Invoice",inv,"gst_invoice",1)
+        frappe.db.set_value("Sales Invoice",inv,"gst_invoice",0)
         frappe.db.set_value("Sales Invoice",inv,'acknowledgement_number', response.get('govt_response').get("AckNo"))
         frappe.db.set_value("Sales Invoice",inv,'acknowledgement_date', response.get('govt_response').get('AckDt'))
         frappe.db.set_value("Sales Invoice",inv,'signed_invoice', response.get('govt_response').get('SignedInvoice'))
@@ -145,7 +145,7 @@ def cancel_irn_request(inv,data):
         return error_response(e)
 
 @frappe.whitelist()
-def e_invoicing_enabled(company):
+def e_invoicing_enabled(company,name):
     if frappe.db.exists('E Invoicing Eligible',{'company':company}):
         return True
     

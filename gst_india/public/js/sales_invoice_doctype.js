@@ -12,7 +12,8 @@ frappe.ui.form.on('Sales Invoice', {
 			frappe.call({
 				method: "gst_india.cleartax_integration.API.irn.e_invoicing_enabled",
 				args: {
-					company: frm.selected_doc.company
+					company: frm.selected_doc.company,
+					name:frm.selected_doc.name
 				},
 				callback: function (r) {
 					if (r.message == true) {
@@ -148,7 +149,7 @@ frappe.ui.form.on('Sales Invoice', {
 						}
 					}
 					let button_name = ""
-					if (frm.selected_doc.gst_invoice == true) {
+					if (frm.selected_doc.gst_invoice == false) {
 						button_name = "GST Invoice"
 					}
 					else if ((frm.selected_doc.is_return || frm.selected_doc.is_debit_note) && frm.selected_doc.cdn == 0) {
