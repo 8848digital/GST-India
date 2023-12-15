@@ -148,7 +148,7 @@ frappe.ui.form.on('Sales Invoice', {
 						}
 					}
 					let button_name = ""
-					if (frm.selected_doc.gst_invoice == false) {
+					if (frm.selected_doc.gst_invoice == true) {
 						button_name = "GST Invoice"
 					}
 					else if ((frm.selected_doc.is_return || frm.selected_doc.is_debit_note) && frm.selected_doc.cdn == 0) {
