@@ -166,7 +166,6 @@ frappe.ui.form.on('Sales Invoice', {
 					else if ((frm.selected_doc.is_return || frm.selected_doc.is_debit_note) && frm.selected_doc.cdn == 0) {
 						button_name = "Credit/Debit Note"
 					}
-					// GST Invoice Custom Button
 					if (button_name != "") {
 						cur_frm.add_custom_button(__(button_name), function () {
 							frappe.call({
