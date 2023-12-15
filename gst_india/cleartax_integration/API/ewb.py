@@ -73,6 +73,7 @@ def create_ewb_request(inv,gstin,data):
 
 
 @frappe.whitelist()
+#Ewb API
 def ewb_without_irn(**kwargs):
     try:
         delivery_note = frappe.get_doc('Delivery Note',kwargs.get('delivery_note'))
