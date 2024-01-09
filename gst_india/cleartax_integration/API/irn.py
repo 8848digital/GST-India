@@ -16,10 +16,7 @@ def generate_irn(**kwargs):
         #add batch
         for row in invoice.items:
             item_list.append(get_dict('Item',row.item_code))
-        #     if row.batch_no:
-        #         item_list[-1]['batch_no'] = get_dict('Batch',row.batch_no)
             
-        
         data = {
             'invoice': invoice.as_dict(),
             'customer': get_dict('Customer',invoice.customer),
