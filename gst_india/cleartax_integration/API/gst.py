@@ -179,3 +179,11 @@ def bulk_purchase_gst(**kwargs):
         frappe.enqueue("gst_india.cleartax_integration.API.gst.bulk_gst_processing",**{'data':kwargs.get('data')})
     except Exception as e:
         frappe.logger('sfa_online').exception(e)
+
+
+@frappe.whitelist()
+def bulk_sales_gst(**kwargs):
+    try:
+        frappe.enqueue("gst_india.cleartax_integration.API.gst.bulk_gst_processing",**{'data':kwargs.get('data')})
+    except Exception as e:
+        frappe.logger('sfa_online').exception(e)
