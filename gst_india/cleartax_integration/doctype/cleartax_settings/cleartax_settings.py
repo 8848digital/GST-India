@@ -51,11 +51,13 @@ def ewb_failed():
 
 def sales_gst_job(data):
     for i in data:
-        create_gst_invoice(**{'invoice':i.name,'type':'SALE'})
+        frappe.enqueue("gst_india.cleartax_integration.API.gst.create_gst_invoice",**{'invoice':i.name,'type':'SALE'})
+        # create_gst_invoice(**{'invoice':i.name,'type':'SALE'})
 
 def purchase_gst_job(data):
     for i in data:
-        create_gst_invoice(**{'invoice':i.name,'type':'PURCHASE'})
+        frappe.enqueue("gst_india.cleartax_integration.API.gst.create_gst_invoice",**{'invoice':i.name,'type':'PURCHASE'})
+        # create_gst_invoice(**{'invoice':i.name,'type':'PURCHASE'})
 
 
 @frappe.whitelist()
@@ -71,13 +73,30 @@ def push_to_cleartax():
                                 log.status = 'Failed'
                             AND
                                 log.api LIKE '%GENERATE GST SINV%'
-                            AND
-                                log.response LIKE '%Invalid GSTIN NRP, please provide a valid consignee GSTIN%'
                             LIMIT 100            
                             """
         sales_invoices = frappe.db.sql(sales_invoices,as_dict=1)
+        frappe.log_error("sales_invoices",sales_invoices)
         frappe.logger('cleartax').exception(doc.sales_invoices_from)
         sales_gst_job(sales_invoices)
+    if doc.purchase_invoices_from:
+        purchase_invoices = """
+                            SELECT
+                                log.document_name as name
+                            FROM
+                                `tabCleartax Api Log` as log
+                            WHERE
+                                log.status = 'Failed'
+                            AND
+                                log.api LIKE '%GENERATE GST PINV%'
+
+                            LIMIT 100            
+                            """
+        purchase_invoices = frappe.db.sql(purchase_invoices,as_dict=1)
+        frappe.log_error("purchase_invoices",purchase_invoices)
+        frappe.logger('cleartax').exception(doc.purchase_invoices_from)
+        purchase_gst_job(purchase_invoices)
+
 
         
 @frappe.whitelist()

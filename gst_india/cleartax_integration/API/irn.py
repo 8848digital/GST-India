@@ -142,7 +142,7 @@ def cancel_irn_request(inv,data):
         return error_response(e)
 
 @frappe.whitelist()
-def e_invoicing_enabled(company,name):
+def e_invoicing_enabled(company,name=None):
     if frappe.db.exists('E Invoicing Eligible',{'company':company}):
         return True
     
