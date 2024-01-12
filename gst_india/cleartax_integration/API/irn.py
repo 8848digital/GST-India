@@ -140,7 +140,7 @@ def cancel_irn_request(inv,data):
     except Exception as e:
         frappe.logger('cleartax').exception(e)
         return error_response(e)
-
+#E Invoice Enable Check
 @frappe.whitelist()
 def e_invoicing_enabled(company,name=None):
     if frappe.db.exists('E Invoicing Eligible',{'company':company}):
