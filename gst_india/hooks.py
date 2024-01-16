@@ -362,7 +362,8 @@ fixtures = [
 # ---------------
 
 scheduler_events = {
-	"hourly_long":["gst_india.cleartax_integration.doctype.cleartax_settings.cleartax_settings.push_to_cleartax"]
+	"hourly_long":["gst_india.cleartax_integration.doctype.cleartax_settings.cleartax_settings.push_to_cleartax",
+            "gst_india.cleartax_integration.doctype.cleartax_settings.cleartax_settings.push_to_cleartax_scheduler"]
 }
 
 # Testing
