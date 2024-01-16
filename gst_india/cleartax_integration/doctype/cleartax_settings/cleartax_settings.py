@@ -93,7 +93,6 @@ def push_to_cleartax():
                             LIMIT 100            
                             """
         purchase_invoices = frappe.db.sql(purchase_invoices,as_dict=1)
-        frappe.log_error("purchase_invoices",purchase_invoices)
         frappe.logger('cleartax').exception(doc.purchase_invoices_from)
         purchase_gst_job(purchase_invoices)
 
@@ -122,12 +121,10 @@ def push_to_cleartax_scheduler():
     if doc.purchase_invoice:
         pi_list=frappe.db.get_all("Purchase Invoice",filters={"gst_invoice":1},fields=["name"])
     if si_list:
-        frappe.log_error("si_list",si_list)
         for i in si_list:
             frappe.enqueue("gst_india.cleartax_integration.API.gst.create_gst_invoice",**{'invoice':i.name,'type':'SALE'})
             # create_gst_invoice(**{'invoice':i.name,'type':'SALE'})
     if pi_list:
-        frappe.log_error("pi_list",pi_list)
         for i in pi_list:
             frappe.enqueue("gst_india.cleartax_integration.API.gst.create_gst_invoice",**{'invoice':i.name,'type':'PURCHASE'})
             # create_gst_invoice(**{'invoice':i.name,'type':'PURCHASE'})
