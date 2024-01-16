@@ -21,6 +21,10 @@
   "e_invoicing",
   "host_url",
   "bulk_upload_section",
+  "enable_scheduler",
+  "sales_invoice",
+  "purchase_invoice",
+  "column_break_fhuym",
   "purchase_invoices_from",
   "sales_invoices_from"
  ],
@@ -110,12 +114,34 @@
    "fieldname": "gst_sandbox_token",
    "fieldtype": "Password",
    "label": "GST Sandbox Token"
+  },
+  {
+   "default": "0",
+   "fieldname": "enable_scheduler",
+   "fieldtype": "Check",
+   "label": "Enable Scheduler"
+  },
+  {
+   "default": "0",
+   "fieldname": "sales_invoice",
+   "fieldtype": "Check",
+   "label": "Sales Invoice"
+  },
+  {
+   "default": "0",
+   "fieldname": "purchase_invoice",
+   "fieldtype": "Check",
+   "label": "Purchase Invoice"
+  },
+  {
+   "fieldname": "column_break_fhuym",
+   "fieldtype": "Column Break"
   }
  ],
  "index_web_pages_for_search": 1,
  "issingle": 1,
  "links": [],
- "modified": "2023-09-30 10:52:48.724735",
+ "modified": "2024-01-16 01:41:48.834395",
  "modified_by": "Administrator",
  "module": "Cleartax Integration",
  "name": "Cleartax Settings",
