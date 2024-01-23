@@ -1,6 +1,7 @@
 from gst_india.cleartax_integration.API.irn import generate_irn, e_invoicing_enabled
 from gst_india.cleartax_integration.API.gst import create_gst_invoice
-import frappe 
+import frappe
+from frappe.utils import flt
 
 def sales_invoice_submit(doc, method=None):
     if frappe.db.get_single_value('Cleartax Settings','automate'):
@@ -27,7 +28,7 @@ def sales_invoice_save(doc,method=None):
     if not doc.dispatch_address_name:
         doc.dispatch_address_name = doc.company_address
     if doc.gst_category == "Unregistered":
-        if doc.taxes_and_charges_added <= 0:
+        if flt(doc.taxes_and_charges_added) <= 0:
             doc.custom_non_gst = 1
 
 
