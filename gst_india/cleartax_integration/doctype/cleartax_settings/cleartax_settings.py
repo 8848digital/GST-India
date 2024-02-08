@@ -63,6 +63,9 @@ def purchase_gst_job(data):
 @frappe.whitelist()
 def push_to_cleartax():
     doc = frappe.get_doc('Cleartax Settings')
+    current_date = frappe.utils.today()
+    if not doc.enable_scheduler:
+        return
     if doc.sales_invoices_from:
         sales_invoices = """
                             SELECT
@@ -70,7 +73,7 @@ def push_to_cleartax():
                             FROM
                                 `tabCleartax Api Log` as log
                             WHERE
-                                log.status = 'Failed'
+                                log.status = 'Failed' and '{current_date}'>'{doc.purchase_invoices_from}'
                             AND
                                 log.api LIKE '%GENERATE GST SINV%'
                             LIMIT 100            
@@ -86,7 +89,7 @@ def push_to_cleartax():
                             FROM
                                 `tabCleartax Api Log` as log
                             WHERE
-                                log.status = 'Failed'
+                                log.status = 'Failed' and '{current_date}'>'{doc.purchase_invoices_from}'
                             AND
                                 log.api LIKE '%GENERATE GST PINV%'
 
@@ -116,10 +119,10 @@ def push_to_cleartax_scheduler():
         return
     si_list=[]
     if doc.sales_invoice:
-        si_list=frappe.db.get_all("Sales Invoice",filters={"gst_invoice":1},fields=["name"])
+        si_list=frappe.db.get_all("Sales Invoice",filters={"gst_invoice":0,"posting_date":['<=', doc.sales_invoices_from]},fields=["name"])
     pi_list=[]
     if doc.purchase_invoice:
-        pi_list=frappe.db.get_all("Purchase Invoice",filters={"gst_invoice":1},fields=["name"])
+        pi_list=frappe.db.get_all("Purchase Invoice",filters={"gst_invoice":0,"posting_date":['<=', doc.purchase_invoices_from]},fields=["name"])
     if si_list:
         for i in si_list:
             frappe.enqueue("gst_india.cleartax_integration.API.gst.create_gst_invoice",**{'invoice':i.name,'type':'SALE'})
@@ -128,6 +131,7 @@ def push_to_cleartax_scheduler():
         for i in pi_list:
             frappe.enqueue("gst_india.cleartax_integration.API.gst.create_gst_invoice",**{'invoice':i.name,'type':'PURCHASE'})
             # create_gst_invoice(**{'invoice':i.name,'type':'PURCHASE'})
+
 
 
 
