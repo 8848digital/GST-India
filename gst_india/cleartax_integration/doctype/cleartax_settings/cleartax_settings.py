@@ -69,15 +69,16 @@ def push_to_cleartax():
     if doc.sales_invoices_from:
         sales_invoices = """
                             SELECT
-                                log.document_name as name
+                                log.document_name as name,
+                                DATE(log.creation) as creation_date
                             FROM
                                 `tabCleartax Api Log` as log
                             WHERE
-                                log.status = 'Failed' and '{current_date}'>'{doc.purchase_invoices_from}'
+                                log.status = 'Failed' AND  DATE(log.creation)>DATE('{0}')
                             AND
                                 log.api LIKE '%GENERATE GST SINV%'
                             LIMIT 100            
-                            """
+                            """.format(doc.sales_invoices_from)
         sales_invoices = frappe.db.sql(sales_invoices,as_dict=1)
         frappe.log_error("sales_invoices",sales_invoices)
         frappe.logger('cleartax').exception(doc.sales_invoices_from)
@@ -89,12 +90,12 @@ def push_to_cleartax():
                             FROM
                                 `tabCleartax Api Log` as log
                             WHERE
-                                log.status = 'Failed' and '{current_date}'>'{doc.purchase_invoices_from}'
+                                log.status = 'Failed' AND DATE(log.creation)>DATE('{0}')
                             AND
                                 log.api LIKE '%GENERATE GST PINV%'
 
                             LIMIT 100            
-                            """
+                            """.format(doc.purchase_invoices_from)
         purchase_invoices = frappe.db.sql(purchase_invoices,as_dict=1)
         frappe.logger('cleartax').exception(doc.purchase_invoices_from)
         purchase_gst_job(purchase_invoices)
