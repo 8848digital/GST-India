@@ -1,0 +1,73 @@
+{
+ "actions": [],
+ "allow_rename": 1,
+ "autoname": "field:pan",
+ "creation": "2024-02-20 11:09:47.097835",
+ "default_view": "List",
+ "doctype": "DocType",
+ "editable_grid": 1,
+ "engine": "InnoDB",
+ "field_order": [
+  "pan",
+  "pan_no",
+  "document_no",
+  "random_id",
+  "dacument_type"
+ ],
+ "fields": [
+  {
+   "fieldname": "pan",
+   "fieldtype": "Data",
+   "label": "Pan",
+   "unique": 1
+  },
+  {
+   "fieldname": "pan_no",
+   "fieldtype": "Data",
+   "label": "Pan No"
+  },
+  {
+   "fieldname": "document_no",
+   "fieldtype": "Data",
+   "label": "Document No"
+  },
+  {
+   "fieldname": "random_id",
+   "fieldtype": "Data",
+   "label": "Random ID"
+  },
+  {
+   "fieldname": "dacument_type",
+   "fieldtype": "Select",
+   "label": "Dacument Type",
+   "options": "\nSales Invoice\nPurchase Invoice"
+  }
+ ],
+ "index_web_pages_for_search": 1,
+ "links": [],
+ "modified": "2024-02-20 15:52:09.400343",
+ "modified_by": "Administrator",
+ "module": "GST India",
+ "name": "Generate Group ID",
+ "naming_rule": "By fieldname",
+ "owner": "Administrator",
+ "permissions": [
+  {
+   "create": 1,
+   "delete": 1,
+   "email": 1,
+   "export": 1,
+   "print": 1,
+   "read": 1,
+   "report": 1,
+   "role": "System Manager",
+   "share": 1,
+   "write": 1
+  }
+ ],
+ "quick_entry": 1,
+ "sort_field": "modified",
+ "sort_order": "DESC",
+ "states": [],
+ "track_changes": 1
+}

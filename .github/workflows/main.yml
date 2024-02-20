@@ -1,0 +1,46 @@
+name: Check Lines Before Merge
+
+on:
+  pull_request:
+    types:
+      - synchronize
+      - opened
+      - reopened
+
+jobs:
+  check-lines:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v2
+
+      - name: Count lines of code
+        id: count-lines
+        run: |
+          line_count=$(find . -name '*.js' -o -name '*.jsx' -o -name '*.ts' -o -name '*.tsx' -o -name '*.py' -o -name '*.java' -o -name '*.swift' -o -name '*.c' -o -name '*.cpp' -o -name '*.h' | xargs cat | wc -l)
+          echo "::set-output name=line_count::$line_count"
+
+      - name: Check line count
+        run: |
+          line_count=${{ steps.count-lines.outputs.line_count }}
+          if [ $line_count -gt 250 ]; then
+            echo "Error: Too many lines of code ($line_count). Please reduce the code size before merging."
+            exit 1
+          fi
+
+      - name: Display message
+        if: failure()
+        run: echo "Code size is within limits. Merging is allowed."
+
+      - name: Send email notification
+        if: failure()
+        uses: dawidd6/action-send-mail@v2
+        with:
+          server_address: smtp.gmail.com
+          server_port: 587
+          username: ${{ secrets.GMAIL_USER }}
+          password: ${{ secrets.GMAIL_PASSWORD }}
+          subject: "Code Size Exceeded"
+          to: shahaji@8848digital.com
+          body: "Code size exceeded the limit. Please reduce the code size before merging."

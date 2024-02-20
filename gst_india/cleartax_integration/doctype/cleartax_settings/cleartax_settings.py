@@ -63,18 +63,22 @@ def purchase_gst_job(data):
 @frappe.whitelist()
 def push_to_cleartax():
     doc = frappe.get_doc('Cleartax Settings')
+    current_date = frappe.utils.today()
+    if not doc.enable_scheduler:
+        return
     if doc.sales_invoices_from:
         sales_invoices = """
                             SELECT
-                                log.document_name as name
+                                log.document_name as name,
+                                DATE(log.creation) as creation_date
                             FROM
                                 `tabCleartax Api Log` as log
                             WHERE
-                                log.status = 'Failed'
+                                log.status = 'Failed' AND  DATE(log.creation)>DATE('{0}')
                             AND
                                 log.api LIKE '%GENERATE GST SINV%'
                             LIMIT 100            
-                            """
+                            """.format(doc.sales_invoices_from)
         sales_invoices = frappe.db.sql(sales_invoices,as_dict=1)
         frappe.log_error("sales_invoices",sales_invoices)
         frappe.logger('cleartax').exception(doc.sales_invoices_from)
@@ -86,12 +90,12 @@ def push_to_cleartax():
                             FROM
                                 `tabCleartax Api Log` as log
                             WHERE
-                                log.status = 'Failed'
+                                log.status = 'Failed' AND DATE(log.creation)>DATE('{0}')
                             AND
                                 log.api LIKE '%GENERATE GST PINV%'
 
                             LIMIT 100            
-                            """
+                            """.format(doc.purchase_invoices_from)
         purchase_invoices = frappe.db.sql(purchase_invoices,as_dict=1)
         frappe.logger('cleartax').exception(doc.purchase_invoices_from)
         purchase_gst_job(purchase_invoices)
@@ -116,10 +120,10 @@ def push_to_cleartax_scheduler():
         return
     si_list=[]
     if doc.sales_invoice:
-        si_list=frappe.db.get_all("Sales Invoice",filters={"gst_invoice":1},fields=["name"])
+        si_list=frappe.db.get_all("Sales Invoice",filters={"gst_invoice":0,"posting_date":['<=', doc.sales_invoices_from]},fields=["name"])
     pi_list=[]
     if doc.purchase_invoice:
-        pi_list=frappe.db.get_all("Purchase Invoice",filters={"gst_invoice":1},fields=["name"])
+        pi_list=frappe.db.get_all("Purchase Invoice",filters={"gst_invoice":0,"posting_date":['<=', doc.purchase_invoices_from]},fields=["name"])
     if si_list:
         for i in si_list:
             frappe.enqueue("gst_india.cleartax_integration.API.gst.create_gst_invoice",**{'invoice':i.name,'type':'SALE'})
@@ -128,6 +132,7 @@ def push_to_cleartax_scheduler():
         for i in pi_list:
             frappe.enqueue("gst_india.cleartax_integration.API.gst.create_gst_invoice",**{'invoice':i.name,'type':'PURCHASE'})
             # create_gst_invoice(**{'invoice':i.name,'type':'PURCHASE'})
+
 
 
 
