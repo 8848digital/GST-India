@@ -95,9 +95,11 @@ doc_events = {
     },
     "Purchase Invoice": {
         "validate": "gst_india.gst_india.overrides.purchase_invoice.validate",
-        "before_submit": "gst_india.public.py.purchase_invoice_doctype.purchase_invoice_submit",
+        "before_submit": ["gst_india.public.py.purchase_invoice_doctype.group_id",
+            "gst_india.public.py.purchase_invoice_doctype.purchase_invoice_submit"],
         "before_cancel": "gst_india.public.py.purchase_invoice_doctype.purchase_invoice_cancel",
-        "before_save": "gst_india.public.py.purchase_invoice_doctype.purchase_invoice_save"
+        "before_save": "gst_india.public.py.purchase_invoice_doctype.purchase_invoice_save",
+        "on_submit":"gst_india.public.py.purchase_invoice_doctype.group_id"
     },
     "Purchase Order": {
         "validate": (
@@ -111,8 +113,9 @@ doc_events = {
     },
     "Sales Invoice": {
         "onload": "gst_india.gst_india.overrides.sales_invoice.onload",
-        "validate": "gst_india.gst_india.overrides.sales_invoice.validate",
+        "validate": ["gst_india.gst_india.overrides.sales_invoice.validate","gst_india.public.py.sales_invoice_doctype.group_id"],
         "on_submit": ["gst_india.gst_india.overrides.sales_invoice.on_submit",
+                      "gst_india.public.py.sales_invoice_doctype.sales_invoice_submit",
                       "gst_india.public.py.sales_invoice_doctype.sales_invoice_submit"], 
         "before_cancel": "gst_india.public.py.sales_invoice_doctype.sales_invoice_cancel",
         "before_save": "gst_india.public.py.sales_invoice_doctype.sales_invoice_save"
