@@ -1,7 +1,7 @@
 {
  "actions": [],
  "allow_rename": 1,
- "autoname": "field:pan",
+ "autoname": "hash",
  "creation": "2024-02-20 11:09:47.097835",
  "default_view": "List",
  "doctype": "DocType",
@@ -12,14 +12,14 @@
   "pan_no",
   "document_no",
   "random_id",
-  "dacument_type"
+  "dacument_type",
+  "party_type"
  ],
  "fields": [
   {
    "fieldname": "pan",
    "fieldtype": "Data",
-   "label": "Pan",
-   "unique": 1
+   "label": "Pan"
   },
   {
    "fieldname": "pan_no",
@@ -41,15 +41,20 @@
    "fieldtype": "Select",
    "label": "Dacument Type",
    "options": "\nSales Invoice\nPurchase Invoice"
+  },
+  {
+   "fieldname": "party_type",
+   "fieldtype": "Data",
+   "label": "Party Type"
   }
  ],
  "index_web_pages_for_search": 1,
  "links": [],
- "modified": "2024-02-20 15:52:09.400343",
+ "modified": "2024-02-21 16:03:53.275900",
  "modified_by": "Administrator",
  "module": "GST India",
  "name": "Generate Group ID",
- "naming_rule": "By fieldname",
+ "naming_rule": "Random",
  "owner": "Administrator",
  "permissions": [
   {

@@ -51,7 +51,7 @@ def create_gst_invoice(**kwargs):
             doctype = "Purchase Invoice"
         invoice = frappe.get_doc(doctype,kwargs.get('invoice'))
         item_list = []
-        gst_round_off = frappe.get_value('GST Settings','round_off_gst_values')
+        gst_round_off = 0 #frappe.get_value('GST Settings','round_off_gst_values')
         gst_settings_accounts = frappe.get_all("GST Account",
                 filters={'company':invoice.company},
                 fields=["cgst_account", "sgst_account", "igst_account", "cess_account"])
