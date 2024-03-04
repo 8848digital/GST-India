@@ -52,6 +52,25 @@ def group_id(doc,method=None):
     doc.custom_group_id = random_id
 
 
+def sales_group_id(doc,method=None):
+    # pan_no=frappe.db.get_value("Customer",doc.customer,'pan')
+
+    random_id = generate_random_id()
+    # exist=frappe.db.exists("Generate Group ID", {"pan": doc.supplier_pan,"party_type":"Supplier"})
+    # if exist:
+    #     doc.custom_group_id=frappe.db.get_value("Generate Group ID",exist,"random_id")
+    # else:
+    new_doc=frappe.new_doc("Generate Group ID")
+    new_doc.pan=frappe.get_doc("Customer",doc.customer,"pan")
+    new_doc.pan_no=frappe.get_doc("Customer",doc.customer,"pan")
+    new_doc.random_id = random_id
+    new_doc.document_no=doc.name
+    new_doc.party_type="Customer"
+    new_doc.dacument_type='Sales Invoice'
+    new_doc.save()
+    doc.custom_group_id = random_id
+
+
 
 
     
